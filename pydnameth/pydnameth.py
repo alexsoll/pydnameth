@@ -6,6 +6,7 @@ from pydnameth.config.config import Config
 from pydnameth.config.data.data import Data
 from pydnameth.config.setup.setup import Setup
 from pydnameth.config.setup.types import Experiment, Task, Method
+from pydnameth.model.context import Context
 
 
 def get_config(data,
@@ -38,3 +39,25 @@ def get_setup(experiment,
 
     setup = Setup(experiment, task, method, params)
     return setup
+
+
+def base(config):
+    config.initialize()
+    context = Context(config)
+    context.base_pipeline(config)
+
+
+def advanced(config, configs_primary):
+    config.initialize()
+    for config_primary in configs_primary:
+        config_primary.initialize()
+    context = Context(config)
+    context.advanced_pipeline(config, configs_primary)
+
+
+def plot(config, configs_primary):
+    config.initialize()
+    for config_primary in configs_primary:
+        config_primary.initialize()
+    context = Context(config)
+    context.plot_pipeline(config, configs_primary)
