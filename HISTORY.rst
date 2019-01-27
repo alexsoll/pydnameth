@@ -18,3 +18,9 @@ History
 ------------------
 
 * Second update on PyPI.
+
+
+0.1.3 (2019-01-26)
+------------------
+
+* Test features.
