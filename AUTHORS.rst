@@ -6,6 +6,7 @@ Development Lead
 ----------------
 
 * Aaron Blare <aaron.blare@mail.ru>
+* Archie Hewitt <hewitt.archie@yandex.ru>
 
 Contributors
 ------------
