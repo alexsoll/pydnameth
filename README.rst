@@ -13,7 +13,13 @@ pydnameth
         :target: https://pydnameth.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
+.. image:: https://badges.gitter.im/AaronBlare/pydnameth.png
+        :target: https://gitter.im/pydnameth/community
+        :alt: Project Chat
 
+.. image:: https://pyup.io/repos/github/AaronBlare/pydnameth/shield.svg
+     :target: https://pyup.io/repos/github/AaronBlare/pydnameth/
+     :alt: Updates
 
 
 DNA Methylation Analysis Package
