@@ -1,13 +1,10 @@
 from enum import Enum
-import os
 
 
 class DataPath(Enum):
     local_1 = 'D:/YandexDisk/Work/dna-methylation'
     local_2 = 'E:/YandexDisk/Work/dna-methylation'
     local_3 = 'C:/Users/User/YandexDisk/dna-methylation'
-    cluster = '/common/home/' + os.getlogin() + \
-              '/Work/data/dna-methylation'
 
 
 class DataBase(Enum):
