@@ -13,7 +13,8 @@ pydnameth
         :target: https://pydnameth.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-
+.. image:: https://badges.gitter.im/AaronBlare/pydnameth.png
+        :target: https://gitter.im/AaronBlare/pydnameth)
 
 
 DNA Methylation Analysis Package
