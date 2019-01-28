@@ -14,7 +14,7 @@ pydnameth
         :alt: Documentation Status
 
 .. image:: https://badges.gitter.im/AaronBlare/pydnameth.png
-        :target: https://gitter.im/AaronBlare/pydnameth
+        :target: https://gitter.im/pydnameth/community
 
 
 DNA Methylation Analysis Package
