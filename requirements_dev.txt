@@ -16,3 +16,5 @@ scipy==1.2.0
 Shapely==1.6.4.post2
 colorlover==0.3.0
 sphinx-rtd-theme==0.4.2
+patsy==0.5.1
+geos==0.2.1
