@@ -42,3 +42,6 @@ class Data:
 
     def get_root_path(self):
         return self.path
+
+
+__all__ = ['Data']
