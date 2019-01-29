@@ -17,6 +17,9 @@ setup_requirements = [ ]
 
 test_requirements = [ ]
 
+packages = find_packages(include=['pydnameth'])
+packages.extend('pydnameth.' + item for item in find_packages(where='pydnameth'))
+
 setup(
     author="Aaron Blare",
     author_email='aaron.blare@mail.ru',
@@ -36,11 +39,11 @@ setup(
     include_package_data=True,
     keywords='pydnameth',
     name='pydnameth',
-    packages=find_packages(include=['pydnameth']),
+    packages=packages,
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/AaronBlare/pydnameth',
-    version='0.1.6',
+    version='0.2.0',
     zip_safe=False,
 )
