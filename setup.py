@@ -36,7 +36,7 @@ setup(
     include_package_data=True,
     keywords='pydnameth',
     name='pydnameth',
-    packages=find_packages(include=['pydnameth']),
+    packages=find_packages(where='pydnameth'),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
