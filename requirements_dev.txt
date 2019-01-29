@@ -18,3 +18,7 @@ colorlover==0.3.0
 sphinx-rtd-theme==0.4.2
 patsy==0.5.1
 geos==0.2.1
+xlrd==1.2.0
+XlsxWriter==1.1.2
+psutil==5.5.0
+black==18.9b0
