@@ -5,12 +5,16 @@
 
 __author__ = """Aaron Blare"""
 __email__ = 'aaron.blare@mail.ru'
-__version__ = '0.1.6'
+__version__ = '0.2.0'
 
-from pydnameth import config
-from pydnameth.config import *
-from pydnameth import model
-from pydnameth.model import *
-
-__all__ = config.__all__
-__all__.extend(model.__all__)
+from .config.config import Config
+from .config.common import CommonTypes
+from .config.annotations.annotations import Annotations
+from .config.annotations.types import AnnotationKey
+from .config.annotations.types import Exclude, CrossReactive, SNP, Chromosome, GeneRegion, Geo, ProbeClass
+from .config.attributes.attributes import Cells, Observables, Attributes
+from .config.data.data import Data
+from .config.data.types import DataPath, DataBase, DataType
+from .config.setup.setup import Setup
+from .config.setup.types import Experiment, Task, Method
+from .model.experiment import base, advanced, plot
