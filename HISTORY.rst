@@ -55,3 +55,8 @@ History
 
 * Encapsulate package.
 
+
+0.1.9 (2019-01-29)
+------------------
+
+* Encapsulate package.
