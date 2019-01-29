@@ -5,7 +5,7 @@
 
 __author__ = """Aaron Blare"""
 __email__ = 'aaron.blare@mail.ru'
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 
 from pydnameth.config.config import Config
 from pydnameth.config.common import CommonTypes
