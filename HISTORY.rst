@@ -60,3 +60,9 @@ History
 ------------------
 
 * Encapsulate package.
+
+
+0.1.10 (2019-01-29)
+------------------
+
+* Change setup.py.
