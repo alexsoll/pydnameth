@@ -5,7 +5,7 @@
 
 __author__ = """Aaron Blare"""
 __email__ = 'aaron.blare@mail.ru'
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 
 from .config.config import Config
 from .config.common import CommonTypes
