@@ -5,7 +5,7 @@
 
 __author__ = """Aaron Blare"""
 __email__ = 'aaron.blare@mail.ru'
-__version__ = '0.1.5'
+__version__ = '0.1.6'
 
 from . import config
 from .config import *
