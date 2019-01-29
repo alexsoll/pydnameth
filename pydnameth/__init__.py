@@ -13,4 +13,4 @@ from . import model
 from .model import *
 
 __all__ = config.__all__
-__all__ += model.__all__
+__all__.extend(model.__all__)
