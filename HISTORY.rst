@@ -29,5 +29,11 @@ History
 0.1.4 (2019-01-28)
 ------------------
 
-* Test features.
+* Encapsulate package.
+
+
+0.1.5 (2019-01-29)
+------------------
+
+* Encapsulate package.
 
