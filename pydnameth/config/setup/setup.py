@@ -35,3 +35,6 @@ class Setup:
             fn = 'default'
 
         return fn
+
+
+__all__ = ['Setup']

@@ -21,3 +21,6 @@ def plot(config, configs_primary):
         config_primary.initialize()
     context = Context(config)
     context.plot_pipeline(config, configs_primary)
+
+
+__all__ = ['base', 'advanced', 'plot']

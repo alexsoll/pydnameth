@@ -30,3 +30,6 @@ class Annotations:
                'gene(' + self.gene_region + ')' + '_' + \
                'geo(' + self.geo + ')' + '_' + \
                'class(' + self.probe_class + ')'
+
+
+__all__ = ['Annotations']

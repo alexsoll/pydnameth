@@ -63,3 +63,6 @@ class Config:
         subset_attributes(self)
         self.cells_dict = load_cells_dict(self)
         subset_cells(self)
+
+
+__all__ = ['Config']
