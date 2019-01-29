@@ -51,3 +51,6 @@ class Attributes:
     def __str__(self):
         name = str(self.observables) + '_' + str(self.cells)
         return name
+
+
+__all__ = ['Cells', 'Observables', 'Attributes']
