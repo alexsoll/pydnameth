@@ -31,8 +31,6 @@ install:
     - conda config --set always_yes yes --set show_channel_urls true --set changeps1 no
     - conda update -q conda
     - conda config --add channels conda-forge
-    - conda install Shapely
-    - conda config --remove channels conda-forge
     - conda info -a
     - "conda create --quiet --name test-environment python=%PYTHON_VERSION% pandas --file requirements_dev.txt"
 
