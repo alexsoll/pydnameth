@@ -19,7 +19,6 @@ from pydnameth.infrastucture.load.annotations import load_annotations_dict
 class TestLoadAnnotations(unittest.TestCase):
 
     def setUp(self):
-        target = 'age'
         data = Data(
             name='cpg_beta',
             type=DataType.cpg,
@@ -56,6 +55,7 @@ class TestLoadAnnotations(unittest.TestCase):
         )
 
         attributes = Attributes(
+            target='age',
             observables=observables,
             cells=cells
         )
@@ -65,24 +65,19 @@ class TestLoadAnnotations(unittest.TestCase):
             setup=setup,
             annotations=annotations,
             attributes=attributes,
-            target=target
         )
-
 
     def test_load_annotations_dict_num_elems(self):
         annotations_dict = load_annotations_dict(self.config)
         self.assertEqual(len(annotations_dict['ID_REF']), 300)
 
-
     def test_load_annotations_dict_num_keys(self):
         annotations_dict = load_annotations_dict(self.config)
         self.assertEqual(len(list(annotations_dict.keys())), 10)
 
-
     def test_load_annotations_dict_num_chrs(self):
         annotations_dict = load_annotations_dict(self.config)
         self.assertEqual(len(set(annotations_dict['CHR'])), 11)
-
 
     def test_load_annotations_dict_num_bops(self):
         annotations_dict = load_annotations_dict(self.config)

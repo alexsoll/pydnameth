@@ -101,19 +101,32 @@ Local
    and replace ``x.x`` with the Python version you wish to use (for example 3.7)
 
 3. Go to the root of ``pydnameth`` project and install project in 'editable'
-   or 'develop' mode while you’re working on it::
+   or 'develop' mode while you’re working on it and install all libs ``requirements_dev.txt``::
 
     $ pip install --editable .
+    $ pip install -r requirements_dev.txt
 
    ``.`` refers to the current working directory.
    This allows the project to be both installed and editable in project form.
+
+3. If with some package ``err-pkg`` error occurs, try::
+
+    $ conda install err-pkg --channel=conda-forge
+
+   And repeat command::
+
+    $ pip install -r requirements_dev.txt
+
+4. If ``requirements_dev.txt`` file was updated, you should repeat the command::
+
+    $ pip install -r requirements_dev.txt
 
 Git Pipeline
 ~~~~~~~~~~~~
 
 
 1. ``master`` branch is always in production, tested and complete.
-2. ``development`` is the branch closest to master but has changes that should be merged to master.
+2. ``development`` is the branch closest to ``master`` but has changes that should be merged to ``master``.
    Anyone who starts working on a new feature should or bug fixing always branch out from ``development``.
 3. Branch out from ``development`` with new branch for bug or feature::
 
@@ -132,7 +145,7 @@ Git Pipeline
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-6. Submit a pull request from  through the GitHub website.
+6. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 ~~~~~~~~~~~~~~~~~~~~~~~
