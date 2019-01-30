@@ -33,7 +33,8 @@ install:
     - conda create -n test-env python=%PYTHON_VERSION%
     - activate test-env
     - conda config --add channels conda-forge
-    - pip install -rrequirements_test.txt"
+    - python.exe -m pip install --upgrade pip
+    - python.exe -m pip install -rrequirements_test.txt"
 
 test_script:
-    - tox
+    - python.exe -m tox
