@@ -8,11 +8,9 @@ Installation
 Stable release
 --------------
 
-To install pydnameth, run this command in your terminal:
+To install ``pydnameth``, run this command in your terminal::
 
-.. code-block:: console
-
-    $ pip install pydnameth
+    $ pip install -U pydnameth
 
 This is the preferred method to install pydnameth, as it will always install the most recent stable release.
 
@@ -26,26 +24,16 @@ you through the process.
 From sources
 ------------
 
-The sources for pydnameth can be downloaded from the `Github repo`_.
+The sources for pydnameth can be downloaded from the `GitHub repo`_.
 
-You can either clone the public repository:
-
-.. code-block:: console
+You can either clone the public repository::
 
     $ git clone git://github.com/AaronBlare/pydnameth
 
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/AaronBlare/pydnameth/tarball/master
-
-Once you have a copy of the source, you can install it with:
-
-.. code-block:: console
+Once you have a copy of the source, you can install it with::
 
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/AaronBlare/pydnameth
+.. _GitHub repo: https://github.com/AaronBlare/pydnameth
 .. _tarball: https://github.com/AaronBlare/pydnameth/tarball/master
