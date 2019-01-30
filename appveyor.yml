@@ -33,6 +33,7 @@ install:
 build: false  # Not a C# project, build stuff at the test step instead.
 
 before_test:
+  - "%CMD_IN_ENV% conda config --add channels conda-forge"
   - "%CMD_IN_ENV% pip install -r requirements_dev.txt"
 
 test_script:

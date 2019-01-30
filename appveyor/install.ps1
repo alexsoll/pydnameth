@@ -1,16 +1,18 @@
-# Sample script to install Python and pip under Windows
-# Authors: Olivier Grisel, Jonathan Helmus and Kyle Kastner
+# Sample script to install Miniconda under Windows
+# Authors: Olivier Grisel, Jonathan Helmus and Kyle Kastner, Robert McGibbon
 # License: CC0 1.0 Universal: http://creativecommons.org/publicdomain/zero/1.0/
 
-$BASE_URL = "https://www.python.org/ftp/python/"
-$GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
-$GET_PIP_PATH = "C:\get-pip.py"
+$MINICONDA_URL = "http://repo.continuum.io/miniconda/"
 
 
-function DownloadPython ($python_version, $platform_suffix) {
+function DownloadMiniconda ($python_version, $platform_suffix) {
     $webclient = New-Object System.Net.WebClient
-    $filename = "python-" + $python_version + $platform_suffix + ".msi"
-    $url = $BASE_URL + $python_version + "/" + $filename
+    if ($python_version -match "3.4") {
+        $filename = "Miniconda3-3.8.3-Windows-" + $platform_suffix + ".exe"
+    } else {
+        $filename = "Miniconda-3.8.3-Windows-" + $platform_suffix + ".exe"
+    }
+    $url = $MINICONDA_URL + $filename
 
     $basedir = $pwd.Path + "\"
     $filepath = $basedir + $filename
@@ -40,29 +42,24 @@ function DownloadPython ($python_version, $platform_suffix) {
    return $filepath
 }
 
-
-function InstallPython ($python_version, $architecture, $python_home) {
+function InstallMiniconda ($python_version, $architecture, $python_home) {
     Write-Host "Installing Python" $python_version "for" $architecture "bit architecture to" $python_home
     if (Test-Path $python_home) {
         Write-Host $python_home "already exists, skipping."
         return $false
     }
-    if ($architecture -eq "32") {
-        $platform_suffix = ""
+    if ($architecture -match "32") {
+        $platform_suffix = "x86"
     } else {
-        $platform_suffix = ".amd64"
+        $platform_suffix = "x86_64"
     }
-    $msipath = DownloadPython $python_version $platform_suffix
-    Write-Host "Installing" $msipath "to" $python_home
+
+    $filepath = DownloadMiniconda $python_version $platform_suffix
+    Write-Host "Installing" $filepath "to" $python_home
     $install_log = $python_home + ".log"
-    $install_args = "/qn /log $install_log /i $msipath TARGETDIR=$python_home"
-    $uninstall_args = "/qn /x $msipath"
-    RunCommand "msiexec.exe" $install_args
-    if (-not(Test-Path $python_home)) {
-        Write-Host "Python seems to be installed else-where, reinstalling."
-        RunCommand "msiexec.exe" $uninstall_args
-        RunCommand "msiexec.exe" $install_args
-    }
+    $args = "/S /D=$python_home"
+    Write-Host $filepath $args
+    Start-Process -FilePath $filepath -ArgumentList $args -Wait -Passthru
     if (Test-Path $python_home) {
         Write-Host "Python $python_version ($architecture) installation complete"
     } else {
@@ -72,30 +69,50 @@ function InstallPython ($python_version, $architecture, $python_home) {
     }
 }
 
-function RunCommand ($command, $command_args) {
-    Write-Host $command $command_args
-    Start-Process -FilePath $command -ArgumentList $command_args -Wait -Passthru
+function InstallCondaPackages ($python_home, $spec) {
+    $conda_path = $python_home + "\Scripts\conda.exe"
+    $args = "install --yes " + $spec
+    Write-Host ("conda " + $args)
+    Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
 }
 
+function UpdateConda ($python_home) {
+    $conda_path = $python_home + "\Scripts\conda.exe"
+    Write-Host "Updating conda..."
+    $args = "update --yes conda"
+    Write-Host $conda_path $args
+    Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
+}
 
-function InstallPip ($python_home) {
+function InstallComtypes ($python_home) {
     $pip_path = $python_home + "\Scripts\pip.exe"
-    $python_path = $python_home + "\python.exe"
-    if (-not(Test-Path $pip_path)) {
-        Write-Host "Installing pip..."
-        $webclient = New-Object System.Net.WebClient
-        $webclient.DownloadFile($GET_PIP_URL, $GET_PIP_PATH)
-        Write-Host "Executing:" $python_path $GET_PIP_PATH
-        Start-Process -FilePath "$python_path" -ArgumentList "$GET_PIP_PATH" -Wait -Passthru
-    } else {
-        Write-Host "pip already installed."
-    }
+    $args = "install comtypes"
+    Start-Process -FilePath "$pip_path" -ArgumentList $args -Wait -Passthru
 }
-
 
 function main () {
-    InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
-    InstallPip $env:PYTHON
+    try {
+        $CurrentResolution = Get-DisplayResolution
+        Write-Host "Current resolution: " $CurrentResolution
+    }
+    Catch [Exception]{
+        Write-Host "Can't print current resolution. Get-DisplayResolution cmd is not available"
+    }
+
+    # fallback for running the script locally
+    if ( !(Test-Path $env:PYTHON) ) {
+        Write-Host "No PYTHON vars, setup default values"
+        $env:PYTHON="C:\\Python34-x64"
+        $env:PYTHON_VERSION="3.4"
+        $env:PYTHON_ARCH="64"
+    }
+    Write-Host "PYTHON=" $env:PYTHON
+    Write-Host "PYTHON_VERSION=" $env:PYTHON_VERSION
+    Write-Host "PYTHON_ARCH=" $env:PYTHON_ARCH
+
+    if ($env:UIA_SUPPORT -eq "YES") {
+        InstallComtypes $env:PYTHON
+    }
 }
 
 main
