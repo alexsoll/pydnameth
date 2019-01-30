@@ -5,8 +5,8 @@ Credits
 Development Lead
 ----------------
 
-* Aaron Blare <aaron.blare@mail.ru>
-* Archie Hewitt <hewitt.archie@yandex.ru>
+* Kalyakulina Alena <kalyakulina.alena@gmail.com>
+* Yusipov Igor <yusipov.igor@gmail.com>
 
 Contributors
 ------------

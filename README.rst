@@ -1,7 +1,3 @@
-=========
-pydnameth
-=========
-
 
 .. image:: https://img.shields.io/pypi/v/pydnameth.svg
         :target: https://pypi.python.org/pypi/pydnameth
@@ -21,8 +17,12 @@ pydnameth
      :target: https://pyup.io/repos/github/AaronBlare/pydnameth/
      :alt: Updates
 
+=========
+pydnameth
+=========
 
 DNA Methylation Analysis Package
+
 
 
 * Free software: MIT license
@@ -37,7 +37,4 @@ Features
 Credits
 -------
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+* TODO
