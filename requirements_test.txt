@@ -11,7 +11,7 @@ numpy
 pandas
 plotly
 statsmodels
-sklearn
+scikit-learn
 scipy
 Shapely
 colorlover
