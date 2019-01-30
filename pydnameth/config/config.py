@@ -14,14 +14,12 @@ class Config:
                  setup,
                  annotations,
                  attributes,
-                 target
                  ):
 
         self.data = data
         self.setup = setup
         self.annotations = annotations
         self.attributes = attributes
-        self.target = target
 
         self.cpg_gene_dict = {}
         self.cpg_bop_dict = {}
