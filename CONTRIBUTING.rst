@@ -95,14 +95,10 @@ Local
 2. Create a virtual environment for your project and activate it::
 
     $ conda create --name your-env-name python=x.x
-    $ conda activate your-env-name
+    $ activate your-env-name
 
    where ``your-env-name`` is the name you want to call your environment,
    and replace ``x.x`` with the Python version you wish to use (for example 3.7)
-
-3. For some packages you need to install ``conda-forge`` (optional)::
-
-    $ conda config --add channels conda-forge
 
 3. Go to the root of ``pydnameth`` project and install project in 'editable'
    or 'develop' mode while you’re working on it and install all libs ``requirements_dev.txt``::
@@ -112,7 +108,16 @@ Local
 
    ``.`` refers to the current working directory.
    This allows the project to be both installed and editable in project form.
-   If ``requirements_dev.txt`` file was updated, you should repeat the command::
+
+3. If with some package ``err-pkg`` error occurs, try::
+
+    $ conda install err-pkg --channel=conda-forge
+
+   And repeat command::
+
+    $ pip install -r requirements_dev.txt
+
+4. If ``requirements_dev.txt`` file was updated, you should repeat the command::
 
     $ pip install -r requirements_dev.txt
 

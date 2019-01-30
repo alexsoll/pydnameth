@@ -5,7 +5,9 @@ Usage
 Import
 ------
 
-To use pydnameth in a project::
+To use pydnameth in a project:
+
+.. code-block:: python
 
     import pydnameth as pdm
 
@@ -56,19 +58,55 @@ Data
 ~~~~
 
 ``pdm.Data`` contains information about dataset and the type of data that will be used in the experiments.
-For creating instance of pdm.Data you need to specify next fields:
+For creating instance of ``pdm.Data`` you need to specify next fields:
 
 * ``name`` - name of the file without extension (currently supported only ``.txt`` extension),
   which contains methylation data. Example: ``name='cpg_beta'``
 * ``type`` - instance of ``enum`` ``pdm.DataType``.
   Indicates type of data that will be used in the experiments.
-  Currently supported only ``pdm.DataType.cpg``.
+  Currently supported only ``pdm.DataType.cpg`` and ``pdm.DataType.attributes``.
   In next releases ``pdm.DataType.gene`` and ``pdm.DataType.bop`` will be added. Example: ``type=pdm.DataType.cpg``
 * ``path`` - path to directory, which contains ``base`` directory.
   Example: ``path=C:/Data``
 * ``base`` - name of the directory in which the necessary files are located and in which the files with the results will be saved.
   Example: ``base=GSE40279``
 
+Example of creating ``pdm.Data`` instance:
 
+.. code-block:: python
 
+     data = pdm.Data(
+        name='cpg_beta',
+        type=pdm.DataType.cpg,
+        path='C:/Data',
+        base='GSE40279'
+    )
+
+Setup
+~~~~~
+
+``pdm.Setup`` describes the run experiment.
+For creating instance of ``pdm.Data`` you need to specify next fields:
+
+* ``name`` - name of the file without extension (currently supported only ``.txt`` extension),
+  which contains methylation data. Example: ``name='cpg_beta'``
+* ``type`` - instance of ``enum`` ``pdm.DataType``.
+  Indicates type of data that will be used in the experiments.
+  Currently supported only ``pdm.DataType.cpg`` and ``pdm.DataType.attributes``.
+  In next releases ``pdm.DataType.gene`` and ``pdm.DataType.bop`` will be added. Example: ``type=pdm.DataType.cpg``
+* ``path`` - path to directory, which contains ``base`` directory.
+  Example: ``path=C:/Data``
+* ``base`` - name of the directory in which the necessary files are located and in which the files with the results will be saved.
+  Example: ``base=GSE40279``
+
+Example of creating ``pdm.Data`` instance:
+
+.. code-block:: python
+
+     data = pdm.Data(
+        name='cpg_beta',
+        type=pdm.DataType.cpg,
+        path='C:/Data',
+        base='GSE40279'
+    )
 
