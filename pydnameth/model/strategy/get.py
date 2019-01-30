@@ -13,7 +13,7 @@ class GetStrategy(metaclass=abc.ABCMeta):
         pass
 
     def get_target(self, config, normed=False):
-        target = config.attributes_dict[config.target]
+        target = config.attributes_dict[config.attributes.target]
         if normed:
             target_normed = [(float(x) - min(target)) /
                              (float(max(target)) - float(min(target)))

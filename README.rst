@@ -29,18 +29,32 @@ pydnameth
 
 DNA Methylation Analysis Package
 
+This package provides some pipelines for analysis mythylation data.
+The main goal is to find correlations between methylation on the one hand,
+and age, sex, disease, and other characteristics of subjects on the other.
+
+Examples of free-access methylation datasets:
+
+* `GSE40279`_
+* `GSE87571`_
+
+.. _GSE40279: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE40279
+.. _GSE87571: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE87571
 
 
-* Free software: MIT license
-* Documentation: https://pydnameth.readthedocs.io.
-
+Documentation
+-------------
+Available at https://pydnameth.readthedocs.io.
 
 Features
 --------
 
-* TODO
+* Defining best age-predictors CpGs for different subjects subsets.
+* Defining best observable-specic CpGs (sex-specific, disease-specific) which are differently methylated with age.
+* Building Epigenetic Clock.
+* Plotting subjects distribution depending on the observable (sex, disease).
+* Plotting methylation profiles for CpGs.
 
-Credits
--------
-
-* TODO
+Copyrights
+----------
+Free software: MIT license
