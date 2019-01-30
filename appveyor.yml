@@ -1,0 +1,39 @@
+environment:
+  CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_env.cmd"
+
+  matrix:
+    - TOXENV: 'py35'
+      PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "64"
+      
+    - TOXENV: 'py36'
+      PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+      
+    - TOXENV: 'py37'
+      PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: "3.7"
+      PYTHON_ARCH: "64"
+
+install:
+  # Install Python (from the official .msi of http://python.org) and pip when
+  # not already installed.
+  - "powershell ./appveyor/install.ps1"
+
+  # Prepend newly installed Python to the PATH of this build (this cannot be
+  # done from inside the powershell script as it would require to restart
+  # the parent CMD process).
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+
+  # Check that we have the expected version and architecture for Python
+  - "python --version"
+
+build: false  # Not a C# project, build stuff at the test step instead.
+
+before_test:
+  - "%CMD_IN_ENV% pip install -r requirements_dev.txt"
+
+test_script:
+  - "%CMD_IN_ENV% tox -e %TOX_ENV%"
