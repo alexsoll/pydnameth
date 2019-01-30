@@ -73,7 +73,6 @@ function InstallCondaPackages ($python_home, $spec) {
     $conda_path = $python_home + "\Scripts\conda.exe"
     $args = "install --yes " + $spec
     Write-Host ("conda " + $args)
-    Write-Host "CONDA=" $conda_path
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
 }
 
@@ -92,28 +91,12 @@ function InstallComtypes ($python_home) {
 }
 
 function main () {
-    try {
-        $CurrentResolution = Get-DisplayResolution
-        Write-Host "Current resolution: " $CurrentResolution
-    }
-    Catch [Exception]{
-        Write-Host "Can't print current resolution. Get-DisplayResolution cmd is not available"
-    }
 
-    # fallback for running the script locally
-    if ( !(Test-Path $env:PYTHON) ) {
-        Write-Host "No PYTHON vars, setup default values"
-        $env:PYTHON="C:\\Python34-x64"
-        $env:PYTHON_VERSION="3.4"
-        $env:PYTHON_ARCH="64"
-    }
+    InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
+
     Write-Host "PYTHON=" $env:PYTHON
     Write-Host "PYTHON_VERSION=" $env:PYTHON_VERSION
     Write-Host "PYTHON_ARCH=" $env:PYTHON_ARCH
-
-    if ($env:UIA_SUPPORT -eq "YES") {
-        InstallComtypes $env:PYTHON
-    }
 }
 
 main
