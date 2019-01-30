@@ -42,14 +42,16 @@ class Observables:
 
 class Attributes:
     def __init__(self,
+                 target,
                  observables,
                  cells,
                  ):
+        self.target = target
         self.observables = observables
         self.cells = cells
 
     def __str__(self):
-        name = str(self.observables) + '_' + str(self.cells)
+        name = str(self.target) + '_' + str(self.observables) + '_' + str(self.cells)
         return name
 
 

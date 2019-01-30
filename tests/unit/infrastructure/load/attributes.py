@@ -19,7 +19,7 @@ from pydnameth.infrastucture.load.attributes import load_attributes_dict
 class TestLoadAnnotations(unittest.TestCase):
 
     def setUp(self):
-        target = 'age'
+
         data = Data(
             name='cpg_beta',
             type=DataType.cpg,
@@ -56,6 +56,7 @@ class TestLoadAnnotations(unittest.TestCase):
         )
 
         attributes = Attributes(
+            target='age',
             observables=observables,
             cells=cells
         )
@@ -65,19 +66,15 @@ class TestLoadAnnotations(unittest.TestCase):
             setup=setup,
             annotations=annotations,
             attributes=attributes,
-            target=target
         )
-
 
     def test_load_attributes_dict_num_elems(self):
         attributes_dict = load_attributes_dict(self.config)
         self.assertEqual(len(attributes_dict['age']), 729)
 
-
     def test_load_attributes_dict_num_keys(self):
         attributes_dict = load_attributes_dict(self.config)
         self.assertEqual(len(list(attributes_dict.keys())), 2)
-
 
     def test_load_attributes_dict_age_range(self):
         attributes_dict = load_attributes_dict(self.config)
