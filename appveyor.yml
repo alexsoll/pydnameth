@@ -4,14 +4,17 @@ environment:
   matrix:
     - TOXENV: 'py35'
       MINICONDA: "C:\\Miniconda35-x64"
+      PLATFORM: x64
       PYTHON_VERSION: "3.5"
       
     - TOXENV: 'py36'
       MINICONDA: "C:\\Miniconda36-x64"
+      PLATFORM: x64
       PYTHON_VERSION: "3.6"
       
     - TOXENV: 'py37'
       MINICONDA: "C:\\Miniconda37-x64"
+      PLATFORM: x64
       PYTHON_VERSION: "3.7"
 
 install:
