@@ -11,6 +11,9 @@ install:
 script:
 - flake8 pydnameth, tests
 - tox
+- coverage run --source pydnameth setup.py test
+after_success:
+- codecov
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
