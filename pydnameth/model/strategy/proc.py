@@ -41,7 +41,7 @@ class TableProcStrategy(ProcStrategy):
 
     def single_base(self, config, item):
 
-        if config.setup.method is Method.linreg:
+        if config.setup.method == Method.linreg:
 
             target = self.get_strategy.get_target(config)
             x = sm.add_constant(target)
@@ -60,7 +60,7 @@ class TableProcStrategy(ProcStrategy):
             config.metrics['intercept_p_value'].append(results.pvalues[0])
             config.metrics['slope_p_value'].append(results.pvalues[1])
 
-        elif config.setup.method is Method.variance_linreg:
+        elif config.setup.method == Method.variance_linreg:
 
             target = self.get_strategy.get_target(config)
             x = sm.add_constant(target)
@@ -96,7 +96,7 @@ class TableProcStrategy(ProcStrategy):
             config.metrics['intercept_p_value_var'].append(results_var.pvalues[0])
             config.metrics['slope_p_value_var'].append(results_var.pvalues[1])
 
-        elif config.setup.method is Method.cluster:
+        elif config.setup.method == Method.cluster:
 
             x = self.get_strategy.get_target(config, True)
             y = self.get_strategy.get_single_base(config, [item])[0]
@@ -128,7 +128,7 @@ class TableProcStrategy(ProcStrategy):
         method_primary = config.setup.params['method_primary']
         metrics_keys = get_metrics_keys(config.setup)
 
-        if config.setup.method is Method.polygon:
+        if config.setup.method == Method.polygon:
 
             for item in config.base_list:
                 if item in config.base_dict:
@@ -157,7 +157,7 @@ class TableProcStrategy(ProcStrategy):
                         points_region = []
                         points_slope = []
 
-                        if config_primary.setup.method is Method.linreg:
+                        if config_primary.setup.method == Method.linreg:
 
                             intercept = config_primary.advanced_data['intercept'][item_id]
                             slope = config_primary.advanced_data['slope'][item_id]
@@ -192,7 +192,7 @@ class TableProcStrategy(ProcStrategy):
 
                             max_abs_slope = max(max_abs_slope, abs(slope))
 
-                        elif config_primary.setup.method is Method.linreg.variance_linreg:
+                        elif config_primary.setup.method == Method.linreg.variance_linreg:
 
                             intercept = config_primary.advanced_data['intercept'][item_id]
                             slope = config_primary.advanced_data['slope'][item_id]
@@ -273,7 +273,7 @@ class ClockProcStrategy(ProcStrategy):
 
     def proc_advanced(self, config, configs_primary):
 
-        if config.setup.method is Method.linreg:
+        if config.setup.method == Method.linreg:
 
             items = config.experiment_data['items']
             values = config.experiment_data['values']
@@ -287,7 +287,7 @@ class ClockProcStrategy(ProcStrategy):
             combs = min(config.setup.params['combs'], train_size)
             runs = config.setup.params['runs']
 
-            if type is ClockExogType.all.value:
+            if type == ClockExogType.all.value:
 
                 for exog_id in range(0, exogs):
 
@@ -309,7 +309,7 @@ class ClockProcStrategy(ProcStrategy):
 
                     build_clock_linreg(clock)
 
-            elif type is ClockExogType.deep.value:
+            elif type == ClockExogType.deep.value:
 
                 for exog_id in range(0, exogs):
 
@@ -330,7 +330,7 @@ class ClockProcStrategy(ProcStrategy):
 
                     build_clock_linreg(clock)
 
-            elif type is ClockExogType.single.value:
+            elif type == ClockExogType.single.value:
 
                 config.metrics['cpg'].append(combs)
                 config.metrics['gene'].append(combs)
@@ -349,7 +349,7 @@ class ClockProcStrategy(ProcStrategy):
 
                 build_clock_linreg(clock)
 
-            elif type is ClockExogType.slide.value:
+            elif type == ClockExogType.slide.value:
 
                 for exog_id in range(0, exogs, combs):
 
@@ -400,7 +400,7 @@ class MethylationProcStrategy(ProcStrategy):
         )
         plot_data.append(scatter)
 
-        if config.setup.method is Method.linreg:
+        if config.setup.method == Method.linreg:
 
             target = self.get_strategy.get_target(config)
             x = sm.add_constant(target)
@@ -451,7 +451,7 @@ class MethylationProcStrategy(ProcStrategy):
             )
             plot_data.append(scatter)
 
-        elif config.setup.method is Method.variance_linreg:
+        elif config.setup.method == Method.variance_linreg:
 
             target = self.get_strategy.get_target(config)
             x = sm.add_constant(target)
@@ -515,7 +515,7 @@ class MethylationProcStrategy(ProcStrategy):
             )
             plot_data.append(scatter)
 
-        elif config.setup.method is Method.cluster:
+        elif config.setup.method == Method.cluster:
             pass
 
         return plot_data
@@ -531,7 +531,7 @@ class MethylationProcStrategy(ProcStrategy):
 
     def proc_plot(self, config, configs_primary):
 
-        if config.setup.method is Method.scatter:
+        if config.setup.method == Method.scatter:
 
             item = config.setup.params['item']
             plot_data = []
@@ -554,7 +554,7 @@ class ObservablesProcStrategy(ProcStrategy):
         target = self.get_strategy.get_target(config)
         color = cl.scales['8']['qual']['Set1'][config.plot_data['color_id']]
 
-        if config.setup.method is Method.histogram:
+        if config.setup.method == Method.histogram:
 
             types = config.attributes.observables.types.items()
             histogram = go.Histogram(
@@ -586,7 +586,7 @@ class ObservablesProcStrategy(ProcStrategy):
 
     def proc_plot(self, config, configs_primary):
 
-        if config.setup.method is Method.histogram:
+        if config.setup.method == Method.histogram:
 
             plot_data = []
             for config_primary in configs_primary:
