@@ -11,6 +11,10 @@
      :target: https://ci.appveyor.com/project/AaronBlare/pydnameth
      :alt: Appveyor build status
 
+.. image:: https://codecov.io/gh/AaronBlare/pydnameth/branch/master/graph/badge.svg
+      :target: https://codecov.io/gh/AaronBlare/pydnameth
+      :alt: Coverage status
+
 .. image:: https://img.shields.io/lgtm/grade/python/g/AaronBlare/pydnameth.svg?logo=lgtm&logoWidth=18
       :target: https://lgtm.com/projects/g/AaronBlare/pydnameth/context:python
       :alt: LGTM code quality
