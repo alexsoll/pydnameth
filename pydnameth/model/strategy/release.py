@@ -61,7 +61,7 @@ class MethylationReleaseStrategy(ReleaseStrategy):
 
     def release_plot(self, config, configs_primary):
 
-        if config.setup.method is Method.scatter:
+        if config.setup.method == Method.scatter:
 
             item = config.setup.params['item']
             aux = config.cpg_gene_dict[item]
@@ -138,7 +138,7 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
 
     def release_plot(self, config, configs_primary):
 
-        if config.setup.method is Method.histogram:
+        if config.setup.method == Method.histogram:
             layout = go.Layout(
                 autosize=True,
                 barmode='overlay',
