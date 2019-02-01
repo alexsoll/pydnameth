@@ -41,7 +41,7 @@ class TestLoadAnnotations(unittest.TestCase):
             exclude=CommonTypes.none.value,
             cross_reactive=CrossReactive.exclude.value,
             snp=SNP.exclude.value,
-            chr=Chromosome.non_gender.value,
+            chr=Chromosome.non_sex.value,
             gene_region=GeneRegion.yes.value,
             geo=CommonTypes.any.value,
             probe_class=CommonTypes.any.value

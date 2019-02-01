@@ -24,7 +24,7 @@ def load_attributes_dict(config):
         keys = key_line.split('\t')
         keys = [x.rstrip() for x in keys]
         possible_keys = list(config.attributes.observables.types.keys())
-        possible_keys = [config.target] + possible_keys
+        possible_keys = [config.attributes.target] + possible_keys
 
         attributes_dict = {}
         for key in keys:
