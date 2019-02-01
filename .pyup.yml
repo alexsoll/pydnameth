@@ -4,7 +4,3 @@ requirements:
   - requirements_dev.txt:
       update: all
       pin: True
-  - requirements_test.txt:
-      update: False
-      pin: False
-
