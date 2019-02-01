@@ -1,9 +1,9 @@
 class Cells:
     def __init__(self,
-                 file_name,
+                 name,
                  types,
                  ):
-        self.file_name = file_name
+        self.name = name
         self.types = types
 
     def __str__(self):
@@ -21,10 +21,10 @@ class Cells:
 
 class Observables:
     def __init__(self,
-                 file_name,
+                 name,
                  types,
                  ):
-        self.file_name = file_name
+        self.name = name
         self.types = types
 
     def __str__(self):

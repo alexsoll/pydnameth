@@ -345,10 +345,69 @@ Example of creating ``pdm.Annotations`` instance:
 Attributes
 ~~~~~~~~~~
 
+``pdm.Attributes`` describes information about subjects.
+For creating instance of ``pdm.Attributes`` you need to specify next fields:
+
+++++++++++
+``target``
+++++++++++
+Name of target observable column (``string``)
+
+Example::
+
+    target = 'age'
+
++++++++++++++++
+``observables``
++++++++++++++++
+Specifies observables of subjects under consideration. Should be ``pdm.Observables`` instance.
+For creating ``pdm.Observables`` instance you need to specify:
+
+* ``name`` - name of the file without extension (currently supported only ``.txt`` extension),
+  which contains information about subjects.
+
+Example::
+
+    name = 'observables'
+
+* ``types`` - python ``dict`` with ``key`` - header of target observable and ``value`` - value of target observable.
+  Also values can be ``'any'`` if you want to consider all existing values.
+
+Example::
+
+    {'gender': 'F'}
+
++++++++++
+``cells``
++++++++++
+Specifies cell types population. Should be ``pdm.Cells`` instance.
+For creating ``pdm.Cells`` instance you need to specify:
+
+* ``name`` - name of the file without extension (currently supported only ``.txt`` extension),
+  contains information about cell types population.
+
+Example::
+
+    name = 'cells'
+
+* ``types`` - python ``list`` of cell types which should be considered in the experiment (``string`` headers in ``file_name``)
+  or string ``'any'`` if you want to consider all cells types.
+
+Example::
+
+    types = ['Monocytes', 'B', 'CD4T', 'NK', 'CD8T', 'Gran']
+
+
 --------------------------
 More Details About Methods
 --------------------------
 
+TODO
+
 --------
 Released
 --------
+
+TODO
+
+Repository with examples: https://github.com/GillianGrayson/dna-methylation
