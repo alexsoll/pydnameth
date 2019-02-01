@@ -52,12 +52,12 @@ def load_cpg(config):
         headers = [x.rstrip() for x in headers]
         subjects = headers[1:len(headers)]
 
-        config.cpg_data = np.zeros((num_cpgs, len(subjects)))
+        config.cpg_data = np.zeros((num_cpgs, len(subjects)), dtype=np.float32)
 
         cpg_id = 0
         for line in f:
             line_list = get_line_list(line)
-            curr_data = list(map(float, line_list[1::]))
+            curr_data = list(map(np.float32, line_list[1::]))
             config.cpg_data[cpg_id] = curr_data
             cpg_id += 1
         f.close()

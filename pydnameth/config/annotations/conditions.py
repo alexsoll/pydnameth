@@ -48,7 +48,7 @@ def chromosome_condition(config, annotations_dict):
     match = False
     if target == CommonTypes.any.value:
         match = True
-    elif target == Chromosome.non_gender.value:
+    elif target == Chromosome.non_sex.value:
         if chr != Chromosome.X.value and chr != Chromosome.Y.value:
             match = True
     elif target == Chromosome.X.value:
@@ -124,9 +124,9 @@ def probe_class_condition(config, annotations_dict):
     else:
         keys_preset = [x.value for x in ProbeClass]
         if target in keys_preset:
-            if target is ProbeClass.class_ab.value:
-                classes = [ProbeClass.class_a.value,
-                           ProbeClass.class_b.value]
+            if target is ProbeClass.A_B.value:
+                classes = [ProbeClass.A.value,
+                           ProbeClass.B.value]
                 if probe_class in classes:
                     match = True
             if target == probe_class:

@@ -1,4 +1,5 @@
 from pydnameth.model.context import Context
+from pydnameth.config.setup.types import Experiment
 
 
 def base(config):
@@ -23,4 +24,10 @@ def plot(config, configs_primary):
     context.plot_pipeline(config, configs_primary)
 
 
-__all__ = ['base', 'advanced', 'plot']
+def run(config, configs_primary=None):
+    if config.setup.experiment == Experiment.base:
+        base(config)
+    elif config.setup.experiment == Experiment.advanced:
+        advanced(config, configs_primary)
+    elif config.setup.experiment == Experiment.plot:
+        plot(config, configs_primary)

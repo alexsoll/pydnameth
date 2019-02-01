@@ -27,7 +27,7 @@ class SNP(Enum):
 
 
 class Chromosome(Enum):
-    non_gender = 'NG'
+    non_sex = 'NS'
     X = 'X'
     Y = 'Y'
 
@@ -50,7 +50,7 @@ class ProbeClass(Enum):
     B = 'B'
     C = 'C'
     D = 'D'
-    AB = 'AB'
+    A_B = 'A_B'
 
 
 __all__ = ['AnnotationKey', 'Exclude', 'CrossReactive', 'SNP', 'Chromosome', 'GeneRegion', 'Geo', 'ProbeClass']
