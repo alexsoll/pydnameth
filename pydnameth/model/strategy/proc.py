@@ -297,7 +297,7 @@ class ClockProcStrategy(ProcStrategy):
                     config.metrics['count'].append(exog_id + 1)
 
                     clock = Clock(endog_data=target,
-                                  endog_names=config.target,
+                                  endog_names=config.attributes.target,
                                   exog_data=values[0:exog_id + 1],
                                   exog_names=items[0:exog_id + 1],
                                   metrics_dict=config.metrics,
@@ -318,7 +318,7 @@ class ClockProcStrategy(ProcStrategy):
                     config.metrics['count'].append(exog_id + 1)
 
                     clock = Clock(endog_data=target,
-                                  endog_names=config.target,
+                                  endog_names=config.attributes.target,
                                   exog_data=values[0:exogs + 1],
                                   exog_names=items[0:exogs + 1],
                                   metrics_dict=config.metrics,
@@ -337,7 +337,7 @@ class ClockProcStrategy(ProcStrategy):
                 config.metrics['count'].append(combs)
 
                 clock = Clock(endog_data=target,
-                              endog_names=config.target,
+                              endog_names=config.attributes.target,
                               exog_data=values[0:exogs],
                               exog_names=items[0:exogs],
                               metrics_dict=config.metrics,
@@ -358,7 +358,7 @@ class ClockProcStrategy(ProcStrategy):
                     config.metrics['count'].append(combs)
 
                     clock = Clock(endog_data=target,
-                                  endog_names=config.target,
+                                  endog_names=config.attributes.target,
                                   exog_data=items[exog_id: exog_id + combs],
                                   exog_names=values[exog_id: exog_id + combs],
                                   metrics_dict=config.metrics,

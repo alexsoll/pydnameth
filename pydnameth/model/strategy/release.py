@@ -84,7 +84,7 @@ class MethylationReleaseStrategy(ReleaseStrategy):
                     y=1.15,
                 ),
                 xaxis=dict(
-                    title=config.target,
+                    title=config.attributes.target,
                     showgrid=True,
                     showline=True,
                     mirror='ticks',
