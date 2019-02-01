@@ -17,5 +17,5 @@ from .config.data.data import Data
 from .config.data.types import DataPath, DataBase, DataType
 from .config.setup.setup import Setup
 from .config.setup.types import Experiment, Task, Method
-from .model.experiment import base, advanced, plot
+from .model.experiment import run
 from .setup.advanced.clock.types import ClockExogType
