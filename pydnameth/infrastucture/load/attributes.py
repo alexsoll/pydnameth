@@ -7,7 +7,7 @@ import pickle
 
 def load_attributes_dict(config):
     fn = get_data_base_path(config) + '/' + \
-         config.attributes.observables.file_name
+         config.attributes.observables.name
     fn_txt = fn + '.txt'
     fn_pkl = fn + '.pkl'
 
@@ -55,7 +55,7 @@ def load_attributes_dict(config):
 
 
 def load_cells_dict(config):
-    fn = get_data_base_path(config) + '/' + config.attributes.cells.file_name
+    fn = get_data_base_path(config) + '/' + config.attributes.cells.name
     fn_txt = fn + '.txt'
     fn_pkl = fn + '.pkl'
 

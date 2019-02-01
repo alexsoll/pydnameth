@@ -31,7 +31,7 @@ def load_cpg(config):
         config.cpg_dict = {}
 
         f = open(fn_txt)
-        header_line = f.readline()
+        f.readline()
         cpg_id = 0
         for line in f:
             line_list = get_line_list(line)
