@@ -3,7 +3,7 @@
         :target: https://pypi.python.org/pypi/pydnameth
         :alt: PyPi page
 
-.. image::https://travis-ci.org/AaronBlare/pydnameth.svg?branch=master
+.. image::https://api.travis-ci.org/AaronBlare/pydnameth.svg?branch=master
         :target: https://travis-ci.org/AaronBlare/pydnameth
         :alt: Travis build status
 
