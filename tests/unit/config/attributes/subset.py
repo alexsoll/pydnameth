@@ -48,12 +48,12 @@ class TestLoadAnnotations(unittest.TestCase):
         )
 
         observables = Observables(
-            file_name='observables',
+            name='observables',
             types={'gender': 'vs'}
         )
 
         cells = Cells(
-            file_name='cells',
+            name='cells',
             types=CommonTypes.any.value
         )
 
