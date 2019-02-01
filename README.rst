@@ -7,7 +7,7 @@
     :target: https://travis-ci.org/AaronBlare/pydnameth
     :alt: Travis build status
 
-.. image:: https://ci.appveyor.com/api/projects/status/22k49b00nql1gi5j?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/22k49b00nql1gi5j/branch/master?svg=true
     :target: https://ci.appveyor.com/project/AaronBlare/pydnameth
     :alt: Appveyor build status
 
