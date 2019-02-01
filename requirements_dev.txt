@@ -2,12 +2,12 @@ pip==19.0.1
 bumpversion==0.5.3
 wheel==0.32.3
 watchdog==0.9.0
-flake8==3.7.3
+flake8==3.7.4
 tox==3.7.0
 coverage==4.5.2
 Sphinx==1.8.3
 twine==1.12.1
-numpy==1.16.0
+numpy==1.16.1
 pandas==0.24.0
 plotly==3.5.0
 statsmodels==0.9.0
