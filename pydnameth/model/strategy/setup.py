@@ -66,7 +66,7 @@ class ClockSetUpStrategy(SetupStrategy):
         self.setup_params(config)
         self.setup_metrics(config)
 
-        max_size = len(config.attributes_dict[config.target])
+        max_size = len(config.attributes_dict[config.attributes.target])
         test_size = math.floor(max_size * config.setup.params['part'])
         train_size = max_size - test_size
 
