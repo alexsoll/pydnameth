@@ -30,9 +30,13 @@ As a rule, 4 files are provided in each methylation dataset:
 The first line in each file is usually a header. File names and file extensions may differ, but content is the same.
 Currently supported only ``.txt`` extension.
 
+These files must be located in the same directory. After running experiments, new directories with results
+and cached data files with ``.pkl`` and ``.npz`` extensions will appear in this directory.
+
 All experiments provided py ``pydnameth`` running by single function ``pdm.run(config, configs_primary)``.
 For each experiment, it is necessary to create one main instance of the pdm.Config class (described below).
-For some experiments it is necessary to create additional instances of the pdm.Config class for primary experiments, which results uses it main experiment.
+For some experiments it is necessary to create additional instances of the pdm.Config class for primary experiments,
+which results uses it main experiment.
 
 ------
 Config
