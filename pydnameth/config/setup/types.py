@@ -150,6 +150,8 @@ def get_default_params(setup):
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',
+                'method': Method.linreg.value,
+                'x_range': [0, 100]
             }
 
     return params

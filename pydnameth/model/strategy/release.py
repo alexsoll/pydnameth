@@ -125,6 +125,10 @@ class MethylationReleaseStrategy(ReleaseStrategy):
                 ),
 
             )
+
+            if 'x_range' in config.setup.params:
+                layout.xaxis.range = config.setup.params['x_range']
+
             config.plot_data['fig'] = go.Figure(data=config.plot_data['data'], layout=layout)
 
 
@@ -139,6 +143,7 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
     def release_plot(self, config, configs_primary):
 
         if config.setup.method == Method.histogram:
+
             layout = go.Layout(
                 autosize=True,
                 barmode='overlay',
@@ -193,4 +198,5 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
                 ),
 
             )
+
             config.plot_data['fig'] = go.Figure(data=config.plot_data['data'], layout=layout)
