@@ -1,6 +1,7 @@
 import abc
 from pydnameth.infrastucture.save.figure import save_figure
 from pydnameth.infrastucture.save.table import save_table_dict
+from pydnameth.infrastucture.path import get_save_path
 
 
 class SaveStrategy(metaclass=abc.ABCMeta):
@@ -21,10 +22,14 @@ class SaveStrategy(metaclass=abc.ABCMeta):
 class TableSaveStrategy(SaveStrategy):
 
     def save_base(self, config):
-        save_table_dict(config, config.metrics)
+        fn = get_save_path(config) + '/' + \
+             config.setup.get_file_name()
+        save_table_dict(fn, config.metrics)
 
     def save_advanced(self, config, configs_primary):
-        self.save_base(config)
+        fn = get_save_path(config) + '/' + \
+             config.setup.get_file_name()
+        save_table_dict(fn, config.metrics)
 
     def save_plot(self, config, configs_primary):
         pass
@@ -33,10 +38,14 @@ class TableSaveStrategy(SaveStrategy):
 class ClockSaveStrategy(SaveStrategy):
 
     def save_base(self, config):
-        save_table_dict(config, config.metrics)
+        fn = get_save_path(config) + '/' + \
+             config.setup.get_file_name()
+        save_table_dict(fn, config.metrics)
 
     def save_advanced(self, config, configs_primary):
-        self.save_base(config)
+        fn = get_save_path(config) + '/' + \
+             config.setup.get_file_name()
+        save_table_dict(fn, config.metrics)
 
     def save_plot(self, config, configs_primary):
         pass
