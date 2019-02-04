@@ -10,6 +10,6 @@ def save_figure(config, fig, prefix=''):
     else:
         fn = get_save_path(config) + '/' + \
              prefix + '_' + config.setup.get_file_name()
-    plotly.offline.plot(fig, filename=fn + '.html', auto_open=False)
+    plotly.offline.plot(fig, filename=fn + '.html', auto_open=False, show_link=True)
     pio.write_image(fig, fn + '.png')
     pio.write_image(fig, fn + '.pdf')
