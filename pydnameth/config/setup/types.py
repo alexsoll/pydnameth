@@ -16,6 +16,7 @@ class Task(Enum):
     clock = 'clock'
     observables = 'observables'
     methylation = 'methylation'
+    dependence_2d = 'dependence_2d'
 
     def __str__(self):
         return str(self.value)
@@ -28,6 +29,7 @@ class Method(Enum):
     histogram = 'histogram'
     scatter = 'scatter'
     polygon = 'polygon'
+    special = 'special'
 
     def __str__(self):
         return str(self.value)
@@ -84,6 +86,10 @@ def get_metrics_keys(setup):
                 'slope_intersection_rel',
                 'max_abs_slope'
             ]
+        elif setup.method == Method.special:
+            metrics = [
+                'item'
+            ]
 
     elif setup.task == Task.clock:
 
@@ -91,7 +97,6 @@ def get_metrics_keys(setup):
             metrics = [
                 'item',
                 'aux',
-                'count',
                 'R2',
                 'r',
                 'evs',
@@ -130,9 +135,7 @@ def get_default_params(setup):
                 'min_samples': 5
             }
         elif setup.method == Method.polygon:
-            params = {
-                'method_primary': Method.linreg,
-            }
+            params = {}
 
     elif setup.task == Task.clock:
 
@@ -150,6 +153,15 @@ def get_default_params(setup):
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',
+                'x_range': [0, 100]
+            }
+
+    elif setup.task == Task.dependence_2d:
+
+        if setup.method == Method.scatter:
+            params = {
+                'x': 'count',
+                'y': 'count',
             }
 
     return params

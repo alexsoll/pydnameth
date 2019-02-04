@@ -294,18 +294,19 @@ class ClockProcStrategy(ProcStrategy):
                     config.metrics['item'].append(items[exog_id])
                     aux = self.get_strategy.get_aux(config, items[exog_id])
                     config.metrics['aux'].append(aux)
-                    config.metrics['count'].append(exog_id + 1)
 
-                    clock = Clock(endog_data=target,
-                                  endog_names=config.attributes.target,
-                                  exog_data=values[0:exog_id + 1],
-                                  exog_names=items[0:exog_id + 1],
-                                  metrics_dict=config.metrics,
-                                  train_size=train_size,
-                                  test_size=test_size,
-                                  exog_num=exog_id + 1,
-                                  exog_num_comb=combs,
-                                  num_bootstrap_runs=runs)
+                    clock = Clock(
+                        endog_data=target,
+                        endog_names=config.attributes.target,
+                        exog_data=values[0:exog_id + 1],
+                        exog_names=items[0:exog_id + 1],
+                        metrics_dict=config.metrics,
+                        train_size=train_size,
+                        test_size=test_size,
+                        exog_num=exog_id + 1,
+                        exog_num_comb=combs,
+                        num_bootstrap_runs=runs
+                    )
 
                     build_clock_linreg(clock)
 
@@ -313,39 +314,41 @@ class ClockProcStrategy(ProcStrategy):
 
                 for exog_id in range(0, exogs):
 
-                    config.metrics['cpg'].append(exog_id + 1)
-                    config.metrics['gene'].append(exog_id + 1)
-                    config.metrics['count'].append(exog_id + 1)
+                    config.metrics['item'].append(exog_id + 1)
+                    config.metrics['aux'].append(exog_id + 1)
 
-                    clock = Clock(endog_data=target,
-                                  endog_names=config.attributes.target,
-                                  exog_data=values[0:exogs + 1],
-                                  exog_names=items[0:exogs + 1],
-                                  metrics_dict=config.metrics,
-                                  train_size=train_size,
-                                  test_size=test_size,
-                                  exog_num=exogs,
-                                  exog_num_comb=exog_id + 1,
-                                  num_bootstrap_runs=runs)
+                    clock = Clock(
+                        endog_data=target,
+                        endog_names=config.attributes.target,
+                        exog_data=values[0:exogs + 1],
+                        exog_names=items[0:exogs + 1],
+                        metrics_dict=config.metrics,
+                        train_size=train_size,
+                        test_size=test_size,
+                        exog_num=exogs,
+                        exog_num_comb=exog_id + 1,
+                        num_bootstrap_runs=runs
+                    )
 
                     build_clock_linreg(clock)
 
             elif type == ClockExogType.single.value:
 
-                config.metrics['cpg'].append(combs)
-                config.metrics['gene'].append(combs)
-                config.metrics['count'].append(combs)
+                config.metrics['item'].append(combs)
+                config.metrics['aux'].append(combs)
 
-                clock = Clock(endog_data=target,
-                              endog_names=config.attributes.target,
-                              exog_data=values[0:exogs],
-                              exog_names=items[0:exogs],
-                              metrics_dict=config.metrics,
-                              train_size=train_size,
-                              test_size=test_size,
-                              exog_num=exogs,
-                              exog_num_comb=combs,
-                              num_bootstrap_runs=runs)
+                clock = Clock(
+                    endog_data=target,
+                    endog_names=config.attributes.target,
+                    exog_data=values[0:exogs],
+                    exog_names=items[0:exogs],
+                    metrics_dict=config.metrics,
+                    train_size=train_size,
+                    test_size=test_size,
+                    exog_num=exogs,
+                    exog_num_comb=combs,
+                    num_bootstrap_runs=runs
+                )
 
                 build_clock_linreg(clock)
 
@@ -353,20 +356,21 @@ class ClockProcStrategy(ProcStrategy):
 
                 for exog_id in range(0, exogs, combs):
 
-                    config.metrics['cpg'].append(exog_id)
-                    config.metrics['gene'].append(exog_id)
-                    config.metrics['count'].append(combs)
+                    config.metrics['item'].append(exog_id)
+                    config.metrics['aux'].append(exog_id)
 
-                    clock = Clock(endog_data=target,
-                                  endog_names=config.attributes.target,
-                                  exog_data=items[exog_id: exog_id + combs],
-                                  exog_names=values[exog_id: exog_id + combs],
-                                  metrics_dict=config.metrics,
-                                  train_size=train_size,
-                                  test_size=test_size,
-                                  exog_num=combs,
-                                  exog_num_comb=combs,
-                                  num_bootstrap_runs=runs)
+                    clock = Clock(
+                        endog_data=target,
+                        endog_names=config.attributes.target,
+                        exog_data=items[exog_id: exog_id + combs],
+                        exog_names=values[exog_id: exog_id + combs],
+                        metrics_dict=config.metrics,
+                        train_size=train_size,
+                        test_size=test_size,
+                        exog_num=combs,
+                        exog_num_comb=combs,
+                        num_bootstrap_runs=runs
+                    )
 
                     build_clock_linreg(clock)
 
