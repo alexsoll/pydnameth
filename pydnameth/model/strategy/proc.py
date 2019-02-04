@@ -271,7 +271,6 @@ class TableProcStrategy(ProcStrategy):
                             raise ValueError('method_primary param '
                                              'must agree with configs_primary methods')
 
-                        target = self.get_strategy.get_target(config_primary)
                         item_id = config_primary.advanced_dict[item]
 
                         for key in config_primary.advanced_data:
