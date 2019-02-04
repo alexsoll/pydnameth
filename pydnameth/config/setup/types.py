@@ -30,6 +30,7 @@ class Method(Enum):
     scatter = 'scatter'
     polygon = 'polygon'
     special = 'special'
+    z_test = 'z_test'
 
     def __str__(self):
         return str(self.value)
@@ -90,6 +91,13 @@ def get_metrics_keys(setup):
             metrics = [
                 'item'
             ]
+        elif setup.method == Method.z_test:
+            metrics = [
+                'item',
+                'aux',
+                'z_value',
+                'p_value'
+            ]
 
     elif setup.task == Task.clock:
 
@@ -120,6 +128,8 @@ def get_main_metric(setup):
             metric = ('number_of_clusters', 'descending')
         elif setup.method == Method.polygon:
             metric = ('area_intersection_rel', 'ascending')
+        elif setup.method == Method.z_test:
+            metric = ('p_value', 'ascending')
 
     return metric
 

@@ -93,6 +93,3 @@ class Context:
         self.proc_strategy.proc_plot(config, configs_primary)
         self.release_strategy.release_plot(config, configs_primary)
         self.save_strategy.save_plot(config, configs_primary)
-
-
-__all__ = ['Context']
