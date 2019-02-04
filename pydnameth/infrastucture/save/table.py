@@ -1,19 +1,16 @@
-from pydnameth.infrastucture.path import get_save_path
 import pandas as pd
 import csv
 
 
-def save_table_dict(config, table_dict):
-    fn = get_save_path(config) + '/' + \
-         config.setup.get_file_name() + '.xlsx'
+def save_table_dict(fn, table_dict):
+    fn_xls = fn + '.xlsx'
     df = pd.DataFrame(table_dict)
-    writer = pd.ExcelWriter(fn, engine='xlsxwriter')
+    writer = pd.ExcelWriter(fn_xls, engine='xlsxwriter')
     df.to_excel(writer, index=False)
     writer.save()
 
-    fn = get_save_path(config) + '/' + \
-        config.setup.get_file_name() + '.csv'
-    with open(fn, 'w') as csvfile:
+    fn_csv = fn + '.csv'
+    with open(fn_csv, 'w') as csvfile:
         writer = csv.DictWriter(csvfile,
                                 fieldnames=table_dict.keys(),
                                 lineterminator='\n')
