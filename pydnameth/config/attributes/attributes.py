@@ -51,8 +51,5 @@ class Attributes:
         self.cells = cells
 
     def __str__(self):
-        name = str(self.target) + '_' + str(self.observables) + '_' + str(self.cells)
+        name = 'target(' + str(self.target) + ')' + '_' + str(self.observables) + '_' + str(self.cells)
         return name
-
-
-__all__ = ['Cells', 'Observables', 'Attributes']

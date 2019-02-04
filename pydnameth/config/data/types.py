@@ -2,9 +2,9 @@ from enum import Enum
 
 
 class DataPath(Enum):
-    local_1 = 'D:/YandexDisk/Work/dna-methylation'
-    local_2 = 'E:/YandexDisk/Work/dna-methylation'
-    local_3 = 'C:/Users/User/YandexDisk/dna-methylation'
+    local_1 = 'D:/YandexDisk/Work/pydnameth'
+    local_2 = 'E:/YandexDisk/Work/pydnameth'
+    local_3 = 'C:/Users/User/YandexDisk/pydnameth'
 
 
 class DataBase(Enum):
@@ -25,6 +25,3 @@ class DataType(Enum):
     suppl = 'suppl'
     cache = 'cache'
     attributes = 'attributes'
-
-
-__all__ = ['DataPath', 'DataBase', 'DataType']

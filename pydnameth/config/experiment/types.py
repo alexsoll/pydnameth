@@ -2,15 +2,6 @@ from enum import Enum
 from pydnameth.setup.advanced.clock.types import ClockExogType
 
 
-class Experiment(Enum):
-    base = 'base'
-    advanced = 'advanced'
-    plot = 'plot'
-
-    def __str__(self):
-        return str(self.value)
-
-
 class Task(Enum):
     table = 'table'
     clock = 'clock'

@@ -3,7 +3,8 @@ from pydnameth.config.data.types import DataType
 
 
 def get_data_base_path(config):
-    return config.data.get_data_base_path()
+    path = config.data.path + '/' + config.data.base
+    return path
 
 
 def get_cache_path(config):
@@ -16,12 +17,18 @@ def get_cache_path(config):
 
     return path
 
+def get_experiment_path(config):
+    path = config.data.path + '/' + config.data.base + '/' + config.data.type.value + '/' + \
+           config.experiment.task.value + '/' + config.experiment.method.value
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    return path
 
 def get_save_path(config):
-    path = str(config.data) + '/' + \
-           str(config.setup) + '/' + \
-           str(config.annotations) + '/' + \
-           str(config.attributes)
+    path = get_experiment_path(config)+ '/' + \
+           str(config.hash)
 
     if not os.path.exists(path):
         os.makedirs(path)

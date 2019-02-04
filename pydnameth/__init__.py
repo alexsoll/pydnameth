@@ -15,7 +15,7 @@ from .config.annotations.types import Exclude, CrossReactive, SNP, Chromosome, G
 from .config.attributes.attributes import Cells, Observables, Attributes
 from .config.data.data import Data
 from .config.data.types import DataPath, DataBase, DataType
-from .config.setup.setup import Setup
-from .config.setup.types import Experiment, Task, Method
-from .model.experiment import run
+from .config.experiment.experiment import Experiment
+from .config.experiment.types import Task, Method
+from .model.scripts import proc_table_linreg
 from .setup.advanced.clock.types import ClockExogType

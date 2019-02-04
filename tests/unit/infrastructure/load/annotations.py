@@ -2,7 +2,7 @@ import unittest
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
 from pydnameth.config.data.types import DataType
-from pydnameth.config.setup.setup import Setup
+from pydnameth.config.experiment.experiment import Setup
 from pydnameth.config.annotations.annotations import Annotations
 from pydnameth.config.common import CommonTypes
 from pydnameth.config.annotations.types import CrossReactive

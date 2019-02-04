@@ -6,6 +6,3 @@ class CommonTypes(Enum):
     all = 'all'
     none = 'none'
     vs = 'vs'
-
-
-__all__ = ['CommonTypes']
