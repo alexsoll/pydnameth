@@ -3,6 +3,7 @@ import numpy as np
 from pydnameth.config.setup.types import Method
 from pydnameth.config.setup.types import get_main_metric
 import plotly.graph_objs as go
+from statsmodels.stats.multitest import multipletests
 
 
 class ReleaseStrategy(metaclass=abc.ABCMeta):
@@ -33,6 +34,10 @@ class TableReleaseStrategy(ReleaseStrategy):
             config.metrics[key] = list(np.array(value)[order])
 
     def release_advanced(self, config, configs_primary):
+        if config.setup.method == Method.z_test:
+            reject, pvals_corr, alphacSidak, alphacBonf = \
+                multipletests(config.metrics['p_value'], 0.05, method='fdr_bh')
+            config.metrics['p_value'] = pvals_corr
         self.release_base(config)
 
     def release_plot(self, config, configs_primary):

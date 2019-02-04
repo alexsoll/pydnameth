@@ -9,6 +9,7 @@ from pydnameth.setup.advanced.clock.linreg.processing import build_clock_linreg
 import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry
+from scipy.stats import norm
 
 
 class ProcStrategy(metaclass=abc.ABCMeta):
@@ -255,6 +256,44 @@ class TableProcStrategy(ProcStrategy):
                     config.metrics['area_intersection_rel'].append(area_intersection_rel)
                     config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
                     config.metrics['max_abs_slope'].append(max_abs_slope)
+
+        elif config.setup.method == Method.z_test:
+            for item in config.base_list:
+                if item in config.base_dict:
+
+                    slopes = []
+                    slopes_std = []
+                    num_subs = []
+
+                    for config_primary in configs_primary:
+
+                        if config_primary.setup.method != method_primary:
+                            raise ValueError('method_primary param '
+                                             'must agree with configs_primary methods')
+
+                        item_id = config_primary.advanced_dict[item]
+
+                        for key in config_primary.advanced_data:
+                            if key not in metrics_keys:
+                                types = config_primary.attributes.observables.types.items()
+                                key_primary = key + '_' + '_'.join([key + '(' + value + ')'
+                                                                    for key, value in types])
+                                advanced_data = config_primary.advanced_data[key][item_id]
+                                config.metrics[key_primary].append(advanced_data)
+
+                        slopes.append(config_primary.advanced_data['slope'][item_id])
+                        slopes_std.append(config_primary.advanced_data['slope_std'][item_id])
+                        num_subs.append(len(config_primary.attributes_dict['age']))
+
+                    std_errors = [slopes_std[i] / np.sqrt(num_subs[i]) for i in range (0, len(slopes_std))]
+                    z_value = (slopes[0] - slopes[1]) / np.sqrt(sum([std_error * std_error for std_error in std_errors]))
+                    p_value = norm.sf(abs(z_value)) * 2
+
+                    config.metrics['item'].append(item)
+                    aux = self.get_strategy.get_aux(config, item)
+                    config.metrics['aux'].append(aux)
+                    config.metrics['z_value'].append(z_value)
+                    config.metrics['p_value'].append(p_value)
 
     def proc_plot(self, config, configs_primary):
         pass
