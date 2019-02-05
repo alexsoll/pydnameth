@@ -5,6 +5,7 @@ from pydnameth.infrastucture.load.attributes import load_cells_dict
 from pydnameth.config.annotations.subset import subset_annotations
 from pydnameth.config.attributes.subset import subset_attributes
 from pydnameth.config.attributes.subset import subset_cells, get_indexes
+import json
 
 
 class Config:
@@ -14,12 +15,14 @@ class Config:
                  experiment,
                  annotations,
                  attributes,
+                 is_run=True
                  ):
 
         self.data = data
         self.experiment = experiment
         self.annotations = annotations
         self.attributes = attributes
+        self.is_run = is_run
 
         self.cpg_gene_dict = {}
         self.cpg_bop_dict = {}
@@ -58,7 +61,6 @@ class Config:
 
     def set_hash(self, hash):
         self.hash = hash
-
 
     def initialize(self):
 

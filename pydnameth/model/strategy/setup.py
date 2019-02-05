@@ -31,7 +31,7 @@ class TableSetUpStrategy(SetupStrategy):
 
         for config_child in configs_child:
             metrics_keys = get_metrics_keys(config.experiment)
-            metrics_keys_child = get_metrics_keys(config_child.setup)
+            metrics_keys_child = get_metrics_keys(config_child.experiment)
             for key in metrics_keys_child:
                 if key not in metrics_keys:
                     types = config_child.attributes.observables.types.items()

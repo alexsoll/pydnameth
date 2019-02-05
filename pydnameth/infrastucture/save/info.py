@@ -1,17 +1,23 @@
 from pydnameth.infrastucture.path import get_experiment_path
 from anytree import RenderTree
 import os
+import codecs
 
 
 def save_info(root):
     fn = get_experiment_path(root.config) + '/info.txt'
-    fr = open(fn, 'r')
-    lines = fr.read().splitlines()
-    fr.close()
+
+    if os.path.isfile(fn):
+        fr = codecs.open(fn, 'r+', 'utf-8')
+        lines = fr.read().splitlines()
+        fr.close()
+    else:
+        lines = []
+
     if str(root.config.hash) not in lines:
-        fa = open(fn, 'a')
+        fa = codecs.open(fn, 'a', 'utf-8')
+        fa.write(root.config.hash + '\n')
         for pre, _, node in RenderTree(root):
-            fa.write(root.config.hash + '\n')
-            fa.write(f'{pre}{node.name}')
-            fa.write('\n\n')
+            fa.write(f'{pre}{node.name}\n')
+        fa.write('\n\n')
         fa.close()

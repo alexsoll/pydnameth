@@ -27,6 +27,18 @@ class Method(Enum):
         return str(self.value)
 
 
+class DataType(Enum):
+    cpg = 'cpg'
+    gene = 'gene'
+    bop = 'bop'
+    suppl = 'suppl'
+    cache = 'cache'
+    attributes = 'attributes'
+
+    def __str__(self):
+        return str(self.value)
+
+
 def get_metrics_keys(setup):
     metrics = []
 

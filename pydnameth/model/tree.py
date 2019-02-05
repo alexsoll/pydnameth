@@ -2,13 +2,17 @@ from anytree import PostOrderIter, PreOrderIter
 from pydnameth.infrastucture.save.info import save_info
 from pydnameth.model.context import Context
 import hashlib
+import jsonpickle
 import copy
-import json
+
 
 def calc_tree(root):
 
     for node in PreOrderIter(root):
-        node_json = json.dumps(node.name, sort_keys=True).encode("utf-8")
+        params = copy.deepcopy(node.config.experiment.params)
+        node.config.experiment.params = {}
+        node_json = jsonpickle.encode(node).encode('utf-8')
+        node.config.experiment.params = params
         hash = hashlib.md5(node_json).hexdigest()
         node.config.set_hash(hash)
         save_info(node)

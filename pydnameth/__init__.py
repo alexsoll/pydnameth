@@ -14,8 +14,14 @@ from .config.annotations.types import AnnotationKey
 from .config.annotations.types import Exclude, CrossReactive, SNP, Chromosome, GeneRegion, Geo, ProbeClass
 from .config.attributes.attributes import Cells, Observables, Attributes
 from .config.data.data import Data
-from .config.data.types import DataPath, DataBase, DataType
+from .config.data.types import DataPath, DataBase
 from .config.experiment.experiment import Experiment
-from .config.experiment.types import Task, Method
-from .model.scripts import proc_table_linreg
+from .config.experiment.types import DataType, Task, Method
+from .model.scripts import \
+    cpg_proc_table_linreg, \
+    cpg_proc_table_variance_linreg, \
+    cpg_proc_table_polygon, \
+    cpg_proc_clock_linreg, \
+    cpg_plot_methylation_scatter, \
+    attributes_plot_observables_histogram
 from .setup.advanced.clock.types import ClockExogType

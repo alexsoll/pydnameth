@@ -16,12 +16,3 @@ class DataBase(Enum):
     GSE87571 = 'GSE87571'
     EPIC = 'EPIC'
     liver = 'liver'
-
-
-class DataType(Enum):
-    cpg = 'cpg'
-    gene = 'gene'
-    bop = 'bop'
-    suppl = 'suppl'
-    cache = 'cache'
-    attributes = 'attributes'

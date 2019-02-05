@@ -18,22 +18,22 @@ from pydnameth.model.strategy.save import TableSaveStrategy
 from pydnameth.model.strategy.save import ClockSaveStrategy
 from pydnameth.model.strategy.save import MethylationSaveStrategy
 from pydnameth.model.strategy.save import ObservablesSaveStrategy
-from pydnameth.config.data.types import DataType
 from pydnameth.config.experiment.types import Task
+from pydnameth.config.experiment.types import DataType
 
 
 class Context:
 
     def __init__(self, config):
 
-        if config.data.type == DataType.cpg:
+        if config.experiment.type == DataType.cpg:
             self.load_strategy = CPGLoadStrategy()
-        elif config.data.type == DataType.attributes:
+        elif config.experiment.type == DataType.attributes:
             self.load_strategy = AttributesLoadStrategy()
 
-        if config.data.type == DataType.cpg:
+        if config.experiment.type == DataType.cpg:
             self.get_strategy = CPGGetStrategy()
-        elif config.data.type == DataType.attributes:
+        elif config.experiment.type == DataType.attributes:
             self.get_strategy = AttributesGetStrategy()
 
         if config.experiment.task == Task.table:
@@ -73,14 +73,17 @@ class Context:
             self.save_strategy = ObservablesSaveStrategy()
 
     def pipeline(self, config, configs_child):
-        if not self.save_strategy.is_result_exist(config, configs_child):
 
-            config.initialize()
-            for config_child in configs_child:
-                config_child.initialize()
+        if config.is_run:
 
-            self.load_strategy.load(config, configs_child)
-            self.setup_strategy.setup(config, configs_child)
-            self.run_strategy.run(config, configs_child)
-            self.release_strategy.release(config, configs_child)
-            self.save_strategy.save(config, configs_child)
+            if not self.save_strategy.is_result_exist(config, configs_child):
+
+                config.initialize()
+                for config_child in configs_child:
+                    config_child.initialize()
+
+                self.load_strategy.load(config, configs_child)
+                self.setup_strategy.setup(config, configs_child)
+                self.run_strategy.run(config, configs_child)
+                self.release_strategy.release(config, configs_child)
+                self.save_strategy.save(config, configs_child)

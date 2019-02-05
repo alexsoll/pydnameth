@@ -1,6 +1,5 @@
 from pydnameth.config.data.types import DataPath
 from pydnameth.config.data.types import DataBase
-from pydnameth.config.data.types import DataType
 import socket
 
 """
@@ -12,7 +11,6 @@ class Data:
 
     def __init__(self,
                  name='cpg_beta',
-                 type=DataType.cpg,
                  path='',
                  base=DataBase.GSE87571.value
                  ):
@@ -33,5 +31,5 @@ class Data:
                 self.path = DataPath.cluster.value
 
     def __str__(self):
-        name = f'{self.base}_{self.type.value}'
+        name = f'{self.base}'
         return name

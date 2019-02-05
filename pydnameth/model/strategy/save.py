@@ -54,7 +54,7 @@ class MethylationSaveStrategy(SaveStrategy):
     def save(self, config, configs_child):
         fn = get_save_path(config) + '/' + \
              get_file_name(config)
-        save_figure(fn, config.plot_data['fig'])
+        save_figure(fn, config.experiment_data['fig'])
 
     def is_result_exist(self, config, configs_child):
         fn = get_save_path(config) + '/' + \
@@ -70,7 +70,7 @@ class ObservablesSaveStrategy(SaveStrategy):
     def save(self, config, configs_child):
         fn = get_save_path(config) + '/' + \
              get_file_name(config)
-        save_figure(fn, config.plot_data['fig'])
+        save_figure(fn, config.experiment_data['fig'])
 
     def is_result_exist(self, config, configs_child):
         fn = get_save_path(config) + '/' + \

@@ -107,7 +107,7 @@ class MethylationReleaseStrategy(ReleaseStrategy):
             if 'x_range' in config.experiment.params:
                 layout.xaxis.range = config.experiment.params['x_range']
 
-            config.plot_data['fig'] = go.Figure(data=config.plot_data['data'], layout=layout)
+            config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
 
 class ObservablesReleaseStrategy(ReleaseStrategy):
@@ -172,4 +172,4 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
 
             )
 
-            config.plot_data['fig'] = go.Figure(data=config.plot_data['data'], layout=layout)
+            config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)

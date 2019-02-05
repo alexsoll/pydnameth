@@ -28,7 +28,7 @@ class CPGLoadStrategy(LoadStrategy):
 
             for config_child in configs_child:
 
-                if config_child.setup.task == Task.table:
+                if config_child.experiment.task == Task.table:
 
                     config_child.advanced_data = load_table_dict(config_child)
                     config_child.advanced_list = config_child.base_list

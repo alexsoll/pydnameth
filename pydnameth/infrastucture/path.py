@@ -1,5 +1,5 @@
 import os.path
-from pydnameth.config.data.types import DataType
+from pydnameth.config.experiment.types import DataType
 
 
 def get_data_base_path(config):
@@ -18,8 +18,11 @@ def get_cache_path(config):
     return path
 
 def get_experiment_path(config):
-    path = config.data.path + '/' + config.data.base + '/' + config.data.type.value + '/' + \
-           config.experiment.task.value + '/' + config.experiment.method.value
+    path = config.data.path + '/' + \
+           config.data.base + '/' + \
+           config.experiment.type.value + '/' + \
+           config.experiment.task.value + '/' + \
+           config.experiment.method.value
 
     if not os.path.exists(path):
         os.makedirs(path)

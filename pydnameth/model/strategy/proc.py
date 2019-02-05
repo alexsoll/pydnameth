@@ -132,7 +132,7 @@ class TableRunStrategy(RunStrategy):
                 points_region = []
                 points_slope = []
 
-                if config_child.setup.method == Method.linreg:
+                if config_child.experiment.method == Method.linreg:
 
                     intercept = config_child.advanced_data['intercept'][item_id]
                     slope = config_child.advanced_data['slope'][item_id]
@@ -167,7 +167,7 @@ class TableRunStrategy(RunStrategy):
 
                     max_abs_slope = max(max_abs_slope, abs(slope))
 
-                elif config_child.setup.method == Method.linreg.variance_linreg:
+                elif config_child.experiment.method == Method.linreg.variance_linreg:
 
                     intercept = config_child.advanced_data['intercept'][item_id]
                     slope = config_child.advanced_data['slope'][item_id]
@@ -422,7 +422,7 @@ class MethylationRunStrategy(RunStrategy):
                 )
                 curr_plot_data.append(scatter)
 
-                if config_child.setup.method == Method.linreg:
+                if config_child.experiment.method == Method.linreg:
 
                     target = self.get_strategy.get_target(config_child)
                     x = sm.add_constant(target)
@@ -473,7 +473,7 @@ class MethylationRunStrategy(RunStrategy):
                     )
                     curr_plot_data.append(scatter)
 
-                elif config_child.setup.method == Method.variance_linreg:
+                elif config_child.experiment.method == Method.variance_linreg:
 
                     target = self.get_strategy.get_target(config_child)
                     x = sm.add_constant(target)
@@ -537,7 +537,7 @@ class MethylationRunStrategy(RunStrategy):
                     )
                     curr_plot_data.append(scatter)
 
-                elif config_child.setup.method == Method.cluster:
+                elif config_child.experiment.method == Method.cluster:
                     pass
 
                 plot_data += curr_plot_data
@@ -565,7 +565,7 @@ class ObservablesRunStrategy(RunStrategy):
                 target = self.get_strategy.get_target(config_child)
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
 
-                if config_child.setup.method == Method.histogram:
+                if config_child.experiment.method == Method.histogram:
 
                     types = config_child.attributes.observables.types.items()
                     histogram = go.Histogram(
@@ -587,4 +587,4 @@ class ObservablesRunStrategy(RunStrategy):
 
                 plot_data += curr_plot_data
 
-            config.plot_data['data'] = plot_data
+            config.experiment_data['data'] = plot_data
