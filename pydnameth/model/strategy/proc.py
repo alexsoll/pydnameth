@@ -1,6 +1,6 @@
 import abc
-from pydnameth.config.setup.types import Method
-from pydnameth.config.setup.types import get_metrics_keys
+from pydnameth.config.experiment.types import Method
+from pydnameth.config.experiment.types import get_metrics_keys
 import statsmodels.api as sm
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -12,37 +12,29 @@ from shapely import geometry
 from scipy.stats import norm
 
 
-class ProcStrategy(metaclass=abc.ABCMeta):
+class RunStrategy(metaclass=abc.ABCMeta):
 
     def __init__(self, get_strategy):
         self.get_strategy = get_strategy
 
     @abc.abstractmethod
-    def single_base(self, config, item):
+    def single(self, item, config, configs_child):
         pass
 
     @abc.abstractmethod
-    def iterate_base(self, config):
+    def iterate(self, config, configs_child):
         pass
 
     @abc.abstractmethod
-    def proc_base(self, config):
-        pass
-
-    @abc.abstractmethod
-    def proc_advanced(self, config, configs_primary):
-        pass
-
-    @abc.abstractmethod
-    def proc_plot(self, config, configs_primary):
+    def run(self, config, configs_child):
         pass
 
 
-class TableProcStrategy(ProcStrategy):
+class TableRunStrategy(RunStrategy):
 
-    def single_base(self, config, item):
+    def single(self, item, config, configs_child):
 
-        if config.setup.method == Method.linreg:
+        if config.experiment.method == Method.linreg:
 
             target = self.get_strategy.get_target(config)
             x = sm.add_constant(target)
@@ -61,7 +53,7 @@ class TableProcStrategy(ProcStrategy):
             config.metrics['intercept_p_value'].append(results.pvalues[0])
             config.metrics['slope_p_value'].append(results.pvalues[1])
 
-        elif config.setup.method == Method.variance_linreg:
+        elif config.experiment.method == Method.variance_linreg:
 
             target = self.get_strategy.get_target(config)
             x = sm.add_constant(target)
@@ -97,14 +89,14 @@ class TableProcStrategy(ProcStrategy):
             config.metrics['intercept_p_value_var'].append(results_var.pvalues[0])
             config.metrics['slope_p_value_var'].append(results_var.pvalues[1])
 
-        elif config.setup.method == Method.cluster:
+        elif config.experiment.method == Method.cluster:
 
             x = self.get_strategy.get_target(config, True)
             y = self.get_strategy.get_single_base(config, [item])[0]
 
             X = np.array([x, y]).T
-            db = DBSCAN(eps=config.setup.params['eps'],
-                        min_samples=config.setup.params['min_samples']).fit(X)
+            db = DBSCAN(eps=config.experiment.params['eps'],
+                        min_samples=config.experiment.params['min_samples']).fit(X)
             core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
             core_samples_mask[db.core_sample_indices_] = True
             labels = db.labels_
@@ -116,203 +108,182 @@ class TableProcStrategy(ProcStrategy):
             config.metrics['number_of_clusters'].append(number_of_clusters)
             config.metrics['number_of_noise_points'].append(number_of_noise_points)
 
-    def iterate_base(self, config):
+        elif config.experiment.method == Method.polygon:
+
+            polygons_region = []
+            polygons_slope = []
+            max_abs_slope = 0.0
+
+            for config_child in configs_child:
+
+                target = self.get_strategy.get_target(config_child)
+                item_id = config_child.advanced_dict[item]
+
+                metrics_keys = get_metrics_keys(config.experiment)
+
+                for key in config_child.advanced_data:
+                    if key not in metrics_keys:
+                        types = config_child.attributes.observables.types.items()
+                        key_primary = key + '_' + '_'.join([key + '(' + value + ')'
+                                                            for key, value in types])
+                        advanced_data = config_child.advanced_data[key][item_id]
+                        config.metrics[key_primary].append(advanced_data)
+
+                points_region = []
+                points_slope = []
+
+                if config_child.experiment.method == Method.linreg:
+
+                    intercept = config_child.advanced_data['intercept'][item_id]
+                    slope = config_child.advanced_data['slope'][item_id]
+                    intercept_std = config_child.advanced_data['intercept_std'][item_id]
+                    slope_std = config_child.advanced_data['slope_std'][item_id]
+
+                    x_min = np.min(target)
+                    x_max = np.max(target)
+                    y_min = slope * x_min + intercept
+                    y_max = slope * x_max + intercept
+                    slope_tmp = slope + 3.0 * slope_std
+                    y_tmp = slope_tmp * x_max + intercept
+                    y_diff = 3.0 * np.abs(intercept_std) + np.abs(y_tmp - y_max)
+                    y_min_up = y_min + y_diff
+                    y_min_down = y_min - y_diff
+                    y_max_up = y_max + y_diff
+                    y_max_down = y_max - y_diff
+
+                    points_region = [
+                        geometry.Point(x_min, y_min_down),
+                        geometry.Point(x_max, y_max_down),
+                        geometry.Point(x_max, y_max_up),
+                        geometry.Point(x_min, y_min_up),
+                    ]
+
+                    points_slope = [
+                        geometry.Point(slope - 3.0 * slope_std, 0.0),
+                        geometry.Point(slope + 3.0 * slope_std, 0.0),
+                        geometry.Point(slope + 3.0 * slope_std, 1.0),
+                        geometry.Point(slope - 3.0 * slope_std, 1.0),
+                    ]
+
+                    max_abs_slope = max(max_abs_slope, abs(slope))
+
+                elif config_child.experiment.method == Method.linreg.variance_linreg:
+
+                    intercept = config_child.advanced_data['intercept'][item_id]
+                    slope = config_child.advanced_data['slope'][item_id]
+                    slope_std = config_child.advanced_data['slope_std'][item_id]
+                    intercept_var = config_child.advanced_data['intercept_var'][item_id]
+                    slope_var = config_child.advanced_data['slope_var'][item_id]
+
+                    x_min = np.min(target)
+                    x_max = np.max(target)
+                    y_min = slope * x_min + intercept
+                    y_max = slope * x_max + intercept
+                    y_min_var = slope_var * x_min + intercept_var
+                    if y_min_var < 0:
+                        y_min_var = -y_min_var
+                    y_max_var = slope_var * x_max + intercept_var
+                    if y_max_var < 0:
+                        y_max_var = -y_max_var
+
+                    points_region = [
+                        geometry.Point(x_min, y_min - y_min_var),
+                        geometry.Point(x_max, y_max - y_max_var),
+                        geometry.Point(x_max, y_max + y_max_var),
+                        geometry.Point(x_min, y_min + y_min_var),
+                    ]
+
+                    points_slope = [
+                        geometry.Point(slope - 3.0 * slope_std, 0.0),
+                        geometry.Point(slope + 3.0 * slope_std, 0.0),
+                        geometry.Point(slope + 3.0 * slope_std, 1.0),
+                        geometry.Point(slope - 3.0 * slope_std, 1.0),
+                    ]
+
+                    max_abs_slope = max(max_abs_slope, abs(slope))
+
+                polygon = geometry.Polygon([[point.x, point.y]
+                                            for point in points_region])
+                polygons_region.append(polygon)
+
+                polygon = geometry.Polygon([[point.x, point.y]
+                                            for point in points_slope])
+                polygons_slope.append(polygon)
+
+            intersection = polygons_region[0]
+            union = polygons_region[0]
+            for polygon in polygons_region[1::]:
+                intersection = intersection.intersection(polygon)
+                union = union.union(polygon)
+            area_intersection_rel = intersection.area / union.area
+
+            intersection = polygons_slope[0]
+            union = polygons_slope[0]
+            for polygon in polygons_slope[1::]:
+                intersection = intersection.intersection(polygon)
+                union = union.union(polygon)
+            slope_intersection_rel = intersection.area / union.area
+
+            config.metrics['item'].append(item)
+            aux = self.get_strategy.get_aux(config, item)
+            config.metrics['aux'].append(aux)
+            config.metrics['area_intersection_rel'].append(area_intersection_rel)
+            config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
+            config.metrics['max_abs_slope'].append(max_abs_slope)
+            
+        elif config.experiment.method == Method.z_test_linreg:
+            
+            slopes = []
+            slopes_std = []
+            num_subs = []
+
+            for config_child in configs_child:
+
+                item_id = config_child.advanced_dict[item]
+                metrics_keys = get_metrics_keys(config.experiment)
+
+                for key in config_child.advanced_data:
+                    if key not in metrics_keys:
+                        types = config_child.attributes.observables.types.items()
+                        key_child = key + '_' + '_'.join([key + '(' + value + ')' for key, value in types])
+                        advanced_data = config_child.advanced_data[key][item_id]
+                        config.metrics[key_child].append(advanced_data)
+
+                slopes.append(config_child.advanced_data['slope'][item_id])
+                slopes_std.append(config_child.advanced_data['slope_std'][item_id])
+                num_subs.append(len(config_child.attributes_dict['age']))
+
+            std_errors = [slopes_std[i] / np.sqrt(num_subs[i]) for i in range (0, len(slopes_std))]
+            z_value = (slopes[0] - slopes[1]) / np.sqrt(sum([std_error * std_error for std_error in std_errors]))
+            p_value = norm.sf(abs(z_value)) * 2.0
+
+            config.metrics['item'].append(item)
+            aux = self.get_strategy.get_aux(config, item)
+            config.metrics['aux'].append(aux)
+            config.metrics['z_value'].append(z_value)
+            config.metrics['p_value'].append(p_value)
+
+
+    def iterate(self, config, configs_child):
         for item in config.base_list:
             if item in config.base_dict:
-                self.single_base(config, item)
+                self.single(item, config, configs_child)
 
-    def proc_base(self, config):
-        self.iterate_base(config)
+    def run(self, config, configs_child):
+        self.iterate(config, configs_child)
 
-    def proc_advanced(self, config, configs_primary):
 
-        method_primary = config.setup.params['method_primary']
-        metrics_keys = get_metrics_keys(config.setup)
+class ClockRunStrategy(RunStrategy):
 
-        if config.setup.method == Method.polygon:
-
-            for item in config.base_list:
-                if item in config.base_dict:
-
-                    polygons_region = []
-                    polygons_slope = []
-                    max_abs_slope = 0.0
-
-                    for config_primary in configs_primary:
-
-                        if config_primary.setup.method != method_primary:
-                            raise ValueError('method_primary param '
-                                             'must agree with configs_primary methods')
-
-                        target = self.get_strategy.get_target(config_primary)
-                        item_id = config_primary.advanced_dict[item]
-
-                        for key in config_primary.advanced_data:
-                            if key not in metrics_keys:
-                                types = config_primary.attributes.observables.types.items()
-                                key_primary = key + '_' + '_'.join([key + '(' + value + ')'
-                                                                    for key, value in types])
-                                advanced_data = config_primary.advanced_data[key][item_id]
-                                config.metrics[key_primary].append(advanced_data)
-
-                        points_region = []
-                        points_slope = []
-
-                        if config_primary.setup.method == Method.linreg:
-
-                            intercept = config_primary.advanced_data['intercept'][item_id]
-                            slope = config_primary.advanced_data['slope'][item_id]
-                            intercept_std = config_primary.advanced_data['intercept_std'][item_id]
-                            slope_std = config_primary.advanced_data['slope_std'][item_id]
-
-                            x_min = np.min(target)
-                            x_max = np.max(target)
-                            y_min = slope * x_min + intercept
-                            y_max = slope * x_max + intercept
-                            slope_tmp = slope + 3.0 * slope_std
-                            y_tmp = slope_tmp * x_max + intercept
-                            y_diff = 3.0 * np.abs(intercept_std) + np.abs(y_tmp - y_max)
-                            y_min_up = y_min + y_diff
-                            y_min_down = y_min - y_diff
-                            y_max_up = y_max + y_diff
-                            y_max_down = y_max - y_diff
-
-                            points_region = [
-                                geometry.Point(x_min, y_min_down),
-                                geometry.Point(x_max, y_max_down),
-                                geometry.Point(x_max, y_max_up),
-                                geometry.Point(x_min, y_min_up),
-                            ]
-
-                            points_slope = [
-                                geometry.Point(slope - 3.0 * slope_std, 0.0),
-                                geometry.Point(slope + 3.0 * slope_std, 0.0),
-                                geometry.Point(slope + 3.0 * slope_std, 1.0),
-                                geometry.Point(slope - 3.0 * slope_std, 1.0),
-                            ]
-
-                            max_abs_slope = max(max_abs_slope, abs(slope))
-
-                        elif config_primary.setup.method == Method.linreg.variance_linreg:
-
-                            intercept = config_primary.advanced_data['intercept'][item_id]
-                            slope = config_primary.advanced_data['slope'][item_id]
-                            slope_std = config_primary.advanced_data['slope_std'][item_id]
-                            intercept_var = config_primary.advanced_data['intercept_var'][item_id]
-                            slope_var = config_primary.advanced_data['slope_var'][item_id]
-
-                            x_min = np.min(target)
-                            x_max = np.max(target)
-                            y_min = slope * x_min + intercept
-                            y_max = slope * x_max + intercept
-                            y_min_var = slope_var * x_min + intercept_var
-                            if y_min_var < 0:
-                                y_min_var = -y_min_var
-                            y_max_var = slope_var * x_max + intercept_var
-                            if y_max_var < 0:
-                                y_max_var = -y_max_var
-
-                            points_region = [
-                                geometry.Point(x_min, y_min - y_min_var),
-                                geometry.Point(x_max, y_max - y_max_var),
-                                geometry.Point(x_max, y_max + y_max_var),
-                                geometry.Point(x_min, y_min + y_min_var),
-                            ]
-
-                            points_slope = [
-                                geometry.Point(slope - 3.0 * slope_std, 0.0),
-                                geometry.Point(slope + 3.0 * slope_std, 0.0),
-                                geometry.Point(slope + 3.0 * slope_std, 1.0),
-                                geometry.Point(slope - 3.0 * slope_std, 1.0),
-                            ]
-
-                            max_abs_slope = max(max_abs_slope, abs(slope))
-
-                        polygon = geometry.Polygon([[point.x, point.y]
-                                                    for point in points_region])
-                        polygons_region.append(polygon)
-
-                        polygon = geometry.Polygon([[point.x, point.y]
-                                                    for point in points_slope])
-                        polygons_slope.append(polygon)
-
-                    intersection = polygons_region[0]
-                    union = polygons_region[0]
-                    for polygon in polygons_region[1::]:
-                        intersection = intersection.intersection(polygon)
-                        union = union.union(polygon)
-                    area_intersection_rel = intersection.area / union.area
-
-                    intersection = polygons_slope[0]
-                    union = polygons_slope[0]
-                    for polygon in polygons_slope[1::]:
-                        intersection = intersection.intersection(polygon)
-                        union = union.union(polygon)
-                    slope_intersection_rel = intersection.area / union.area
-
-                    config.metrics['item'].append(item)
-                    aux = self.get_strategy.get_aux(config, item)
-                    config.metrics['aux'].append(aux)
-                    config.metrics['area_intersection_rel'].append(area_intersection_rel)
-                    config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
-                    config.metrics['max_abs_slope'].append(max_abs_slope)
-
-        elif config.setup.method == Method.z_test:
-            for item in config.base_list:
-                if item in config.base_dict:
-
-                    slopes = []
-                    slopes_std = []
-                    num_subs = []
-
-                    for config_primary in configs_primary:
-
-                        if config_primary.setup.method != method_primary:
-                            raise ValueError('method_primary param '
-                                             'must agree with configs_primary methods')
-
-                        item_id = config_primary.advanced_dict[item]
-
-                        for key in config_primary.advanced_data:
-                            if key not in metrics_keys:
-                                types = config_primary.attributes.observables.types.items()
-                                key_primary = key + '_' + '_'.join([key + '(' + value + ')'
-                                                                    for key, value in types])
-                                advanced_data = config_primary.advanced_data[key][item_id]
-                                config.metrics[key_primary].append(advanced_data)
-
-                        slopes.append(config_primary.advanced_data['slope'][item_id])
-                        slopes_std.append(config_primary.advanced_data['slope_std'][item_id])
-                        num_subs.append(len(config_primary.attributes_dict['age']))
-
-                    std_errors = [slopes_std[i] / np.sqrt(num_subs[i]) for i in range (0, len(slopes_std))]
-                    z_value = (slopes[0] - slopes[1]) / np.sqrt(sum([std_error * std_error for std_error in std_errors]))
-                    p_value = norm.sf(abs(z_value)) * 2
-
-                    config.metrics['item'].append(item)
-                    aux = self.get_strategy.get_aux(config, item)
-                    config.metrics['aux'].append(aux)
-                    config.metrics['z_value'].append(z_value)
-                    config.metrics['p_value'].append(p_value)
-
-    def proc_plot(self, config, configs_primary):
+    def single(self, item, config, configs_child):
         pass
 
-
-class ClockProcStrategy(ProcStrategy):
-
-    def single_base(self, config, item):
+    def iterate(self, config, configs_child):
         pass
 
-    def iterate_base(self, config):
-        pass
+    def run(self, config, configs_child):
 
-    def proc_base(self, config):
-        pass
-
-    def proc_advanced(self, config, configs_primary):
-
-        if config.setup.method == Method.linreg:
+        if config.experiment.method == Method.linreg:
 
             items = config.experiment_data['items']
             values = config.experiment_data['values']
@@ -321,15 +292,14 @@ class ClockProcStrategy(ProcStrategy):
 
             target = self.get_strategy.get_target(config)
 
-            type = config.setup.params['type']
-            exogs = min(config.setup.params['exogs'], train_size)
-            combs = min(config.setup.params['combs'], train_size)
-            runs = config.setup.params['runs']
+            type = config.experiment.params['type']
+            exogs = min(config.experiment.params['exogs'], train_size)
+            combs = min(config.experiment.params['combs'], train_size)
+            runs = config.experiment.params['runs']
 
             if type == ClockExogType.all.value:
 
                 for exog_id in range(0, exogs):
-
                     config.metrics['item'].append(items[exog_id])
                     aux = self.get_strategy.get_aux(config, items[exog_id])
                     config.metrics['aux'].append(aux)
@@ -352,7 +322,6 @@ class ClockProcStrategy(ProcStrategy):
             elif type == ClockExogType.deep.value:
 
                 for exog_id in range(0, exogs):
-
                     config.metrics['item'].append(exog_id + 1)
                     config.metrics['aux'].append(exog_id + 1)
 
@@ -394,7 +363,6 @@ class ClockProcStrategy(ProcStrategy):
             elif type == ClockExogType.slide.value:
 
                 for exog_id in range(0, exogs, combs):
-
                     config.metrics['item'].append(exog_id)
                     config.metrics['aux'].append(exog_id)
 
@@ -413,230 +381,210 @@ class ClockProcStrategy(ProcStrategy):
 
                     build_clock_linreg(clock)
 
-    def proc_plot(self, config, configs_primary):
+
+class MethylationRunStrategy(RunStrategy):
+
+    def single(self, item, config_child, configs_child):
         pass
 
-
-class MethylationProcStrategy(ProcStrategy):
-
-    def single_base(self, config, item):
-
-        plot_data = []
-
-        target = self.get_strategy.get_target(config)
-        methylation = self.get_strategy.get_single_base(config, [item])[0]
-        color = cl.scales['8']['qual']['Set1'][config.plot_data['color_id']]
-
-        types = config.attributes.observables.types.items()
-        scatter = go.Scatter(
-            x=target,
-            y=methylation,
-            name='_'.join([key + '(' + value + ')'
-                           for key, value in types]),
-            mode='markers',
-            marker=dict(
-                opacity=0.75,
-                size=15,
-                color=color,
-                line=dict(width=2)
-            ),
-        )
-        plot_data.append(scatter)
-
-        if config.setup.method == Method.linreg:
-
-            target = self.get_strategy.get_target(config)
-            x = sm.add_constant(target)
-            y = self.get_strategy.get_single_base(config, [item])[0]
-
-            results = sm.OLS(y, x).fit()
-
-            intercept = results.params[0]
-            slope = results.params[1]
-            intercept_std = results.bse[0]
-            slope_std = results.bse[1]
-
-            x_min = np.min(target)
-            x_max = np.max(target)
-            y_min = slope * x_min + intercept
-            y_max = slope * x_max + intercept
-            slope_tmp = slope + 3.0 * slope_std
-            y_tmp = slope_tmp * x_max + intercept
-            y_diff = 3.0 * np.abs(intercept_std) + np.abs(y_tmp - y_max)
-            y_min_up = y_min + y_diff
-            y_min_down = y_min - y_diff
-            y_max_up = y_max + y_diff
-            y_max_down = y_max - y_diff
-
-            scatter = go.Scatter(
-                x=[x_min, x_max],
-                y=[y_min, y_max],
-                mode='lines',
-                marker=dict(
-                    color=color,
-                    line=dict(width=8)
-                ),
-                showlegend=False
-            )
-            plot_data.append(scatter)
-
-            scatter = go.Scatter(
-                x=[x_min, x_max, x_max, x_min, x_min],
-                y=[y_min_down, y_max_down, y_max_up, y_min_up, y_min_down],
-                fill='tozerox',
-                mode='lines',
-                marker=dict(
-                    opacity=0.75,
-                    color=color,
-                    line=dict(width=8)
-                ),
-                showlegend=False
-            )
-            plot_data.append(scatter)
-
-        elif config.setup.method == Method.variance_linreg:
-
-            target = self.get_strategy.get_target(config)
-            x = sm.add_constant(target)
-            y = self.get_strategy.get_single_base(config, [item])[0]
-
-            results = sm.OLS(y, x).fit()
-
-            intercept = results.params[0]
-            slope = results.params[1]
-
-            diffs = []
-            for p_id in range(0, len(target)):
-                curr_x = target[p_id]
-                curr_y = y[p_id]
-                pred_y = slope * curr_x + intercept
-                diffs.append(abs(pred_y - curr_y))
-
-            results_var = sm.OLS(diffs, x).fit()
-
-            intercept_var = results_var.params[0]
-            slope_var = results_var.params[1]
-
-            x_min = np.min(target)
-            x_max = np.max(target)
-            y_min = slope * x_min + intercept
-            y_max = slope * x_max + intercept
-            y_min_var = slope_var * x_min + intercept_var
-            if y_min_var < 0:
-                y_min_var = -y_min_var
-            y_max_var = slope_var * x_max + intercept_var
-            if y_max_var < 0:
-                y_max_var = -y_max_var
-
-            scatter = go.Scatter(
-                x=[x_min, x_max],
-                y=[y_min, y_max],
-                mode='lines',
-                marker=dict(
-                    color=color,
-                    line=dict(width=8)
-                ),
-                showlegend=False
-            )
-            plot_data.append(scatter)
-
-            scatter = go.Scatter(
-                x=[x_min, x_max, x_max, x_min, x_min],
-                y=[y_min - y_min_var,
-                   y_max - y_max_var,
-                   y_max + y_max_var,
-                   y_min + y_min_var,
-                   y_min - y_min_var],
-                fill='tozerox',
-                mode='lines',
-                marker=dict(
-                    opacity=0.75,
-                    color=color,
-                    line=dict(width=4)
-                ),
-                showlegend=False
-            )
-            plot_data.append(scatter)
-
-        elif config.setup.method == Method.cluster:
-            pass
-
-        return plot_data
-
-    def iterate_base(self, config):
+    def iterate(self, config, configs_child):
         pass
 
-    def proc_base(self, config):
-        pass
+    def run(self, config, configs_child):
 
-    def proc_advanced(self, config, configs_primary):
-        pass
+        if config.experiment.method == Method.scatter:
 
-    def proc_plot(self, config, configs_primary):
+            item = config.experiment.params['item']
 
-        if config.setup.method == Method.scatter:
-
-            item = config.setup.params['item']
             plot_data = []
-            for config_primary in configs_primary:
-                config_primary.plot_data = {
-                    'color_id': configs_primary.index(config_primary)
-                }
-                curr_plot_data = self.single_base(config_primary, item)
-                plot_data += curr_plot_data
 
-            config.plot_data['data'] = plot_data
+            for config_child in configs_child:
 
+                curr_plot_data = []
 
-class ObservablesProcStrategy(ProcStrategy):
+                target = self.get_strategy.get_target(config_child)
+                methylation = self.get_strategy.get_single_base(config_child, [item])[0]
+                color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
 
-    def single_base(self, config, item):
-
-        plot_data = []
-
-        target = self.get_strategy.get_target(config)
-        color = cl.scales['8']['qual']['Set1'][config.plot_data['color_id']]
-
-        if config.setup.method == Method.histogram:
-
-            types = config.attributes.observables.types.items()
-            histogram = go.Histogram(
-                x=target,
-                name='_'.join([key + '(' + value + ')'
-                               for key, value in types]),
-                xbins=dict(
-                    start=min(target) - 0.5,
-                    end=max(target) + 0.5,
-                    size=1.0
-                ),
-                marker=dict(
-                    opacity=0.75,
-                    color=color
+                types = config_child.attributes.observables.types.items()
+                scatter = go.Scatter(
+                    x=target,
+                    y=methylation,
+                    name='_'.join([key + '(' + value + ')'
+                                   for key, value in types]),
+                    mode='markers',
+                    marker=dict(
+                        opacity=0.75,
+                        size=15,
+                        color=color,
+                        line=dict(width=2)
+                    ),
                 )
-            )
-            plot_data.append(histogram)
+                curr_plot_data.append(scatter)
 
-        return plot_data
+                if config_child.experiment.method == Method.linreg:
 
-    def iterate_base(self, config):
-        pass
+                    target = self.get_strategy.get_target(config_child)
+                    x = sm.add_constant(target)
+                    y = self.get_strategy.get_single_base(config_child, [item])[0]
 
-    def proc_base(self, config):
-        pass
+                    results = sm.OLS(y, x).fit()
 
-    def proc_advanced(self, config, configs_primary):
-        pass
+                    intercept = results.params[0]
+                    slope = results.params[1]
+                    intercept_std = results.bse[0]
+                    slope_std = results.bse[1]
 
-    def proc_plot(self, config, configs_primary):
+                    x_min = np.min(target)
+                    x_max = np.max(target)
+                    y_min = slope * x_min + intercept
+                    y_max = slope * x_max + intercept
+                    slope_tmp = slope + 3.0 * slope_std
+                    y_tmp = slope_tmp * x_max + intercept
+                    y_diff = 3.0 * np.abs(intercept_std) + np.abs(y_tmp - y_max)
+                    y_min_up = y_min + y_diff
+                    y_min_down = y_min - y_diff
+                    y_max_up = y_max + y_diff
+                    y_max_down = y_max - y_diff
 
-        if config.setup.method == Method.histogram:
+                    scatter = go.Scatter(
+                        x=[x_min, x_max],
+                        y=[y_min, y_max],
+                        mode='lines',
+                        marker=dict(
+                            color=color,
+                            line=dict(width=8)
+                        ),
+                        showlegend=False
+                    )
+                    curr_plot_data.append(scatter)
 
-            plot_data = []
-            for config_primary in configs_primary:
-                config_primary.plot_data = {
-                    'color_id': configs_primary.index(config_primary)
-                }
-                curr_plot_data = self.single_base(config_primary, [])
+                    scatter = go.Scatter(
+                        x=[x_min, x_max, x_max, x_min, x_min],
+                        y=[y_min_down, y_max_down, y_max_up, y_min_up, y_min_down],
+                        fill='tozerox',
+                        mode='lines',
+                        marker=dict(
+                            opacity=0.75,
+                            color=color,
+                            line=dict(width=8)
+                        ),
+                        showlegend=False
+                    )
+                    curr_plot_data.append(scatter)
+
+                elif config_child.experiment.method == Method.variance_linreg:
+
+                    target = self.get_strategy.get_target(config_child)
+                    x = sm.add_constant(target)
+                    y = self.get_strategy.get_single_base(config_child, [item])[0]
+
+                    results = sm.OLS(y, x).fit()
+
+                    intercept = results.params[0]
+                    slope = results.params[1]
+
+                    diffs = []
+                    for p_id in range(0, len(target)):
+                        curr_x = target[p_id]
+                        curr_y = y[p_id]
+                        pred_y = slope * curr_x + intercept
+                        diffs.append(abs(pred_y - curr_y))
+
+                    results_var = sm.OLS(diffs, x).fit()
+
+                    intercept_var = results_var.params[0]
+                    slope_var = results_var.params[1]
+
+                    x_min = np.min(target)
+                    x_max = np.max(target)
+                    y_min = slope * x_min + intercept
+                    y_max = slope * x_max + intercept
+                    y_min_var = slope_var * x_min + intercept_var
+                    if y_min_var < 0:
+                        y_min_var = -y_min_var
+                    y_max_var = slope_var * x_max + intercept_var
+                    if y_max_var < 0:
+                        y_max_var = -y_max_var
+
+                    scatter = go.Scatter(
+                        x=[x_min, x_max],
+                        y=[y_min, y_max],
+                        mode='lines',
+                        marker=dict(
+                            color=color,
+                            line=dict(width=8)
+                        ),
+                        showlegend=False
+                    )
+                    curr_plot_data.append(scatter)
+
+                    scatter = go.Scatter(
+                        x=[x_min, x_max, x_max, x_min, x_min],
+                        y=[y_min - y_min_var,
+                           y_max - y_max_var,
+                           y_max + y_max_var,
+                           y_min + y_min_var,
+                           y_min - y_min_var],
+                        fill='tozerox',
+                        mode='lines',
+                        marker=dict(
+                            opacity=0.75,
+                            color=color,
+                            line=dict(width=4)
+                        ),
+                        showlegend=False
+                    )
+                    curr_plot_data.append(scatter)
+
+                elif config_child.experiment.method == Method.cluster:
+                    pass
+
                 plot_data += curr_plot_data
 
-            config.plot_data['data'] = plot_data
+            config.experiment_data['data'] = plot_data
+
+
+class ObservablesRunStrategy(RunStrategy):
+
+    def single(self, item, config, configs_child):
+        pass
+
+    def iterate(self, config, configs_primary):
+        pass
+
+    def run(self, config, configs_child):
+
+        if config.experiment.method == Method.histogram:
+
+            plot_data = []
+            for config_child in configs_child:
+
+                curr_plot_data = []
+
+                target = self.get_strategy.get_target(config_child)
+                color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
+
+                if config_child.experiment.method == Method.histogram:
+
+                    types = config_child.attributes.observables.types.items()
+                    histogram = go.Histogram(
+                        x=target,
+                        name='_'.join([key + '(' + value + ')'
+                                       for key, value in types]),
+                        xbins=dict(
+                            start=min(target) - 0.5,
+                            end=max(target) + 0.5,
+                            size=1.0
+                        ),
+                        marker=dict(
+                            opacity=0.75,
+                            color=color
+                        )
+                    )
+
+                    curr_plot_data.append(histogram)
+
+                plot_data += curr_plot_data
+
+            config.experiment_data['data'] = plot_data

@@ -1,8 +1,8 @@
 import unittest
 from tests.definitions import ROOT_DIR
 from pydnameth import Data
-from pydnameth import DataType
-from pydnameth import Setup
+from pydnameth import Experiment
+from pydnameth.config.experiment.types import DataType
 from pydnameth import Annotations
 from pydnameth import CommonTypes
 from pydnameth import CrossReactive
@@ -24,13 +24,12 @@ class TestLoadAnnotations(unittest.TestCase):
 
         data = Data(
             name='cpg_beta',
-            type=DataType.cpg,
             path=ROOT_DIR,
             base='fixtures'
         )
 
-        setup = Setup(
-            experiment='',
+        experiment = Experiment(
+            type=DataType.cpg,
             task='',
             method='',
             params={}
@@ -65,7 +64,7 @@ class TestLoadAnnotations(unittest.TestCase):
 
         self.config = Config(
             data=data,
-            setup=setup,
+            experiment=experiment,
             annotations=annotations,
             attributes=attributes
         )

@@ -2,15 +2,6 @@ from enum import Enum
 from pydnameth.setup.advanced.clock.types import ClockExogType
 
 
-class Experiment(Enum):
-    base = 'base'
-    advanced = 'advanced'
-    plot = 'plot'
-
-    def __str__(self):
-        return str(self.value)
-
-
 class Task(Enum):
     table = 'table'
     clock = 'clock'
@@ -30,7 +21,19 @@ class Method(Enum):
     scatter = 'scatter'
     polygon = 'polygon'
     special = 'special'
-    z_test = 'z_test'
+    z_test_linreg = 'z_test_linreg'
+
+    def __str__(self):
+        return str(self.value)
+
+
+class DataType(Enum):
+    cpg = 'cpg'
+    gene = 'gene'
+    bop = 'bop'
+    attributes = 'attributes'
+    suppl = 'suppl'
+    cache = 'cache'
 
     def __str__(self):
         return str(self.value)
@@ -91,7 +94,7 @@ def get_metrics_keys(setup):
             metrics = [
                 'item'
             ]
-        elif setup.method == Method.z_test:
+        elif setup.method == Method.z_test_linreg:
             metrics = [
                 'item',
                 'aux',
@@ -128,7 +131,7 @@ def get_main_metric(setup):
             metric = ('number_of_clusters', 'descending')
         elif setup.method == Method.polygon:
             metric = ('area_intersection_rel', 'ascending')
-        elif setup.method == Method.z_test:
+        elif setup.method == Method.z_test_linreg:
             metric = ('p_value', 'ascending')
 
     return metric

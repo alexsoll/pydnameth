@@ -31,5 +31,3 @@ class Annotations:
                'geo(' + self.geo + ')' + '_' + \
                'class(' + self.probe_class + ')'
 
-
-__all__ = ['Annotations']
