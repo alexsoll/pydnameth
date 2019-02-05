@@ -5,7 +5,6 @@ from pydnameth.infrastucture.load.attributes import load_cells_dict
 from pydnameth.config.annotations.subset import subset_annotations
 from pydnameth.config.attributes.subset import subset_attributes
 from pydnameth.config.attributes.subset import subset_cells, get_indexes
-import json
 
 
 class Config:
