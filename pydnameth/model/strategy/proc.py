@@ -231,7 +231,7 @@ class TableRunStrategy(RunStrategy):
             config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
             config.metrics['max_abs_slope'].append(max_abs_slope)
             
-        elif config.experiment.method == Method.z_test:
+        elif config.experiment.method == Method.z_test_linreg:
             
             slopes = []
             slopes_std = []

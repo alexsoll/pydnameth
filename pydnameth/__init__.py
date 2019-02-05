@@ -21,6 +21,7 @@ from .model.scripts import \
     cpg_proc_table_linreg, \
     cpg_proc_table_variance_linreg, \
     cpg_proc_table_polygon, \
+    cpg_proc_table_z_test_linreg, \
     cpg_proc_clock_linreg, \
     cpg_plot_methylation_scatter, \
     attributes_plot_observables_histogram

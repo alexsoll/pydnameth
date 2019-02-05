@@ -16,7 +16,7 @@ class ReleaseStrategy(metaclass=abc.ABCMeta):
 class TableReleaseStrategy(ReleaseStrategy):
 
     def release(self, config, configs_child):
-        if config.setup.method == Method.z_test:
+        if config.experiment.method == Method.z_test_linreg:
             reject, pvals_corr, alphacSidak, alphacBonf = multipletests(config.metrics['p_value'], 0.05, method='fdr_bh')
             config.metrics['p_value'] = pvals_corr
 

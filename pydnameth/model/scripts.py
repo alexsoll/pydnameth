@@ -99,6 +99,59 @@ def cpg_proc_table_polygon(
 
     calc_tree(root)
 
+def cpg_proc_table_z_test_linreg(
+    data,
+    annotations,
+    attributes,
+    observables_list,
+    child_method = Method.linreg
+):
+    config_root = Config(
+        data=data,
+        experiment=Experiment(
+            type=DataType.cpg,
+            task=Task.table,
+            method=Method.z_test_linreg,
+            params={}
+        ),
+        annotations=annotations,
+        attributes=attributes
+    )
+    root = Node(name=str(config_root), config=config_root)
+
+    for d in observables_list:
+
+        observables_child = Observables(
+            name=attributes.observables.name,
+            types=d
+        )
+
+        cells_child = Cells(
+            name=attributes.cells.name,
+            types=attributes.cells.types
+        )
+
+        attributes_child = Attributes(
+            target=attributes.target,
+            observables=observables_child,
+            cells=cells_child,
+        )
+
+        config_child = Config(
+            data=data,
+            experiment=Experiment(
+                type=DataType.cpg,
+                task=Task.table,
+                method=child_method,
+                params={}
+            ),
+            annotations=annotations,
+            attributes=attributes_child
+        )
+        Node(name=str(config_child), config=config_child, parent=root)
+
+    calc_tree(root)
+
 def cpg_proc_clock_linreg(
     data,
     annotations,
