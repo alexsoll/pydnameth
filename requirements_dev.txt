@@ -24,3 +24,5 @@ psutil==5.5.0
 coverage==4.5.2
 codecov==2.0.15
 psutil==5.5.0
+anytree==2.5.0
+jsonpickle==1.1

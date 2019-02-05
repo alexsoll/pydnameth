@@ -6,10 +6,10 @@ from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
 from pydnameth.model.strategy.setup import MethylationSetUpStrategy
 from pydnameth.model.strategy.setup import ObservablesSetUpStrategy
-from pydnameth.model.strategy.proc import TableProcStrategy
-from pydnameth.model.strategy.proc import ClockProcStrategy
-from pydnameth.model.strategy.proc import MethylationProcStrategy
-from pydnameth.model.strategy.proc import ObservablesProcStrategy
+from pydnameth.model.strategy.proc import TableRunStrategy
+from pydnameth.model.strategy.proc import ClockRunStrategy
+from pydnameth.model.strategy.proc import MethylationRunStrategy
+from pydnameth.model.strategy.proc import ObservablesRunStrategy
 from pydnameth.model.strategy.release import TableReleaseStrategy
 from pydnameth.model.strategy.release import ClockReleaseStrategy
 from pydnameth.model.strategy.release import MethylationReleaseStrategy
@@ -18,78 +18,72 @@ from pydnameth.model.strategy.save import TableSaveStrategy
 from pydnameth.model.strategy.save import ClockSaveStrategy
 from pydnameth.model.strategy.save import MethylationSaveStrategy
 from pydnameth.model.strategy.save import ObservablesSaveStrategy
-from pydnameth.config.data.types import DataType
-from pydnameth.config.setup.types import Task
+from pydnameth.config.experiment.types import Task
+from pydnameth.config.experiment.types import DataType
 
 
 class Context:
 
-    def __init__(self,
-                 config):
+    def __init__(self, config):
 
-        if config.data.type == DataType.cpg:
+        if config.experiment.type == DataType.cpg:
             self.load_strategy = CPGLoadStrategy()
-        elif config.data.type == DataType.attributes:
+        elif config.experiment.type == DataType.attributes:
             self.load_strategy = AttributesLoadStrategy()
 
-        if config.data.type == DataType.cpg:
+        if config.experiment.type == DataType.cpg:
             self.get_strategy = CPGGetStrategy()
-        elif config.data.type == DataType.attributes:
+        elif config.experiment.type == DataType.attributes:
             self.get_strategy = AttributesGetStrategy()
 
-        if config.setup.task == Task.table:
+        if config.experiment.task == Task.table:
             self.setup_strategy = TableSetUpStrategy(self.get_strategy)
-        elif config.setup.task == Task.clock:
+        elif config.experiment.task == Task.clock:
             self.setup_strategy = ClockSetUpStrategy(self.get_strategy)
-        elif config.setup.task == Task.methylation:
+        elif config.experiment.task == Task.methylation:
             self.setup_strategy = MethylationSetUpStrategy(self.get_strategy)
-        elif config.setup.task == Task.observables:
+        elif config.experiment.task == Task.observables:
             self.setup_strategy = ObservablesSetUpStrategy(self.get_strategy)
 
-        if config.setup.task == Task.table:
-            self.proc_strategy = TableProcStrategy(self.get_strategy)
-        elif config.setup.task == Task.clock:
-            self.proc_strategy = ClockProcStrategy(self.get_strategy)
-        elif config.setup.task == Task.methylation:
-            self.proc_strategy = MethylationProcStrategy(self.get_strategy)
-        elif config.setup.task == Task.observables:
-            self.proc_strategy = ObservablesProcStrategy(self.get_strategy)
+        if config.experiment.task == Task.table:
+            self.run_strategy = TableRunStrategy(self.get_strategy)
+        elif config.experiment.task == Task.clock:
+            self.run_strategy = ClockRunStrategy(self.get_strategy)
+        elif config.experiment.task == Task.methylation:
+            self.run_strategy = MethylationRunStrategy(self.get_strategy)
+        elif config.experiment.task == Task.observables:
+            self.run_strategy = ObservablesRunStrategy(self.get_strategy)
 
-        if config.setup.task == Task.table:
+        if config.experiment.task == Task.table:
             self.release_strategy = TableReleaseStrategy()
-        elif config.setup.task == Task.clock:
+        elif config.experiment.task == Task.clock:
             self.release_strategy = ClockReleaseStrategy()
-        elif config.setup.task == Task.methylation:
+        elif config.experiment.task == Task.methylation:
             self.release_strategy = MethylationReleaseStrategy()
-        elif config.setup.task == Task.observables:
+        elif config.experiment.task == Task.observables:
             self.release_strategy = ObservablesReleaseStrategy()
 
-        if config.setup.task == Task.table:
+        if config.experiment.task == Task.table:
             self.save_strategy = TableSaveStrategy()
-        elif config.setup.task == Task.clock:
+        elif config.experiment.task == Task.clock:
             self.save_strategy = ClockSaveStrategy()
-        elif config.setup.task == Task.methylation:
+        elif config.experiment.task == Task.methylation:
             self.save_strategy = MethylationSaveStrategy()
-        elif config.setup.task == Task.observables:
+        elif config.experiment.task == Task.observables:
             self.save_strategy = ObservablesSaveStrategy()
 
-    def base_pipeline(self, config):
-        self.load_strategy.load_base(config)
-        self.setup_strategy.setup_base(config)
-        self.proc_strategy.proc_base(config)
-        self.release_strategy.release_base(config)
-        self.save_strategy.save_base(config)
+    def pipeline(self, config, configs_child):
 
-    def advanced_pipeline(self, config, configs_primary):
-        self.load_strategy.load_advanced(config, configs_primary)
-        self.setup_strategy.setup_advanced(config, configs_primary)
-        self.proc_strategy.proc_advanced(config, configs_primary)
-        self.release_strategy.release_advanced(config, configs_primary)
-        self.save_strategy.save_advanced(config, configs_primary)
+        if config.is_run:
 
-    def plot_pipeline(self, config, configs_primary):
-        self.load_strategy.load_plot(config, configs_primary)
-        self.setup_strategy.setup_plot(config, configs_primary)
-        self.proc_strategy.proc_plot(config, configs_primary)
-        self.release_strategy.release_plot(config, configs_primary)
-        self.save_strategy.save_plot(config, configs_primary)
+            if not self.save_strategy.is_result_exist(config, configs_child):
+
+                config.initialize()
+                for config_child in configs_child:
+                    config_child.initialize()
+
+                self.load_strategy.load(config, configs_child)
+                self.setup_strategy.setup(config, configs_child)
+                self.run_strategy.run(config, configs_child)
+                self.release_strategy.release(config, configs_child)
+                self.save_strategy.save(config, configs_child)

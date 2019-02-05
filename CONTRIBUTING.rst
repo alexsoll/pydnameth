@@ -124,6 +124,12 @@ Local
 
     $ pip install -r requirements_dev.txt
 
+6. If you update ``requirements_dev.txt`` file, you should recreate environment for ``tox`` (only locally)::
+
+    $ tox -recreate -e env
+
+   Where ``env`` is name for ``tox`` environment.
+
 Git Pipeline
 ~~~~~~~~~~~~
 

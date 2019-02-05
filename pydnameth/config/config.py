@@ -11,15 +11,17 @@ class Config:
 
     def __init__(self,
                  data,
-                 setup,
+                 experiment,
                  annotations,
                  attributes,
+                 is_run=True
                  ):
 
         self.data = data
-        self.setup = setup
+        self.experiment = experiment
         self.annotations = annotations
         self.attributes = attributes
+        self.is_run = is_run
 
         self.cpg_gene_dict = {}
         self.cpg_bop_dict = {}
@@ -49,6 +51,16 @@ class Config:
         self.attributes_indexes = None
         self.cells_dict = None
 
+    def __str__(self):
+        name = f'data({str(self.data)})_' \
+               + f'experiment({str(self.experiment)})_' \
+               + f'annotations({str(self.annotations)})_' \
+               + f'attributes({str(self.attributes)})'
+        return name
+
+    def set_hash(self, hash):
+        self.hash = hash
+
     def initialize(self):
 
         self.excluded = load_excluded(self)
@@ -61,6 +73,3 @@ class Config:
         subset_attributes(self)
         self.cells_dict = load_cells_dict(self)
         subset_cells(self)
-
-
-__all__ = ['Config']
