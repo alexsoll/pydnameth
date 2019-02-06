@@ -1,7 +1,7 @@
 import abc
 import numpy as np
-from pydnameth.config.setup.types import Method
-from pydnameth.config.setup.types import get_main_metric
+from pydnameth.config.experiment.types import Method
+from pydnameth.config.experiment.types import get_main_metric
 import plotly.graph_objs as go
 from statsmodels.stats.multitest import multipletests
 
@@ -9,23 +9,19 @@ from statsmodels.stats.multitest import multipletests
 class ReleaseStrategy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def release_base(self, config):
-        pass
-
-    @abc.abstractmethod
-    def release_advanced(self, config, configs_primary):
-        pass
-
-    @abc.abstractmethod
-    def release_plot(self, config, configs_primary):
+    def release(self, config, configs_child):
         pass
 
 
 class TableReleaseStrategy(ReleaseStrategy):
 
-    def release_base(self, config):
-        (key, direction) = get_main_metric(config.setup)
+    def release(self, config, configs_child):
+        if config.experiment.method == Method.z_test_linreg:
+            reject, pvals_corr, alphacSidak, alphacBonf = multipletests(config.metrics['p_value'], 0.05, method='fdr_bh')
+            config.metrics['p_value'] = pvals_corr
 
+        (key, direction) = get_main_metric(config.experiment)
+        
         order = list(np.argsort(config.metrics[key]))
         if direction == 'descending':
             order.reverse()
@@ -33,42 +29,19 @@ class TableReleaseStrategy(ReleaseStrategy):
         for key, value in config.metrics.items():
             config.metrics[key] = list(np.array(value)[order])
 
-    def release_advanced(self, config, configs_primary):
-        if config.setup.method == Method.z_test:
-            reject, pvals_corr, alphacSidak, alphacBonf = \
-                multipletests(config.metrics['p_value'], 0.05, method='fdr_bh')
-            config.metrics['p_value'] = pvals_corr
-        self.release_base(config)
-
-    def release_plot(self, config, configs_primary):
-        pass
-
-
 class ClockReleaseStrategy(ReleaseStrategy):
 
-    def release_base(self, config):
-        pass
-
-    def release_advanced(self, config, configs_primary):
-        pass
-
-    def release_plot(self, config, configs_primary):
+    def release(self, config, configs_child):
         pass
 
 
 class MethylationReleaseStrategy(ReleaseStrategy):
 
-    def release_base(self, config):
-        pass
+    def release(self, config, configs_child):
 
-    def release_advanced(self, config, configs_primary):
-        pass
+        if config.experiment.method == Method.scatter:
 
-    def release_plot(self, config, configs_primary):
-
-        if config.setup.method == Method.scatter:
-
-            item = config.setup.params['item']
+            item = config.experiment.params['item']
             aux = config.cpg_gene_dict[item]
             if isinstance(aux, list):
                 aux_str = ';'.join(aux)
@@ -131,23 +104,18 @@ class MethylationReleaseStrategy(ReleaseStrategy):
 
             )
 
-            if 'x_range' in config.setup.params:
-                layout.xaxis.range = config.setup.params['x_range']
+            if 'x_range' in config.experiment.params:
+                layout.xaxis.range = config.experiment.params['x_range']
 
-            config.plot_data['fig'] = go.Figure(data=config.plot_data['data'], layout=layout)
+            config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
 
 class ObservablesReleaseStrategy(ReleaseStrategy):
 
-    def release_base(self, config):
-        pass
 
-    def release_advanced(self, config, configs_primary):
-        pass
+    def release(self, config, configs_child):
 
-    def release_plot(self, config, configs_primary):
-
-        if config.setup.method == Method.histogram:
+        if config.experiment.method == Method.histogram:
 
             layout = go.Layout(
                 autosize=True,
@@ -204,4 +172,4 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
 
             )
 
-            config.plot_data['fig'] = go.Figure(data=config.plot_data['data'], layout=layout)
+            config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
