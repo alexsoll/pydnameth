@@ -33,25 +33,21 @@ Currently supported only ``.txt`` extension.
 These files must be located in the same directory. After running experiments, new directories with results
 and cached data files with ``.pkl`` and ``.npz`` extensions will appear in this directory.
 
-All experiments provided py ``pydnameth`` running by single function ``pdm.run(config, configs_primary)``.
-For each experiment, it is necessary to create one main instance of the pdm.Config class (described below).
-For some experiments it is necessary to create additional instances of the pdm.Config class for primary experiments,
-which results uses it main experiment.
+For all experiments provided by ``pydnameth`` you need to specify config information.
 
 ------
 Config
 ------
-For creating instance of the ``pdm.Config`` you need to create additional instances:
+For each experiment you need to create instances:
 
 * ``pdm.Data``
-* ``pdm.Setup``
 * ``pdm.Annotations``
 * ``pdm.Attributes``
 
 ~~~~
 Data
 ~~~~
-``pdm.Data`` contains information about dataset and the type of data that will be used in the experiments.
+``pdm.Data`` contains information about dataset.
 For creating instance of ``pdm.Data`` you need to specify next fields:
 
 ++++++++
@@ -65,24 +61,13 @@ Example::
     name = 'cpg_beta'
 
 ++++++++
-``type``
-++++++++
-Indicates type of data that will be used in the experiments. Instance of ``enum`` ``pdm.DataType``
-Currently supported only ``pdm.DataType.cpg`` and ``pdm.DataType.attributes``.
-In next releases ``pdm.DataType.gene`` and ``pdm.DataType.bop`` will be added.
-
-Example::
-
-    type = pdm.DataType.cpg
-
-++++++++
 ``path``
 ++++++++
 Path to directory, which contains ``base`` directory.
 
 Example::
 
-    path = C:/Data
+    path = 'C:/Data'
 
 ++++++++
 ``base``
@@ -102,102 +87,9 @@ Example of creating ``pdm.Data`` instance:
 
      data = pdm.Data(
         name='cpg_beta',
-        type=pdm.DataType.cpg,
         path='C:/Data',
         base='GSE40279'
     )
-
-~~~~~
-Setup
-~~~~~
-
-``pdm.Setup`` describes the run experiment using the following hierarchy.
-For creating instance of ``pdm.Setup`` you need to specify each level of hierarchy:
-
-++++++++++++++
-``experiment``
-++++++++++++++
-
-Type of the experiment, specifies ``TYPE OF RESEARCH`` (top-level of hierarchy). It should be instance of ``enum`` ``pdm.Experiment``.
-Currently supported 3 main types of experiment:
-
-* ``pdm.Experiment.base`` - use only methylation data.
-* ``pdm.Experiment.advanced`` - use methylation data and results of any other experiments.
-* ``pdm.Experiment.plot`` - use methylation data and results of any other experiments.
-
-Example::
-
-    experiment = pdm.Experiment.base
-
-++++++++
-``task``
-++++++++
-Specifies ``WHAT WE WANT TO DO`` (mid-level of hierarchy). It should be instance of ``enum`` ``pdm.Task``. Currently supported tasks:
-
-* ``pdm.Experiment.table`` - creating table with different measurables.
-  Can be used for ``pdm.Experiment.base`` and ``pdm.Experiment.advanced``.
-* ``pdm.Experiment.clock`` - building epigenetic clock.
-  Can be used only for ``pdm.Experiment.advanced``.
-* ``pdm.Experiment.observables`` - perform analysis with subject's observables.
-  Can be used only for ``pdm.Experiment.plot``.
-* ``pdm.Experiment.methylation`` - perform analysis with raw methylation data.
-  Can be used only for ``pdm.Experiment.plot``.
-
-Example::
-
-    task = pdm.Experiment.table
-
-++++++++++
-``method``
-++++++++++
-Specifies ``HOW WE WANT TO DO`` (bottom-level hierarchy).
-It should be instance of ``enum`` ``pdm.Method``. Currently supported tasks:
-
-* ``pdm.Method.linreg`` - perform linear regression between target observable and choosen ``pdm.DataType``.
-  Can be used for ``pdm.Experiment.table`` and  ``pdm.Experiment.clock``.
-* ``pdm.Method.variance_linreg`` - perform linear regression for variance
-  from linear regression line between target observable and chosen ``pdm.DataType``.
-  Can be used for ``pdm.Experiment.table``
-* ``pdm.Method.cluster`` - clustering on plane of target observable and chosen ``pdm.DataType``.
-  Can be used for ``pdm.Experiment.table``
-* ``pdm.Method.histogram`` - creating figures with histograms.
-  Can be used for ``pdm.Experiment.observables``
-* ``pdm.Method.scatter`` - creating figures with scatters.
-  Can be used for ``pdm.Experiment.methylation``
-* ``pdm.Method.polygon`` - allows to define observable-specific markers.
-  Can be used for ``pdm.Experiment.table``
-
-Example::
-
-    method = pdm.Method.linreg
-
-++++++++++
-``params``
-++++++++++
-Specifies params for chosen combination of  ``task`` and ``method``.
-It should be ``dict`` where ``key`` is the name of param and ``value`` is the value of param.
-You can leave it empty - in this case, the params settings are used.
-
-Example::
-
-    params = {}
-
-+++++++
-Example
-+++++++
-
-Example of creating ``pdm.Setup`` instance:
-
-.. code-block:: python
-
-     setup = pdm.Setup(
-        experiment=pdm.Experiment.base,
-        task=pdm.Task.table,
-        method=pdm.Method.linreg,
-        params={}
-    )
-
-More information in `More Details About Methods`_ and `Released`_ sections
 
 ~~~~~~~~~~~
 Annotations
@@ -401,17 +293,61 @@ Example::
 
     types = ['Monocytes', 'B', 'CD4T', 'NK', 'CD8T', 'Gran']
 
++++++++
+Example
++++++++
 
---------------------------
-More Details About Methods
---------------------------
+Example of creating ``pdm.Attributes`` instance:
 
-TODO
+.. code-block:: python
 
---------
-Released
---------
+    observables = pdm.Observables(
+        name='observables',
+        types={'gender': 'F'}
+    )
 
-TODO
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
 
-Repository with examples: https://github.com/GillianGrayson/dna-methylation
+    attributes = pdm.Attributes(
+        target='age',
+        observables=observables,
+        cells=cells
+    )
+
+--------------------
+Released Experiments
+--------------------
+The name of the functions provided by the ``pydnameth`` package are follow the next logic:
+
+* First part is data type for the experiment. For example ``cpg`` or ``attributes``.
+* Second part answers the question ``WHAT WE WANT TO DO?``.
+  For example ``proc_table`` - table with data and characteristics processing,
+  ``plot_methylation`` - methylation data plotting.
+* Third part answers the question ``HOW WE WANT TO DO?``. Specifies the method for the experiment.
+  For example ``linreg`` - linear regression method.
+
+Currently released functions:
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``attributes_plot_observables_histogram``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++++++++++++
+Description
++++++++++++
+
+Plotting histograms for different subset of subjects, which are specified by certain values of observables.
+
+++++++
+Params
+++++++
+
+
++++++++
+Example
++++++++
+
