@@ -4,12 +4,22 @@ from pydnameth.config.experiment.types import DataType, Task, Method
 from pydnameth.config.config import Config
 from pydnameth.model.tree import calc_tree
 from pydnameth.config.attributes.attributes import Attributes, Observables, Cells
+from pydnameth.scripts.develop import \
+    cpg_proc_table_linreg_dev, \
+    cpg_proc_table_variance_linreg_dev, \
+    cpg_proc_table_polygon_dev, \
+    cpg_proc_table_z_test_linreg_dev, \
+    cpg_proc_clock_linreg_dev, \
+    cpg_plot_methylation_scatter_dev, \
+    attributes_plot_observables_histogram_dev
+import copy
 
 
 def cpg_proc_table_linreg(
     data,
     annotations,
-    attributes
+    attributes,
+    params=None
 ):
     """
     Producing table with information for linear regression between target observable
@@ -29,30 +39,28 @@ def cpg_proc_table_linreg(
     * intercept_p_value: p-value for the intercept of linear regression.
     * slope_p_pvalue: p-value for the slope of linear regression.
 
+    Possible parameters of experiment:
+
+    * None
+
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
     :param attributes: pdm.Attributes instance, which specifies information about subjects.
+    :param params: parameters of experiment.
     """
-    config_root = Config(
+    cpg_proc_table_linreg_dev(
         data=data,
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=Method.linreg,
-            params={}
-        ),
         annotations=annotations,
-        attributes=attributes
+        attributes=attributes,
+        params=params
     )
-
-    root = Node(name=str(config_root), config=config_root)
-    calc_tree(root)
 
 
 def cpg_proc_table_variance_linreg(
     data,
     annotations,
-    attributes
+    attributes,
+    params=None
 ):
     """
     Producing table with information for linear regression of variance from primary linear regression between target observable
@@ -81,24 +89,21 @@ def cpg_proc_table_variance_linreg(
     * intercept_p_value_var: p-value for the intercept of linear regression for variance.
     * slope_p_pvalue_var: p-value for the slope of linear regression for variance.
 
+    Possible parameters of experiment:
+
+    * None
+
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
     :param attributes: pdm.Attributes instance, which specifies information about subjects.
+    :param params: parameters of experiment.
     """
-    config_root = Config(
+    cpg_proc_table_variance_linreg_dev(
         data=data,
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=Method.variance_linreg,
-            params={}
-        ),
         annotations=annotations,
-        attributes=attributes
+        attributes=attributes,
+        params=params
     )
-
-    root = Node(name=str(config_root), config=config_root)
-    calc_tree(root)
 
 
 def cpg_proc_table_polygon(
@@ -106,7 +111,7 @@ def cpg_proc_table_polygon(
     annotations,
     attributes,
     observables_list,
-    child_method=Method.linreg
+    params=None
 ):
     """
     Producing table with information about observable-specificity of methylation level
@@ -139,56 +144,28 @@ def cpg_proc_table_polygon(
 
     Where *** is the name of subjects subset.
 
+    Possible parameters of experiment:
+
+    * None
+
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
     :param attributes: pdm.Attributes instance, which specifies information about subjects.
     :param observables_list: list of subjects subsets. Each element in list is dict,
      where ``key`` is observable name and ``value`` is possible values for this observable.
+    :param params: parameters of experiment.
     """
-    config_root = Config(
+
+    child_method = Method.linreg
+
+    cpg_proc_table_polygon_dev(
         data=data,
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=Method.polygon,
-            params={}
-        ),
         annotations=annotations,
-        attributes=attributes
+        attributes=attributes,
+        observables_list=observables_list,
+        child_method=child_method,
+        params=params
     )
-    root = Node(name=str(config_root), config=config_root)
-
-    for d in observables_list:
-        observables_child = Observables(
-            name=attributes.observables.name,
-            types=d
-        )
-
-        cells_child = Cells(
-            name=attributes.cells.name,
-            types=attributes.cells.types
-        )
-
-        attributes_child = Attributes(
-            target=attributes.target,
-            observables=observables_child,
-            cells=cells_child,
-        )
-
-        config_child = Config(
-            data=data,
-            experiment=Experiment(
-                type=DataType.cpg,
-                task=Task.table,
-                method=child_method,
-                params={}
-            ),
-            annotations=annotations,
-            attributes=attributes_child
-        )
-        Node(name=str(config_child), config=config_child, parent=root)
-
-    calc_tree(root)
 
 
 def cpg_proc_table_z_test_linreg(
@@ -196,7 +173,7 @@ def cpg_proc_table_z_test_linreg(
     annotations,
     attributes,
     observables_list,
-    child_method=Method.linreg
+    params=None
 ):
     """
     Producing table with information about z-test for slopes of linear regression performed for each subset separately.
@@ -223,63 +200,34 @@ def cpg_proc_table_z_test_linreg(
 
     Where *** is the name of subjects subset.
 
+    Possible parameters of experiment:
+
+    * None
+
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
     :param attributes: pdm.Attributes instance, which specifies information about subjects.
     :param observables_list: list of subjects subsets. Each element in list is dict,
      where ``key`` is observable name and ``value`` is possible values for this observable.
+     :param params: parameters of experiment.
     """
-    config_root = Config(
+
+    child_method = Method.linreg
+
+    cpg_proc_table_z_test_linreg_dev(
         data=data,
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=Method.z_test_linreg,
-            params={}
-        ),
         annotations=annotations,
-        attributes=attributes
+        attributes=attributes,
+        observables_list=observables_list,
+        child_method=child_method,
+        params=params
     )
-    root = Node(name=str(config_root), config=config_root)
-
-    for d in observables_list:
-        observables_child = Observables(
-            name=attributes.observables.name,
-            types=d
-        )
-
-        cells_child = Cells(
-            name=attributes.cells.name,
-            types=attributes.cells.types
-        )
-
-        attributes_child = Attributes(
-            target=attributes.target,
-            observables=observables_child,
-            cells=cells_child,
-        )
-
-        config_child = Config(
-            data=data,
-            experiment=Experiment(
-                type=DataType.cpg,
-                task=Task.table,
-                method=child_method,
-                params={}
-            ),
-            annotations=annotations,
-            attributes=attributes_child
-        )
-        Node(name=str(config_child), config=config_child, parent=root)
-
-    calc_tree(root)
-
 
 def cpg_proc_clock_linreg(
     data,
     annotations,
     attributes,
-    child_method=Method.linreg
+    params=None
 ):
     """
     Producing epigentic clock, using best CpGs target-predictors.
@@ -302,39 +250,25 @@ def cpg_proc_clock_linreg(
     * mae: mean absolute error regression loss.
     * summary: summary output from OLS
 
+    Possible parameters of experiment:
+
+    * None
+
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
     :param attributes: pdm.Attributes instance, which specifies information about subjects.
+    :param params: parameters of experiment.
     """
-    config_root = Config(
+
+    child_method = Method.linreg
+
+    cpg_proc_clock_linreg_dev(
         data=data,
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.clock,
-            method=Method.linreg,
-            params={}
-        ),
         annotations=annotations,
-        attributes=attributes
+        attributes=attributes,
+        child_method=child_method,
+        params=params
     )
-    root = Node(name=str(config_root), config=config_root)
-
-    config_child = Config(
-        data=data,
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=child_method,
-            params={}
-        ),
-        annotations=annotations,
-        attributes=attributes
-    )
-
-    Node(name=str(config_child), config=config_child, parent=root)
-
-    calc_tree(root)
-
 
 def cpg_plot_methylation_scatter(
     data,
@@ -342,10 +276,14 @@ def cpg_plot_methylation_scatter(
     attributes,
     cpg_list,
     observables_list,
-    child_method=Method.linreg
+    params=None
 ):
     """
     Plotting methylation level from observables as scatter for provided subjects subsets and provided CpG list.
+
+    Possible parameters of experiment:
+
+    * None
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
@@ -353,56 +291,20 @@ def cpg_plot_methylation_scatter(
     :param cpg_list: List of CpGs for plotting
     :param observables_list: list of subjects subsets. Each element in list is dict,
      where ``key`` is observable name and ``value`` is possible values for this observable.
+    :param params: parameters of experiment.
     """
-    for cpg in cpg_list:
 
-        config_root = Config(
-            data=data,
-            experiment=Experiment(
-                type=DataType.cpg,
-                task=Task.methylation,
-                method=Method.scatter,
-                params={}
-            ),
-            annotations=annotations,
-            attributes=attributes
-        )
-        config_root.experiment.params['item'] = cpg
+    child_method = Method.linreg
 
-        root = Node(name=str(config_root), config=config_root)
-
-        for d in observables_list:
-            observables_child = Observables(
-                name=attributes.observables.name,
-                types=d
-            )
-
-            cells_child = Cells(
-                name=attributes.cells.name,
-                types=attributes.cells.types
-            )
-
-            attributes_child = Attributes(
-                target=attributes.target,
-                observables=observables_child,
-                cells=cells_child,
-            )
-
-            config_child = Config(
-                data=data,
-                experiment=Experiment(
-                    type=DataType.cpg,
-                    task=Task.table,
-                    method=child_method,
-                    params={}
-                ),
-                annotations=annotations,
-                attributes=attributes_child,
-                is_run=False
-            )
-            Node(name=str(config_child), config=config_child, parent=root)
-
-        calc_tree(root)
+    cpg_plot_methylation_scatter_dev(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        cpg_list=cpg_list,
+        observables_list=observables_list,
+        child_method=child_method,
+        params=params
+    )
 
 
 def attributes_plot_observables_histogram(
@@ -410,9 +312,14 @@ def attributes_plot_observables_histogram(
     annotations,
     attributes,
     observables_list,
+    params=None
 ):
     """
     Plotting histogram for target observable distribution for provided subjects subsets and provided CpG list.
+
+    Possible parameters of experiment:
+
+    * None
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
@@ -420,44 +327,13 @@ def attributes_plot_observables_histogram(
     :param cpg_list: List of CpGs for plotting
     :param observables_list: list of subjects subsets. Each element in list is dict,
      where ``key`` is observable name and ``value`` is possible values for this observable.
+    :param params: parameters of experiment.
     """
-    config_root = Config(
+    attributes_plot_observables_histogram_dev(
         data=data,
-        experiment=Experiment(
-            type=DataType.attributes,
-            task=Task.observables,
-            method=Method.histogram,
-            params={}
-        ),
         annotations=annotations,
-        attributes=attributes
+        attributes=attributes,
+        observables_list=observables_list,
+        params=params
     )
-    root = Node(name=str(config_root), config=config_root)
 
-    for d in observables_list:
-        observables_child = Observables(
-            name=attributes.observables.name,
-            types=d
-        )
-
-        cells_child = Cells(
-            name=attributes.cells.name,
-            types=attributes.cells.types
-        )
-
-        attributes_child = Attributes(
-            target=attributes.target,
-            observables=observables_child,
-            cells=cells_child,
-        )
-
-        config_child = Config(
-            data=data,
-            experiment=config_root.experiment,
-            annotations=annotations,
-            attributes=attributes_child,
-            is_run=False
-        )
-        Node(name=str(config_child), config=config_child, parent=root)
-
-    calc_tree(root)

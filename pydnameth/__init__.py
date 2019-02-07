@@ -17,7 +17,7 @@ from .config.data.data import Data
 from .config.data.types import DataPath, DataBase
 from .config.experiment.experiment import Experiment
 from .config.experiment.types import DataType, Task, Method
-from .model.scripts import \
+from pydnameth.scripts.release import \
     cpg_proc_table_linreg, \
     cpg_proc_table_variance_linreg, \
     cpg_proc_table_polygon, \
@@ -25,4 +25,12 @@ from .model.scripts import \
     cpg_proc_clock_linreg, \
     cpg_plot_methylation_scatter, \
     attributes_plot_observables_histogram
-from .setup.advanced.clock.types import ClockExogType
+from pydnameth.scripts.release import \
+    cpg_proc_table_linreg_dev, \
+    cpg_proc_table_variance_linreg_dev, \
+    cpg_proc_table_polygon_dev, \
+    cpg_proc_table_z_test_linreg_dev, \
+    cpg_proc_clock_linreg_dev, \
+    cpg_plot_methylation_scatter_dev, \
+    attributes_plot_observables_histogram_dev
+from pydnameth.routines.clock.types import ClockExogType

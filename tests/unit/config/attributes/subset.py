@@ -2,13 +2,7 @@ import unittest
 from tests.definitions import ROOT_DIR
 from pydnameth import Data
 from pydnameth import Experiment
-from pydnameth.config.experiment.types import DataType
 from pydnameth import Annotations
-from pydnameth import CommonTypes
-from pydnameth import CrossReactive
-from pydnameth import SNP
-from pydnameth import Chromosome
-from pydnameth import GeneRegion
 from pydnameth import Observables
 from pydnameth import Cells
 from pydnameth import Attributes
@@ -29,31 +23,31 @@ class TestLoadAnnotations(unittest.TestCase):
         )
 
         experiment = Experiment(
-            type=DataType.cpg,
-            task='',
-            method='',
-            params={}
+            type=None,
+            task=None,
+            method=None,
+            params=None
         )
 
         annotations = Annotations(
             name='annotations',
-            exclude=CommonTypes.none.value,
-            cross_reactive=CrossReactive.exclude.value,
-            snp=SNP.exclude.value,
-            chr=Chromosome.non_sex.value,
-            gene_region=GeneRegion.yes.value,
-            geo=CommonTypes.any.value,
-            probe_class=CommonTypes.any.value
+            exclude='none',
+            cross_reactive='ex',
+            snp='ex',
+            chr='NS',
+            gene_region='yes',
+            geo='any',
+            probe_class='any'
         )
 
         observables = Observables(
             name='observables',
-            types={'gender': 'vs'}
+            types={}
         )
 
         cells = Cells(
             name='cells',
-            types=CommonTypes.any.value
+            types='any'
         )
 
         attributes = Attributes(
@@ -70,25 +64,25 @@ class TestLoadAnnotations(unittest.TestCase):
         )
 
     def test_pass_indexes_num_elems(self):
-        self.config.attributes.observables.types = {'gender': CommonTypes.any.value}
+        self.config.attributes.observables.types = {'gender': 'any'}
         self.config.attributes_dict = load_attributes_dict(self.config)
-        indexes = pass_indexes(self.config, 'gender', CommonTypes.any.value, CommonTypes.any.value)
+        indexes = pass_indexes(self.config, 'gender', 'any', 'any')
         self.assertEqual(len(indexes), 729)
 
     def test_pass_indexes_num_f(self):
         self.config.attributes.observables.types = {'gender': 'F'}
         self.config.attributes_dict = load_attributes_dict(self.config)
-        indexes = pass_indexes(self.config, 'gender', 'F', CommonTypes.any.value)
+        indexes = pass_indexes(self.config, 'gender', 'F', 'any')
         self.assertEqual(len(indexes), 388)
 
     def test_pass_indexes_num_m(self):
         self.config.attributes.observables.types = {'gender': 'M'}
         self.config.attributes_dict = load_attributes_dict(self.config)
-        indexes = pass_indexes(self.config, 'gender', 'M', CommonTypes.any.value)
+        indexes = pass_indexes(self.config, 'gender', 'M', 'any')
         self.assertEqual(len(indexes), 341)
 
     def test_get_indexes_num_elems(self):
-        self.config.attributes.observables.types = {'gender': CommonTypes.any.value}
+        self.config.attributes.observables.types = {'gender': 'any'}
         self.config.attributes_dict = load_attributes_dict(self.config)
         indexes = get_indexes(self.config)
         self.assertEqual(len(indexes), 729)
