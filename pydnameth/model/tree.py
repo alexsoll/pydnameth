@@ -8,11 +8,11 @@ import copy
 
 def calc_tree(root):
 
-    for node in PreOrderIter(root):
-        params = copy.deepcopy(node.config.experiment.params)
-        node.config.experiment.params = {}
+    for node in PostOrderIter(root):
+        config = copy.deepcopy(node.config)
+        hide_node(node)
         node_json = jsonpickle.encode(node).encode('utf-8')
-        node.config.experiment.params = params
+        node.config = config
         hash = hashlib.md5(node_json).hexdigest()
         node.config.set_hash(hash)
         save_info(node)
@@ -22,3 +22,12 @@ def calc_tree(root):
         configs_child = [node_child.config for node_child in node.children]
         context = Context(config)
         context.pipeline(config, configs_child)
+
+
+def hide_node(node):
+    node.config.experiment.params = {}
+    node.config.data.path = ''
+    node.config.data.name = ''
+    node.config.annotations.name = ''
+    node.config.attributes.observables.name = ''
+    node.config.attributes.cells.name = ''

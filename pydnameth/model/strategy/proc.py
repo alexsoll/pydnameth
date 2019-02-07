@@ -4,8 +4,8 @@ from pydnameth.config.experiment.types import get_metrics_keys
 import statsmodels.api as sm
 import numpy as np
 from sklearn.cluster import DBSCAN
-from pydnameth.setup.advanced.clock.types import ClockExogType, Clock
-from pydnameth.setup.advanced.clock.linreg.processing import build_clock_linreg
+from pydnameth.routines.clock.types import ClockExogType, Clock
+from pydnameth.routines.clock.linreg.processing import build_clock_linreg
 import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry

@@ -1,5 +1,5 @@
 from enum import Enum
-from pydnameth.setup.advanced.clock.types import ClockExogType
+from pydnameth.routines.clock.types import ClockExogType
 
 
 class Task(Enum):
