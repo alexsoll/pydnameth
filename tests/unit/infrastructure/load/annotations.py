@@ -1,14 +1,8 @@
 import unittest
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
-from pydnameth.config.experiment.types import DataType
 from pydnameth.config.experiment.experiment import Experiment
 from pydnameth.config.annotations.annotations import Annotations
-from pydnameth.config.common import CommonTypes
-from pydnameth.config.annotations.types import CrossReactive
-from pydnameth.config.annotations.types import SNP
-from pydnameth.config.annotations.types import Chromosome
-from pydnameth.config.annotations.types import GeneRegion
 from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
@@ -26,21 +20,21 @@ class TestLoadAnnotations(unittest.TestCase):
         )
 
         experiment = Experiment(
-            type=DataType.cpg,
-            task='',
-            method='',
-            params={}
+            type=None,
+            task=None,
+            method=None,
+            params=None
         )
 
         annotations = Annotations(
             name='annotations',
-            exclude=CommonTypes.none.value,
-            cross_reactive=CrossReactive.exclude.value,
-            snp=SNP.exclude.value,
-            chr=Chromosome.non_sex.value,
-            gene_region=GeneRegion.yes.value,
-            geo=CommonTypes.any.value,
-            probe_class=CommonTypes.any.value
+            exclude='none',
+            cross_reactive='ex',
+            snp='ex',
+            chr='NS',
+            gene_region='yes',
+            geo='any',
+            probe_class='any'
         )
 
         observables = Observables(
@@ -50,7 +44,7 @@ class TestLoadAnnotations(unittest.TestCase):
 
         cells = Cells(
             name='cells',
-            types=CommonTypes.any.value
+            types='any'
         )
 
         attributes = Attributes(
