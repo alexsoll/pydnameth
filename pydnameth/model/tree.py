@@ -1,4 +1,4 @@
-from anytree import PostOrderIter, PreOrderIter
+from anytree import PostOrderIter
 from pydnameth.infrastucture.save.info import save_info
 from pydnameth.model.context import Context
 import hashlib
