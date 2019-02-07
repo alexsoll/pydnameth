@@ -331,4 +331,4 @@ The name of the functions provided by the ``pydnameth`` package are follow the n
 
 Currently released functions:
 
-.. automodule:: pydnameth.release
+.. automodule:: pydnameth.scripts.release
