@@ -163,6 +163,14 @@ def get_default_params(setup):
 
     elif setup.task == Task.observables:
 
+        if setup.method == Method.histogram:
+            params = {
+                'bin_size': 1.0,
+                'opacity': 0.5
+            }
+
+    elif setup.task == Task.methylation:
+
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',

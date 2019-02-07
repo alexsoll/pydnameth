@@ -5,6 +5,15 @@ from pydnameth.infrastucture.load.attributes import load_cells_dict
 from pydnameth.config.annotations.subset import subset_annotations
 from pydnameth.config.attributes.subset import subset_attributes
 from pydnameth.config.attributes.subset import subset_cells, get_indexes
+from json import JSONEncoder
+
+
+# json serialization for Config
+def _default(self, obj):
+    return getattr(obj.__class__, "to_json", _default.default)(obj)
+
+_default.default = JSONEncoder().default
+JSONEncoder.default = _default
 
 
 class Config:
@@ -57,6 +66,9 @@ class Config:
                + f'annotations({str(self.annotations)})_' \
                + f'attributes({str(self.attributes)})'
         return name
+
+    def to_json(self):
+        return str(self)
 
     def set_hash(self, hash):
         self.hash = hash

@@ -14,8 +14,13 @@ class SetupStrategy(metaclass=abc.ABCMeta):
         pass
 
     def setup_params(self, config):
+        default_params = get_default_params(config.experiment)
         if not bool(config.experiment.params):
-            config.experiment.params = get_default_params(config.experiment)
+            config.experiment.params = default_params
+        else:
+            for dp in default_params:
+                if dp not in config.experiment.params:
+                    config.experiment.params[dp] = default_params[dp]
 
     def setup_metrics(self, config):
         config.metrics = {}
