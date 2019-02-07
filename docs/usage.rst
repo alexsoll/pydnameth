@@ -331,23 +331,5 @@ The name of the functions provided by the ``pydnameth`` package are follow the n
 
 Currently released functions:
 
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``attributes_plot_observables_histogram``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-+++++++++++
-Description
-+++++++++++
-
-Plotting histograms for different subset of subjects, which are specified by certain values of observables.
-
-++++++
-Params
-++++++
-
-
-+++++++
-Example
-+++++++
-
+.. automodule:: pydnameth.scripts.release
+    :members:

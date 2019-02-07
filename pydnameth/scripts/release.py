@@ -1,9 +1,4 @@
-from anytree import Node
-from pydnameth.config.experiment.experiment import Experiment
-from pydnameth.config.experiment.types import DataType, Task, Method
-from pydnameth.config.config import Config
-from pydnameth.model.tree import calc_tree
-from pydnameth.config.attributes.attributes import Attributes, Observables, Cells
+from pydnameth.config.experiment.types import Method
 from pydnameth.scripts.develop import \
     cpg_proc_table_linreg_dev, \
     cpg_proc_table_variance_linreg_dev, \
@@ -12,7 +7,6 @@ from pydnameth.scripts.develop import \
     cpg_proc_clock_linreg_dev, \
     cpg_plot_methylation_scatter_dev, \
     attributes_plot_observables_histogram_dev
-import copy
 
 
 def cpg_proc_table_linreg(
