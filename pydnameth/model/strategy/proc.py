@@ -10,6 +10,7 @@ import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry
 from scipy.stats import norm
+from pydnameth.routines.common import is_float
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -563,6 +564,17 @@ class ObservablesRunStrategy(RunStrategy):
                 curr_plot_data = []
 
                 target = self.get_strategy.get_target(config_child)
+                is_number_list = [is_float(t) for t in target]
+                if False in is_number_list:
+                    xbins = {}
+                else:
+                    bin_size = config.experiment.params['bin_size']
+                    xbins = dict(
+                        start=min(target) - 0.5 * bin_size,
+                        end=max(target) + 0.5 * bin_size,
+                        size=bin_size
+                    )
+
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
 
                 if config_child.experiment.method == Method.histogram:
@@ -572,13 +584,9 @@ class ObservablesRunStrategy(RunStrategy):
                         x=target,
                         name='_'.join([key + '(' + value + ')'
                                        for key, value in types]),
-                        xbins=dict(
-                            start=min(target) - 0.5,
-                            end=max(target) + 0.5,
-                            size=1.0
-                        ),
+                        xbins=xbins,
                         marker=dict(
-                            opacity=0.75,
+                            opacity=config.experiment.params['opacity'],
                             color=color
                         )
                     )

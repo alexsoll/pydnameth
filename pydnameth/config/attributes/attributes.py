@@ -14,7 +14,7 @@ class Cells:
         elif isinstance(self.types, str):
             name += self.types
         else:
-            raise ValueError('Cells.types must be list or str')
+            raise ValueError('Cells.types must be list or str.')
         name += ')'
         return name
 
@@ -30,12 +30,18 @@ class Observables:
     def __str__(self):
         name = 'observables('
         if isinstance(self.types, dict):
-            name += '_'.join([key + '(' + value + ')'
-                              for key, value in self.types.items()])
+            str_list = []
+            for key, value in self.types.items():
+                if isinstance(value, list):
+                    value.sort()
+                    str_list.append(key + '(' + '_'.join(list(map(str, value))) + ')')
+                else:
+                    str_list.append(key + '(' + value + ')')
+            name += '_'.join(str_list)
         elif isinstance(self.types, str):
             name += self.types
         else:
-            raise ValueError('Observables.types must be dict or str')
+            raise ValueError('Observables.types must be dict or str.')
         name += ')'
         return name
 
