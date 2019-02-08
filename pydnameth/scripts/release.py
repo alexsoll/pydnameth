@@ -246,7 +246,7 @@ def cpg_proc_clock_linreg(
 
     Possible parameters of experiment:
 
-    * None
+    * ``'x_range'``: list with two elements, which are borders of target axis.
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
@@ -313,7 +313,13 @@ def attributes_plot_observables_histogram(
 
     Possible parameters of experiment:
 
-    * None
+    * ``'bin_size'``: bin size for numeric target.
+      For categorical target is not considered.
+    * ``'opacity'``: opacity level.
+      From ``0.0`` to ``1.0``.
+    * ``'barmode'``: type of barmode.
+      ``'overlay'`` for overlaid histograms.
+      ``'stack'`` for stacked histograms.
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
