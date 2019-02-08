@@ -36,7 +36,7 @@ class Observables:
                     value.sort()
                     str_list.append(key + '(' + '_'.join(list(map(str, value))) + ')')
                 else:
-                    str_list.append(key + '(' + value + ')')
+                    str_list.append(key + '(' + str(value) + ')')
             name += '_'.join(str_list)
         elif isinstance(self.types, str):
             name += self.types

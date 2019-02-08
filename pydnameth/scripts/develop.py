@@ -218,6 +218,10 @@ def cpg_plot_methylation_scatter_dev(
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes)
         )
+
+        if config_root.experiment.params == None:
+            config_root.experiment.params = dict()
+
         config_root.experiment.params['item'] = cpg
 
         root = Node(name=str(config_root), config=config_root)

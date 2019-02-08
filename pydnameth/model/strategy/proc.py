@@ -263,6 +263,7 @@ class TableRunStrategy(RunStrategy):
             config.metrics['aux'].append(aux)
             config.metrics['z_value'].append(z_value)
             config.metrics['p_value'].append(p_value)
+            config.metrics['z_value_abs'].append(np.absolute(z_value))
 
 
     def iterate(self, config, configs_child):
@@ -582,7 +583,7 @@ class ObservablesRunStrategy(RunStrategy):
                     types = config_child.attributes.observables.types.items()
                     histogram = go.Histogram(
                         x=target,
-                        name='_'.join([key + '(' + value + ')'
+                        name='_'.join([key + '(' + str(value) + ')'
                                        for key, value in types]),
                         xbins=xbins,
                         marker=dict(
