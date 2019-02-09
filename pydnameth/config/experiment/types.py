@@ -1,5 +1,4 @@
 from enum import Enum
-from pydnameth.routines.clock.types import ClockExogType
 
 
 class Task(Enum):
