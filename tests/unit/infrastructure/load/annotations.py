@@ -58,6 +58,8 @@ class TestLoadAnnotations(unittest.TestCase):
             experiment=experiment,
             annotations=annotations,
             attributes=attributes,
+            is_run=True,
+            is_root=True
         )
 
     def test_load_annotations_dict_num_elems(self):
