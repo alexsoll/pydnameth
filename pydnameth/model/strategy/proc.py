@@ -296,7 +296,7 @@ class ClockRunStrategy(RunStrategy):
 
             type = config.experiment.params['type']
             runs = config.experiment.params['runs']
-            size = min(config.experiment.params['size'], train_size)
+            size = min(config.experiment.params['size'], train_size, len(items))
             config.experiment.params['size'] = size
 
             if type == ClockExogType.all.value:
