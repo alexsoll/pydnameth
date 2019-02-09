@@ -295,13 +295,13 @@ class ClockRunStrategy(RunStrategy):
             target = self.get_strategy.get_target(config)
 
             type = config.experiment.params['type']
-            exogs = min(config.experiment.params['exogs'], train_size)
-            combs = min(config.experiment.params['combs'], train_size)
             runs = config.experiment.params['runs']
+            size = min(config.experiment.params['size'], train_size)
+            config.experiment.params['size'] = size
 
             if type == ClockExogType.all.value:
 
-                for exog_id in range(0, exogs):
+                for exog_id in range(0, size):
                     config.metrics['item'].append(items[exog_id])
                     aux = self.get_strategy.get_aux(config, items[exog_id])
                     config.metrics['aux'].append(aux)
@@ -315,7 +315,7 @@ class ClockRunStrategy(RunStrategy):
                         train_size=train_size,
                         test_size=test_size,
                         exog_num=exog_id + 1,
-                        exog_num_comb=combs,
+                        exog_num_comb=exog_id + 1,
                         num_bootstrap_runs=runs
                     )
 
@@ -323,19 +323,19 @@ class ClockRunStrategy(RunStrategy):
 
             elif type == ClockExogType.deep.value:
 
-                for exog_id in range(0, exogs):
+                for exog_id in range(0, size):
                     config.metrics['item'].append(exog_id + 1)
                     config.metrics['aux'].append(exog_id + 1)
 
                     clock = Clock(
                         endog_data=target,
                         endog_names=config.attributes.target,
-                        exog_data=values[0:exogs + 1],
-                        exog_names=items[0:exogs + 1],
+                        exog_data=values[0:size + 1],
+                        exog_names=items[0:size + 1],
                         metrics_dict=config.metrics,
                         train_size=train_size,
                         test_size=test_size,
-                        exog_num=exogs,
+                        exog_num=size,
                         exog_num_comb=exog_id + 1,
                         num_bootstrap_runs=runs
                     )
@@ -344,44 +344,23 @@ class ClockRunStrategy(RunStrategy):
 
             elif type == ClockExogType.single.value:
 
-                config.metrics['item'].append(combs)
-                config.metrics['aux'].append(combs)
+                config.metrics['item'].append(size)
+                config.metrics['aux'].append(size)
 
                 clock = Clock(
                     endog_data=target,
                     endog_names=config.attributes.target,
-                    exog_data=values[0:exogs],
-                    exog_names=items[0:exogs],
+                    exog_data=values[0:size],
+                    exog_names=items[0:size],
                     metrics_dict=config.metrics,
                     train_size=train_size,
                     test_size=test_size,
-                    exog_num=exogs,
-                    exog_num_comb=combs,
+                    exog_num=size,
+                    exog_num_comb=size,
                     num_bootstrap_runs=runs
                 )
 
                 build_clock_linreg(clock)
-
-            elif type == ClockExogType.slide.value:
-
-                for exog_id in range(0, exogs, combs):
-                    config.metrics['item'].append(exog_id)
-                    config.metrics['aux'].append(exog_id)
-
-                    clock = Clock(
-                        endog_data=target,
-                        endog_names=config.attributes.target,
-                        exog_data=items[exog_id: exog_id + combs],
-                        exog_names=values[exog_id: exog_id + combs],
-                        metrics_dict=config.metrics,
-                        train_size=train_size,
-                        test_size=test_size,
-                        exog_num=combs,
-                        exog_num_comb=combs,
-                        num_bootstrap_runs=runs
-                    )
-
-                    build_clock_linreg(clock)
 
 
 class MethylationRunStrategy(RunStrategy):

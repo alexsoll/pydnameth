@@ -155,10 +155,9 @@ def get_default_params(setup):
 
         if setup.method == Method.linreg:
             params = {
-                'type': ClockExogType.all.value,
+                'type': 'all',
                 'part': 0.25,
-                'exogs': 100,
-                'combs': 100,
+                'size': 100,
                 'runs': 100,
             }
 
@@ -175,7 +174,8 @@ def get_default_params(setup):
 
         if setup.method == Method.scatter:
             params = {
-                'item': 'cg01620164'
+                'item': 'cg01620164',
+                'x_range': 'auto'
             }
 
     elif setup.task == Task.dependence_2d:

@@ -242,11 +242,18 @@ def cpg_proc_clock_linreg(
     * r: correlation coefficient of linear regression between real and predicted target observable.
     * evs: explained variance regression score.
     * mae: mean absolute error regression loss.
-    * summary: summary output from OLS
+    * summary: summary output from OLS.
 
     Possible parameters of experiment:
 
-    * ``'x_range'``: list with two elements, which are borders of target axis.
+    * ``'type'``: type of clocks. \n
+      Possible options: \n
+      ``'all'``: iterative building of clocks starting from one element in the model, ending with ``'size'`` elements in the model. \n
+      ``'single '``: building of clocks only with ``'size'`` elements in the model. \n
+      ``'deep'``: iterative building of clocks starting from one element in the model, ending with ``'size'`` elements in the model, but choosing all posible combinations from ``'size'`` elements.
+    * ``'part'``: the proportion of considered number of subject in the test set. From ``0.0`` to ``1.0``.
+    * ``'size'``: maximum number of exogenous variables in a model.
+    * ``'runs'`` number of bootstrap runs in model
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
@@ -277,7 +284,7 @@ def cpg_plot_methylation_scatter(
 
     Possible parameters of experiment:
 
-    * None
+     * ``'x_range'``: can be ``'auto'`` or list with two elements, which are borders of target axis.
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
@@ -313,13 +320,14 @@ def attributes_plot_observables_histogram(
 
     Possible parameters of experiment:
 
-    * ``'bin_size'``: bin size for numeric target.
+    * ``'bin_size'``: bin size for numeric target. \n
       For categorical target is not considered.
     * ``'opacity'``: opacity level.
       From ``0.0`` to ``1.0``.
-    * ``'barmode'``: type of barmode.
-      ``'overlay'`` for overlaid histograms.
-      ``'stack'`` for stacked histograms.
+    * ``'barmode'``: type of barmode. \n
+      Possible options: \n
+      ``'overlay'`` for overlaid histograms. \n
+      ``'stack'`` for stacked histograms. \n
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
