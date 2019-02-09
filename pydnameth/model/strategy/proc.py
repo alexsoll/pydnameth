@@ -408,12 +408,10 @@ class MethylationRunStrategy(RunStrategy):
                 methylation = self.get_strategy.get_single_base(config_child, [item])[0]
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
 
-                types = config_child.attributes.observables.types.items()
                 scatter = go.Scatter(
                     x=target,
                     y=methylation,
-                    name='_'.join([key + '(' + value + ')'
-                                   for key, value in types]),
+                    name=str(config_child.attributes.observables),
                     mode='markers',
                     marker=dict(
                         opacity=0.75,
@@ -580,11 +578,9 @@ class ObservablesRunStrategy(RunStrategy):
 
                 if config_child.experiment.method == Method.histogram:
 
-                    types = config_child.attributes.observables.types.items()
                     histogram = go.Histogram(
                         x=target,
-                        name='_'.join([key + '(' + str(value) + ')'
-                                       for key, value in types]),
+                        name=str(config_child.attributes.observables),
                         xbins=xbins,
                         marker=dict(
                             opacity=config.experiment.params['opacity'],

@@ -119,7 +119,7 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
 
             layout = go.Layout(
                 autosize=True,
-                barmode='overlay',
+                barmode=config.experiment.params['barmode'],
                 legend=dict(
                     font=dict(
                         family='sans-serif',

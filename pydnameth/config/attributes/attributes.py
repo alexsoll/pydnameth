@@ -7,7 +7,7 @@ class Cells:
         self.types = types
 
     def __str__(self):
-        name = 'cells('
+        name = ''
         if isinstance(self.types, list):
             self.types.sort()
             name += '_'.join(self.types)
@@ -15,7 +15,6 @@ class Cells:
             name += self.types
         else:
             raise ValueError('Cells.types must be list or str.')
-        name += ')'
         return name
 
 
@@ -28,7 +27,7 @@ class Observables:
         self.types = types
 
     def __str__(self):
-        name = 'observables('
+        name = ''
         if isinstance(self.types, dict):
             str_list = []
             for key, value in self.types.items():
@@ -38,11 +37,8 @@ class Observables:
                 else:
                     str_list.append(key + '(' + str(value) + ')')
             name += '_'.join(str_list)
-        elif isinstance(self.types, str):
-            name += self.types
         else:
-            raise ValueError('Observables.types must be dict or str.')
-        name += ')'
+            raise ValueError('Observables.types must be dict.')
         return name
 
 
@@ -57,5 +53,7 @@ class Attributes:
         self.cells = cells
 
     def __str__(self):
-        name = 'target(' + str(self.target) + ')' + '_' + str(self.observables) + '_' + str(self.cells)
+        name = 'target(' + str(self.target) + ')' + '_' + \
+               'observables(' + str(self.observables) + ')' + '_' + \
+               'cells(' + str(self.cells) + ')'
         return name
