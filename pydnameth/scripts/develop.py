@@ -303,7 +303,7 @@ def cpg_plot_methylation_scatter_dev(
             is_root=True
         )
 
-        if config_root.experiment.params == None:
+        if config_root.experiment.params is None:
             config_root.experiment.params = dict()
 
         config_root.experiment.params['item'] = cpg
