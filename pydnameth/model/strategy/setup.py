@@ -39,9 +39,7 @@ class TableSetUpStrategy(SetupStrategy):
             metrics_keys_child = get_metrics_keys(config_child.experiment)
             for key in metrics_keys_child:
                 if key not in metrics_keys:
-                    types = config_child.attributes.observables.types.items()
-                    key_primary = key + '_' + '_'.join([key + '(' + value + ')'
-                                                        for key, value in types])
+                    key_primary = key + '_' + str(config_child.attributes.observables)
                     config.metrics[key_primary] = []
 
 

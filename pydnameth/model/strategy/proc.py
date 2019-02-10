@@ -124,9 +124,7 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        types = config_child.attributes.observables.types.items()
-                        key_primary = key + '_' + '_'.join([key + '(' + value + ')'
-                                                            for key, value in types])
+                        key_primary = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
                         config.metrics[key_primary].append(advanced_data)
 
@@ -245,8 +243,7 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        types = config_child.attributes.observables.types.items()
-                        key_child = key + '_' + '_'.join([key + '(' + value + ')' for key, value in types])
+                        key_child = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
                         config.metrics[key_child].append(advanced_data)
 

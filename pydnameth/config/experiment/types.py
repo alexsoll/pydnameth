@@ -99,7 +99,7 @@ def get_metrics_keys(setup):
                 'aux',
                 'z_value',
                 'p_value',
-                'z_value_abs'
+                'abs_z_value'
             ]
 
     elif setup.task == Task.clock:
