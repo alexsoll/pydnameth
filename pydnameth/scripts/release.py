@@ -180,6 +180,7 @@ def cpg_proc_table_z_test_linreg(
     * aux: gene, on which CpG is mapped.
     * z_value: number of standard deviations by which data point is above the mean value.
       The considered data point is the difference between two linear regressions slopes.
+    * abs_z_value: absolute z_value
     * p_value: probability of rejecting the null hypothesis that the difference in slopes is zero.
 
     For each subjects subset the next columns are added to the resulting table:

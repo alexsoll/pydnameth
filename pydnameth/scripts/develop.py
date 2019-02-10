@@ -26,7 +26,9 @@ def cpg_proc_table_linreg_dev(
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=True
     )
 
     root = Node(name=str(config_root), config=config_root)
@@ -49,7 +51,9 @@ def cpg_proc_table_variance_linreg_dev(
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=True
     )
 
     root = Node(name=str(config_root), config=config_root)
@@ -74,7 +78,9 @@ def cpg_proc_table_polygon_dev(
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=True
     )
     root = Node(name=str(config_root), config=config_root)
 
@@ -104,7 +110,9 @@ def cpg_proc_table_polygon_dev(
                 params={}
             ),
             annotations=copy.deepcopy(annotations),
-            attributes=attributes_child
+            attributes=attributes_child,
+            is_run=True,
+            is_root=False
         )
         Node(name=str(config_child), config=config_child, parent=root)
 
@@ -129,7 +137,9 @@ def cpg_proc_table_z_test_linreg_dev(
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=True
     )
     root = Node(name=str(config_root), config=config_root)
 
@@ -159,7 +169,9 @@ def cpg_proc_table_z_test_linreg_dev(
                 params={}
             ),
             annotations=copy.deepcopy(annotations),
-            attributes=attributes_child
+            attributes=attributes_child,
+            is_run=True,
+            is_root=False
         )
         Node(name=str(config_child), config=config_child, parent=root)
 
@@ -183,7 +195,9 @@ def cpg_proc_clock_linreg_dev(
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=True
     )
     root = Node(name=str(config_root), config=config_root)
 
@@ -196,7 +210,9 @@ def cpg_proc_clock_linreg_dev(
             params={}
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=False
     )
 
     Node(name=str(config_child), config=config_child, parent=root)
@@ -227,7 +243,9 @@ def cpg_proc_special_clock_linreg_dev(
                 params=copy.deepcopy(params)
             ),
             annotations=copy.deepcopy(annotations),
-            attributes=copy.deepcopy(attributes)
+            attributes=copy.deepcopy(attributes),
+            is_run=True,
+            is_root=True
         )
         root = Node(name=str(config_root), config=config_root)
 
@@ -241,7 +259,8 @@ def cpg_proc_special_clock_linreg_dev(
             ),
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes),
-            is_run=False
+            is_run=False,
+            is_root=False
         )
 
         Node(name=str(config_child), config=config_child, parent=root)
@@ -279,7 +298,9 @@ def cpg_plot_methylation_scatter_dev(
                 params=copy.deepcopy(params)
             ),
             annotations=copy.deepcopy(annotations),
-            attributes=copy.deepcopy(attributes)
+            attributes=copy.deepcopy(attributes),
+            is_run=True,
+            is_root=True
         )
 
         if config_root.experiment.params == None:
@@ -316,7 +337,8 @@ def cpg_plot_methylation_scatter_dev(
                 ),
                 annotations=copy.deepcopy(annotations),
                 attributes=attributes_child,
-                is_run=False
+                is_run=False,
+                is_root=False
             )
             Node(name=str(config_child), config=config_child, parent=root)
 
@@ -340,7 +362,9 @@ def attributes_plot_observables_histogram_dev(
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes)
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=True
     )
     root = Node(name=str(config_root), config=config_root)
 
@@ -366,7 +390,8 @@ def attributes_plot_observables_histogram_dev(
             experiment=config_root.experiment,
             annotations=copy.deepcopy(annotations),
             attributes=attributes_child,
-            is_run=False
+            is_run=False,
+            is_root=True
         )
         Node(name=str(config_child), config=config_child, parent=root)
 

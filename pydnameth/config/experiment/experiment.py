@@ -17,5 +17,22 @@ class Experiment:
         self.params = params
 
     def __str__(self):
+        return self.get_experiment_str()
+
+    def get_experiment_str(self):
         name = f'{self.type.value}_{self.task.value}_{self.method.value}'
         return name
+
+    def get_params_str(self):
+        name = ''
+        if bool(self.params):
+            params_keys = list(self.params.keys())
+            if len(params_keys) > 0:
+                params_keys.sort()
+                name += '_'.join([key + '(' + str(self.params[key]) + ')' for key in params_keys])
+
+        if name == '':
+            name = 'default'
+
+        return name
+
