@@ -1,5 +1,4 @@
 from enum import Enum
-from pydnameth.routines.clock.types import ClockExogType
 
 
 class Task(Enum):
@@ -99,7 +98,8 @@ def get_metrics_keys(setup):
                 'item',
                 'aux',
                 'z_value',
-                'p_value'
+                'p_value',
+                'abs_z_value'
             ]
 
     elif setup.task == Task.clock:
@@ -154,19 +154,27 @@ def get_default_params(setup):
 
         if setup.method == Method.linreg:
             params = {
-                'type': ClockExogType.all.value,
+                'type': 'all',
                 'part': 0.25,
-                'exogs': 100,
-                'combs': 100,
+                'size': 100,
                 'runs': 100,
             }
 
     elif setup.task == Task.observables:
 
+        if setup.method == Method.histogram:
+            params = {
+                'bin_size': 1.0,
+                'opacity': 0.5,
+                'barmode': 'stack'
+            }
+
+    elif setup.task == Task.methylation:
+
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',
-                'x_range': [0, 100]
+                'x_range': 'auto'
             }
 
     elif setup.task == Task.dependence_2d:

@@ -10,6 +10,7 @@ import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry
 from scipy.stats import norm
+from pydnameth.routines.common import is_float
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -123,9 +124,7 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        types = config_child.attributes.observables.types.items()
-                        key_primary = key + '_' + '_'.join([key + '(' + value + ')'
-                                                            for key, value in types])
+                        key_primary = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
                         config.metrics[key_primary].append(advanced_data)
 
@@ -244,8 +243,7 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        types = config_child.attributes.observables.types.items()
-                        key_child = key + '_' + '_'.join([key + '(' + value + ')' for key, value in types])
+                        key_child = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
                         config.metrics[key_child].append(advanced_data)
 
@@ -262,6 +260,7 @@ class TableRunStrategy(RunStrategy):
             config.metrics['aux'].append(aux)
             config.metrics['z_value'].append(z_value)
             config.metrics['p_value'].append(p_value)
+            config.metrics['z_value_abs'].append(np.absolute(z_value))
 
 
     def iterate(self, config, configs_child):
@@ -293,13 +292,13 @@ class ClockRunStrategy(RunStrategy):
             target = self.get_strategy.get_target(config)
 
             type = config.experiment.params['type']
-            exogs = min(config.experiment.params['exogs'], train_size)
-            combs = min(config.experiment.params['combs'], train_size)
             runs = config.experiment.params['runs']
+            size = min(config.experiment.params['size'], train_size, len(items))
+            config.experiment.params['size'] = size
 
             if type == ClockExogType.all.value:
 
-                for exog_id in range(0, exogs):
+                for exog_id in range(0, size):
                     config.metrics['item'].append(items[exog_id])
                     aux = self.get_strategy.get_aux(config, items[exog_id])
                     config.metrics['aux'].append(aux)
@@ -313,7 +312,7 @@ class ClockRunStrategy(RunStrategy):
                         train_size=train_size,
                         test_size=test_size,
                         exog_num=exog_id + 1,
-                        exog_num_comb=combs,
+                        exog_num_comb=exog_id + 1,
                         num_bootstrap_runs=runs
                     )
 
@@ -321,19 +320,19 @@ class ClockRunStrategy(RunStrategy):
 
             elif type == ClockExogType.deep.value:
 
-                for exog_id in range(0, exogs):
+                for exog_id in range(0, size):
                     config.metrics['item'].append(exog_id + 1)
                     config.metrics['aux'].append(exog_id + 1)
 
                     clock = Clock(
                         endog_data=target,
                         endog_names=config.attributes.target,
-                        exog_data=values[0:exogs + 1],
-                        exog_names=items[0:exogs + 1],
+                        exog_data=values[0:size + 1],
+                        exog_names=items[0:size + 1],
                         metrics_dict=config.metrics,
                         train_size=train_size,
                         test_size=test_size,
-                        exog_num=exogs,
+                        exog_num=size,
                         exog_num_comb=exog_id + 1,
                         num_bootstrap_runs=runs
                     )
@@ -342,44 +341,23 @@ class ClockRunStrategy(RunStrategy):
 
             elif type == ClockExogType.single.value:
 
-                config.metrics['item'].append(combs)
-                config.metrics['aux'].append(combs)
+                config.metrics['item'].append(size)
+                config.metrics['aux'].append(size)
 
                 clock = Clock(
                     endog_data=target,
                     endog_names=config.attributes.target,
-                    exog_data=values[0:exogs],
-                    exog_names=items[0:exogs],
+                    exog_data=values[0:size],
+                    exog_names=items[0:size],
                     metrics_dict=config.metrics,
                     train_size=train_size,
                     test_size=test_size,
-                    exog_num=exogs,
-                    exog_num_comb=combs,
+                    exog_num=size,
+                    exog_num_comb=size,
                     num_bootstrap_runs=runs
                 )
 
                 build_clock_linreg(clock)
-
-            elif type == ClockExogType.slide.value:
-
-                for exog_id in range(0, exogs, combs):
-                    config.metrics['item'].append(exog_id)
-                    config.metrics['aux'].append(exog_id)
-
-                    clock = Clock(
-                        endog_data=target,
-                        endog_names=config.attributes.target,
-                        exog_data=items[exog_id: exog_id + combs],
-                        exog_names=values[exog_id: exog_id + combs],
-                        metrics_dict=config.metrics,
-                        train_size=train_size,
-                        test_size=test_size,
-                        exog_num=combs,
-                        exog_num_comb=combs,
-                        num_bootstrap_runs=runs
-                    )
-
-                    build_clock_linreg(clock)
 
 
 class MethylationRunStrategy(RunStrategy):
@@ -406,12 +384,10 @@ class MethylationRunStrategy(RunStrategy):
                 methylation = self.get_strategy.get_single_base(config_child, [item])[0]
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
 
-                types = config_child.attributes.observables.types.items()
                 scatter = go.Scatter(
                     x=target,
                     y=methylation,
-                    name='_'.join([key + '(' + value + ')'
-                                   for key, value in types]),
+                    name=str(config_child.attributes.observables),
                     mode='markers',
                     marker=dict(
                         opacity=0.75,
@@ -563,22 +539,27 @@ class ObservablesRunStrategy(RunStrategy):
                 curr_plot_data = []
 
                 target = self.get_strategy.get_target(config_child)
+                is_number_list = [is_float(t) for t in target]
+                if False in is_number_list:
+                    xbins = {}
+                else:
+                    bin_size = config.experiment.params['bin_size']
+                    xbins = dict(
+                        start=min(target) - 0.5 * bin_size,
+                        end=max(target) + 0.5 * bin_size,
+                        size=bin_size
+                    )
+
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
 
                 if config_child.experiment.method == Method.histogram:
 
-                    types = config_child.attributes.observables.types.items()
                     histogram = go.Histogram(
                         x=target,
-                        name='_'.join([key + '(' + value + ')'
-                                       for key, value in types]),
-                        xbins=dict(
-                            start=min(target) - 0.5,
-                            end=max(target) + 0.5,
-                            size=1.0
-                        ),
+                        name=str(config_child.attributes.observables),
+                        xbins=xbins,
                         marker=dict(
-                            opacity=0.75,
+                            opacity=config.experiment.params['opacity'],
                             color=color
                         )
                     )

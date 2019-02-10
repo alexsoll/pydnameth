@@ -59,15 +59,13 @@ class TestLoadAnnotations(unittest.TestCase):
             experiment=experiment,
             annotations=annotations,
             attributes=attributes,
+            is_run=True,
+            is_root=True
         )
 
     def test_load_attributes_dict_num_elems(self):
         attributes_dict = load_attributes_dict(self.config)
         self.assertEqual(len(attributes_dict['age']), 729)
-
-    def test_load_attributes_dict_num_keys(self):
-        attributes_dict = load_attributes_dict(self.config)
-        self.assertEqual(len(list(attributes_dict.keys())), 2)
 
     def test_load_attributes_dict_age_range(self):
         attributes_dict = load_attributes_dict(self.config)

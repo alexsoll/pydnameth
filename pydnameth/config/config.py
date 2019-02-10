@@ -5,6 +5,15 @@ from pydnameth.infrastucture.load.attributes import load_cells_dict
 from pydnameth.config.annotations.subset import subset_annotations
 from pydnameth.config.attributes.subset import subset_attributes
 from pydnameth.config.attributes.subset import subset_cells, get_indexes
+from json import JSONEncoder
+
+
+# json serialization for Config
+def _default(self, obj):
+    return getattr(obj.__class__, "to_json", _default.default)(obj)
+
+_default.default = JSONEncoder().default
+JSONEncoder.default = _default
 
 
 class Config:
@@ -14,7 +23,8 @@ class Config:
                  experiment,
                  annotations,
                  attributes,
-                 is_run=True
+                 is_run=True,
+                 is_root=True,
                  ):
 
         self.data = data
@@ -22,6 +32,7 @@ class Config:
         self.annotations = annotations
         self.attributes = attributes
         self.is_run = is_run
+        self.is_root = is_root
 
         self.cpg_gene_dict = {}
         self.cpg_bop_dict = {}
@@ -52,11 +63,20 @@ class Config:
         self.cells_dict = None
 
     def __str__(self):
-        name = f'data({str(self.data)})_' \
-               + f'experiment({str(self.experiment)})_' \
-               + f'annotations({str(self.annotations)})_' \
-               + f'attributes({str(self.attributes)})'
+        if self.is_root:
+            name = f'data({str(self.data)})_' \
+                   + f'experiment({str(self.experiment)})_' \
+                   + f'annotations({str(self.annotations)})_' \
+                   + f'attributes({str(self.attributes)})'
+        else:
+            name = f'data({str(self.data)})_' \
+                   + f'experiment({self.experiment.get_experiment_str()})_params({self.experiment.get_params_str()})_' \
+                   + f'annotations({str(self.annotations)})_' \
+                   + f'attributes({str(self.attributes)})'
         return name
+
+    def to_json(self):
+        return str(self)
 
     def set_hash(self, hash):
         self.hash = hash
