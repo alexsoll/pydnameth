@@ -333,3 +333,410 @@ Currently released functions:
 
 .. automodule:: pydnameth.scripts.release
     :members:
+
+
+
+
+--------------
+Usage Examples
+--------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+attributes_plot_observables_histogram
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='GSE87571'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    observables = pdm.Observables(
+        name='observables',
+        types={}
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    attributes = pdm.Attributes(
+        target='age',
+        observables=observables,
+        cells=cells
+    )
+
+    observables_list = [
+        {'gender': 'F'},
+        {'gender': 'M'}
+    ]
+
+    pdm.attributes_plot_observables_histogram(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        observables_list=observables_list,
+        params={
+            'bin_size': 1.0,
+            'opacity': 0.75,
+            'barmode': 'overlay'
+        }
+    )
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cpg_plot_methylation_scatter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    cpg_list = [
+        'cg13982318',
+        'cg11868595',
+        'cg08900404'
+    ]
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='GSE87571'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    observables = pdm.Observables(
+        name='observables',
+        types={}
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    attributes = pdm.Attributes(
+        target='age',
+        observables=observables,
+        cells=cells
+    )
+
+    observables_list = [
+        {'gender': 'F'},
+        {'gender': 'M'}
+    ]
+
+    pdm.cpg_plot_methylation_scatter(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        observables_list=observables_list,
+        cpg_list=cpg_list,
+        params={
+            'x_range': [10, 110]
+        }
+    )
+
+~~~~~~~~~~~~~~~~~~~~~
+cpg_proc_clock_linreg
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='GSE87571'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    obs_list = [
+        {'gender': 'F'},
+        {'gender': 'M'},
+        {'gender': 'any'}
+    ]
+
+    for obs in obs_list:
+
+        observables = pdm.Observables(
+            name='observables',
+            types=obs
+        )
+
+        attributes = pdm.Attributes(
+            target='age',
+            observables=observables,
+            cells=cells
+        )
+
+        pdm.cpg_proc_clock_linreg(
+            data=data,
+            annotations=annotations,
+            attributes=attributes,
+            params={
+                'type': 'all',
+                'part': 0.25,
+                'size': 100,
+                'runs': 100,
+            }
+        )
+
+~~~~~~~~~~~~~~~~~~~~~
+cpg_proc_table_linreg
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='GSE87571'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    obs_list = [
+        {'gender': 'F'},
+        {'gender': 'M'},
+        {'gender': 'any'}
+    ]
+
+    for obs in obs_list:
+
+        observables = pdm.Observables(
+            name='observables',
+            types=obs
+        )
+
+        attributes = pdm.Attributes(
+            target='age',
+            observables=observables,
+            cells=cells
+        )
+
+        pdm.cpg_proc_table_linreg(
+            data=data,
+            annotations=annotations,
+            attributes=attributes
+        )
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cpg_proc_table_variance_linreg
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='GSE87571'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    obs_list = [
+        {'gender': 'F'},
+        {'gender': 'M'},
+        {'gender': 'any'}
+    ]
+
+    for obs in obs_list:
+
+        observables = pdm.Observables(
+            name='observables',
+            types=obs
+        )
+
+        attributes = pdm.Attributes(
+            target='age',
+            observables=observables,
+            cells=cells
+        )
+
+        pdm.cpg_proc_table_variance_linreg(
+            data=data,
+            annotations=annotations,
+            attributes=attributes
+        )
+
+
+~~~~~~~~~~~~~~~~~~~~~~
+cpg_proc_table_polygon
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='GSE87571'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    observables = pdm.Observables(
+        name='observables',
+        types={}
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    attributes = pdm.Attributes(
+        target='age',
+        observables=observables,
+        cells=cells
+    )
+
+    observables_list = [
+        {'gender': 'F'},
+        {'gender': 'M'}
+    ]
+
+    pdm.cpg_proc_table_polygon(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        observables_list=observables_list
+    )
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cpg_proc_table_z_test_linreg
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import pydnameth as pdm
+
+    data = pdm.Data(
+        name='cpg_beta',
+        path='C:/Data',
+        base='EPIC'
+    )
+
+    annotations = pdm.Annotations(
+        name='annotations',
+        exclude='none',
+        cross_reactive='ex',
+        snp='ex',
+        chr='NS',
+        gene_region='yes',
+        geo='any',
+        probe_class='any'
+    )
+
+    observables = pdm.Observables(
+        name='observables',
+        types={}
+    )
+
+    cells = pdm.Cells(
+        name='cells',
+        types='any'
+    )
+
+    attributes = pdm.Attributes(
+        target='age',
+        observables=observables,
+        cells=cells
+    )
+
+    observables_list = [
+        {'gender': 'F'},
+        {'gender': 'M'}
+    ]
+
+    pdm.cpg_proc_table_z_test_linreg(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        observables_list=observables_list
+    )

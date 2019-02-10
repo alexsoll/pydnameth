@@ -20,6 +20,9 @@ you through the process.
 .. _pip: https://pip.pypa.io
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
+If you want to save figures locally as ``.pdf`` and ``.png`` run the command::
+
+    $ conda install -c plotly plotly-orca psutil
 
 From sources
 ------------

@@ -60,7 +60,9 @@ class TestLoadAnnotations(unittest.TestCase):
             data=data,
             experiment=experiment,
             annotations=annotations,
-            attributes=attributes
+            attributes=attributes,
+            is_run=True,
+            is_root=True
         )
 
     def test_pass_indexes_num_elems(self):

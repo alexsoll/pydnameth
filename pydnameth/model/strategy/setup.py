@@ -14,8 +14,13 @@ class SetupStrategy(metaclass=abc.ABCMeta):
         pass
 
     def setup_params(self, config):
+        default_params = get_default_params(config.experiment)
         if not bool(config.experiment.params):
-            config.experiment.params = get_default_params(config.experiment)
+            config.experiment.params = default_params
+        else:
+            for dp in default_params:
+                if dp not in config.experiment.params:
+                    config.experiment.params[dp] = default_params[dp]
 
     def setup_metrics(self, config):
         config.metrics = {}
@@ -34,9 +39,7 @@ class TableSetUpStrategy(SetupStrategy):
             metrics_keys_child = get_metrics_keys(config_child.experiment)
             for key in metrics_keys_child:
                 if key not in metrics_keys:
-                    types = config_child.attributes.observables.types.items()
-                    key_primary = key + '_' + '_'.join([key + '(' + value + ')'
-                                                        for key, value in types])
+                    key_primary = key + '_' + str(config_child.attributes.observables)
                     config.metrics[key_primary] = []
 
 

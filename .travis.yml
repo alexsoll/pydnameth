@@ -4,8 +4,21 @@ python:
 - 3.6
 dist: xenial
 sudo: true
+before_install:
+- sudo apt-get update
+- wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+- bash miniconda.sh -b -p $HOME/miniconda
+- export PATH="$HOME/miniconda/bin:$PATH"
+- hash -r
+- conda config --set always_yes yes --set changeps1 no
+- conda update -q conda
 install:
-- pip install -U tox-travis flake8
+- conda create --yes -n test-env python=$TRAVIS_PYTHON_VERSION
+- activate test-env
+- conda install shapely --channel=conda-forge
+- conda install -c plotly plotly-orca psutil
+- pip install --upgrade pip
+- pip install -U tox-travis tox-conda flake8
 - pip install -r requirements_dev.txt
 script:
 - flake8 pydnameth, tests

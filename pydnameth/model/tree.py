@@ -2,20 +2,10 @@ from anytree import PostOrderIter
 from pydnameth.infrastucture.save.info import save_info
 from pydnameth.model.context import Context
 import hashlib
-import jsonpickle
-import copy
+from anytree.exporter import JsonExporter
 
 
 def calc_tree(root):
-
-    for node in PostOrderIter(root):
-        config = copy.deepcopy(node.config)
-        hide_node(node)
-        node_json = jsonpickle.encode(node).encode('utf-8')
-        node.config = config
-        hash = hashlib.md5(node_json).hexdigest()
-        node.config.set_hash(hash)
-        save_info(node)
 
     for node in PostOrderIter(root):
         config = node.config
@@ -24,10 +14,20 @@ def calc_tree(root):
         context.pipeline(config, configs_child)
 
 
-def hide_node(node):
-    node.config.experiment.params = {}
-    node.config.data.path = ''
-    node.config.data.name = ''
-    node.config.annotations.name = ''
-    node.config.attributes.observables.name = ''
-    node.config.attributes.cells.name = ''
+def build_tree(root):
+
+    for node in PostOrderIter(root):
+
+        node_status = node.config.is_root
+        node.config.is_root = True
+        node.name = str(node.config)
+
+        exporter = JsonExporter(sort_keys=True)
+        node_json = exporter.export(node).encode('utf-8')
+        hash = hashlib.md5(node_json).hexdigest()
+        node.config.set_hash(hash)
+        if node.config.is_run:
+            save_info(node)
+
+        node.config.is_root = node_status
+        node.name = str(node.config)
