@@ -118,7 +118,7 @@ Local
 
    If you want to save figures locally as ``.pdf`` and ``.png`` run the command::
 
-    $ conda install -c plotly plotly-orca
+    $ conda install -c plotly plotly-orca psutil
 
    And repeat command::
 
