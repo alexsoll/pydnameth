@@ -341,9 +341,9 @@ Currently released functions:
 Usage Examples
 --------------
 
-++++++++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 attributes_plot_observables_histogram
-++++++++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -399,9 +399,9 @@ attributes_plot_observables_histogram
         }
     )
 
-++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cpg_plot_methylation_scatter
-++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -462,9 +462,9 @@ cpg_plot_methylation_scatter
         }
     )
 
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 cpg_proc_clock_linreg
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -523,9 +523,9 @@ cpg_proc_clock_linreg
             }
         )
 
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 cpg_proc_table_linreg
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -579,9 +579,9 @@ cpg_proc_table_linreg
         )
 
 
-++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cpg_proc_table_variance_linreg
-++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -635,9 +635,9 @@ cpg_proc_table_variance_linreg
         )
 
 
-++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~
 cpg_proc_table_polygon
-++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -688,9 +688,9 @@ cpg_proc_table_polygon
         observables_list=observables_list
     )
 
-++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cpg_proc_table_z_test_linreg
-++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
