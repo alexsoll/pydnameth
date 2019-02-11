@@ -124,9 +124,11 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        key_primary = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
-                        config.metrics[key_primary].append(advanced_data)
+                        suffix = str(config_child.attributes.observables)
+                        if suffix != '' and suffix not in key:
+                            key += '_' + suffix
+                        config.metrics[key].append(advanced_data)
 
                 points_region = []
                 points_slope = []
@@ -243,9 +245,11 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        key_child = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
-                        config.metrics[key_child].append(advanced_data)
+                        suffix = str(config_child.attributes.observables)
+                        if suffix != '' and suffix not in key:
+                            key += '_' + suffix
+                        config.metrics[key].append(advanced_data)
 
                 slopes.append(config_child.advanced_data['slope'][item_id])
                 slopes_std.append(config_child.advanced_data['slope_std'][item_id])
@@ -260,7 +264,26 @@ class TableRunStrategy(RunStrategy):
             config.metrics['aux'].append(aux)
             config.metrics['z_value'].append(z_value)
             config.metrics['p_value'].append(p_value)
-            config.metrics['z_value_abs'].append(np.absolute(z_value))
+            config.metrics['abs_z_value'].append(np.absolute(z_value))
+
+        elif config.experiment.method == Method.aggregator:
+
+            for config_child in configs_child:
+
+                item_id = config_child.advanced_dict[item]
+                metrics_keys = get_metrics_keys(config.experiment)
+
+                for key in config_child.advanced_data:
+                    if key not in metrics_keys:
+                        advanced_data = config_child.advanced_data[key][item_id]
+                        suffix = str(config_child.attributes.observables)
+                        if suffix != '' and suffix not in key:
+                            key += '_' + suffix
+                        config.metrics[key].append(advanced_data)
+
+            config.metrics['item'].append(item)
+            aux = self.get_strategy.get_aux(config, item)
+            config.metrics['aux'].append(aux)
 
 
     def iterate(self, config, configs_child):

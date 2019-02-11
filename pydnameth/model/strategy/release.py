@@ -29,6 +29,7 @@ class TableReleaseStrategy(ReleaseStrategy):
         for key, value in config.metrics.items():
             config.metrics[key] = list(np.array(value)[order])
 
+
 class ClockReleaseStrategy(ReleaseStrategy):
 
     def release(self, config, configs_child):
@@ -112,7 +113,6 @@ class MethylationReleaseStrategy(ReleaseStrategy):
 
 
 class ObservablesReleaseStrategy(ReleaseStrategy):
-
 
     def release(self, config, configs_child):
 
