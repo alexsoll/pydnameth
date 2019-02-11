@@ -21,6 +21,7 @@ class Method(Enum):
     polygon = 'polygon'
     special = 'special'
     z_test_linreg = 'z_test_linreg'
+    aggregator = 'aggregator'
 
     def __str__(self):
         return str(self.value)
@@ -101,6 +102,11 @@ def get_metrics_keys(setup):
                 'p_value',
                 'abs_z_value'
             ]
+        elif setup.method == Method.aggregator:
+            metrics = [
+                'item',
+                'aux'
+            ]
 
     elif setup.task == Task.clock:
 
@@ -133,6 +139,8 @@ def get_main_metric(setup):
             metric = ('area_intersection_rel', 'ascending')
         elif setup.method == Method.z_test_linreg:
             metric = ('p_value', 'ascending')
+        elif setup.method == Method.aggregator:
+            metric = ('item', 'ascending')
 
     return metric
 

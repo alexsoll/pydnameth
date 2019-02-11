@@ -36,11 +36,12 @@ class TableSetUpStrategy(SetupStrategy):
 
         for config_child in configs_child:
             metrics_keys = get_metrics_keys(config.experiment)
-            metrics_keys_child = get_metrics_keys(config_child.experiment)
-            for key in metrics_keys_child:
+            for key in config_child.advanced_data:
                 if key not in metrics_keys:
-                    key_primary = key + '_' + str(config_child.attributes.observables)
-                    config.metrics[key_primary] = []
+                    suffix = str(config_child.attributes.observables)
+                    if suffix != '' and suffix not in key:
+                        key += '_' + suffix
+                    config.metrics[key] = []
 
 
 class ClockSetUpStrategy(SetupStrategy):
