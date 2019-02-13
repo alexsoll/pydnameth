@@ -27,6 +27,7 @@ install:
     - conda update -q conda
     - conda create -n test-env python=%PYTHON_VERSION%
     - activate test-env
+    - conda install -c conda-forge numpy
     - conda install shapely --channel=conda-forge
     - conda install -c plotly plotly-orca psutil
     - python.exe -m pip install --upgrade pip
