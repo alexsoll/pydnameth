@@ -11,6 +11,7 @@ import colorlover as cl
 from shapely import geometry
 from scipy.stats import norm
 from pydnameth.routines.common import is_float
+from pydnameth.routines.polygon.types import PolygonRoutines
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -124,9 +125,11 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        key_primary = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
-                        config.metrics[key_primary].append(advanced_data)
+                        suffix = str(config_child.attributes.observables)
+                        if suffix != '' and suffix not in key:
+                            key += '_' + suffix
+                        config.metrics[key].append(advanced_data)
 
                 points_region = []
                 points_slope = []
@@ -138,24 +141,19 @@ class TableRunStrategy(RunStrategy):
                     intercept_std = config_child.advanced_data['intercept_std'][item_id]
                     slope_std = config_child.advanced_data['slope_std'][item_id]
 
-                    x_min = np.min(target)
-                    x_max = np.max(target)
-                    y_min = slope * x_min + intercept
-                    y_max = slope * x_max + intercept
-                    slope_tmp = slope + 3.0 * slope_std
-                    y_tmp = slope_tmp * x_max + intercept
-                    y_diff = 3.0 * np.abs(intercept_std) + np.abs(y_tmp - y_max)
-                    y_min_up = y_min + y_diff
-                    y_min_down = y_min - y_diff
-                    y_max_up = y_max + y_diff
-                    y_max_down = y_max - y_diff
+                    pr = PolygonRoutines(
+                        x=target,
+                        y=[],
+                        params={
+                            'intercept': intercept,
+                            'slope': slope,
+                            'intercept_std': intercept_std,
+                            'slope_std': slope_std
+                        },
+                        method=config_child.experiment.method
+                    )
 
-                    points_region = [
-                        geometry.Point(x_min, y_min_down),
-                        geometry.Point(x_max, y_max_down),
-                        geometry.Point(x_max, y_max_up),
-                        geometry.Point(x_min, y_min_up),
-                    ]
+                    points_region = pr.get_border_points()
 
                     points_slope = [
                         geometry.Point(slope - 3.0 * slope_std, 0.0),
@@ -174,23 +172,19 @@ class TableRunStrategy(RunStrategy):
                     intercept_var = config_child.advanced_data['intercept_var'][item_id]
                     slope_var = config_child.advanced_data['slope_var'][item_id]
 
-                    x_min = np.min(target)
-                    x_max = np.max(target)
-                    y_min = slope * x_min + intercept
-                    y_max = slope * x_max + intercept
-                    y_min_var = slope_var * x_min + intercept_var
-                    if y_min_var < 0:
-                        y_min_var = -y_min_var
-                    y_max_var = slope_var * x_max + intercept_var
-                    if y_max_var < 0:
-                        y_max_var = -y_max_var
+                    pr = PolygonRoutines(
+                        x=target,
+                        y=[],
+                        params={
+                            'intercept': intercept,
+                            'slope': slope,
+                            'intercept_var': intercept_var,
+                            'slope_var': slope_var,
+                        },
+                        method=config_child.experiment.method
+                    )
 
-                    points_region = [
-                        geometry.Point(x_min, y_min - y_min_var),
-                        geometry.Point(x_max, y_max - y_max_var),
-                        geometry.Point(x_max, y_max + y_max_var),
-                        geometry.Point(x_min, y_min + y_min_var),
-                    ]
+                    points_region = pr.get_border_points()
 
                     points_slope = [
                         geometry.Point(slope - 3.0 * slope_std, 0.0),
@@ -201,12 +195,10 @@ class TableRunStrategy(RunStrategy):
 
                     max_abs_slope = max(max_abs_slope, abs(slope))
 
-                polygon = geometry.Polygon([[point.x, point.y]
-                                            for point in points_region])
+                polygon = geometry.Polygon([[point.x, point.y] for point in points_region])
                 polygons_region.append(polygon)
 
-                polygon = geometry.Polygon([[point.x, point.y]
-                                            for point in points_slope])
+                polygon = geometry.Polygon([[point.x, point.y] for point in points_slope])
                 polygons_slope.append(polygon)
 
             intersection = polygons_region[0]
@@ -243,9 +235,11 @@ class TableRunStrategy(RunStrategy):
 
                 for key in config_child.advanced_data:
                     if key not in metrics_keys:
-                        key_child = key + '_' + str(config_child.attributes.observables)
                         advanced_data = config_child.advanced_data[key][item_id]
-                        config.metrics[key_child].append(advanced_data)
+                        suffix = str(config_child.attributes.observables)
+                        if suffix != '' and suffix not in key:
+                            key += '_' + suffix
+                        config.metrics[key].append(advanced_data)
 
                 slopes.append(config_child.advanced_data['slope'][item_id])
                 slopes_std.append(config_child.advanced_data['slope_std'][item_id])
@@ -260,8 +254,26 @@ class TableRunStrategy(RunStrategy):
             config.metrics['aux'].append(aux)
             config.metrics['z_value'].append(z_value)
             config.metrics['p_value'].append(p_value)
-            config.metrics['z_value_abs'].append(np.absolute(z_value))
+            config.metrics['abs_z_value'].append(np.absolute(z_value))
 
+        elif config.experiment.method == Method.aggregator:
+
+            for config_child in configs_child:
+
+                item_id = config_child.advanced_dict[item]
+                metrics_keys = get_metrics_keys(config.experiment)
+
+                for key in config_child.advanced_data:
+                    if key not in metrics_keys:
+                        advanced_data = config_child.advanced_data[key][item_id]
+                        suffix = str(config_child.attributes.observables)
+                        if suffix != '' and suffix not in key:
+                            key += '_' + suffix
+                        config.metrics[key].append(advanced_data)
+
+            config.metrics['item'].append(item)
+            aux = self.get_strategy.get_aux(config, item)
+            config.metrics['aux'].append(aux)
 
     def iterate(self, config, configs_child):
         for item in config.base_list:
@@ -411,18 +423,11 @@ class MethylationRunStrategy(RunStrategy):
                     intercept_std = results.bse[0]
                     slope_std = results.bse[1]
 
+                    # Adding regression line
                     x_min = np.min(target)
                     x_max = np.max(target)
                     y_min = slope * x_min + intercept
                     y_max = slope * x_max + intercept
-                    slope_tmp = slope + 3.0 * slope_std
-                    y_tmp = slope_tmp * x_max + intercept
-                    y_diff = 3.0 * np.abs(intercept_std) + np.abs(y_tmp - y_max)
-                    y_min_up = y_min + y_diff
-                    y_min_down = y_min - y_diff
-                    y_max_up = y_max + y_diff
-                    y_max_down = y_max - y_diff
-
                     scatter = go.Scatter(
                         x=[x_min, x_max],
                         y=[y_min, y_max],
@@ -435,18 +440,19 @@ class MethylationRunStrategy(RunStrategy):
                     )
                     curr_plot_data.append(scatter)
 
-                    scatter = go.Scatter(
-                        x=[x_min, x_max, x_max, x_min, x_min],
-                        y=[y_min_down, y_max_down, y_max_up, y_min_up, y_min_down],
-                        fill='tozerox',
-                        mode='lines',
-                        marker=dict(
-                            opacity=0.75,
-                            color=color,
-                            line=dict(width=8)
-                        ),
-                        showlegend=False
+                    # Adding polygon area
+                    pr = PolygonRoutines(
+                        x=target,
+                        y=[],
+                        params={
+                            'intercept': intercept,
+                            'slope': slope,
+                            'intercept_std': intercept_std,
+                            'slope_std': slope_std
+                        },
+                        method=config_child.experiment.method
                     )
+                    scatter = pr.get_scatter(color)
                     curr_plot_data.append(scatter)
 
                 elif config_child.experiment.method == Method.variance_linreg:
@@ -472,17 +478,11 @@ class MethylationRunStrategy(RunStrategy):
                     intercept_var = results_var.params[0]
                     slope_var = results_var.params[1]
 
+                    # Adding regression line
                     x_min = np.min(target)
                     x_max = np.max(target)
                     y_min = slope * x_min + intercept
                     y_max = slope * x_max + intercept
-                    y_min_var = slope_var * x_min + intercept_var
-                    if y_min_var < 0:
-                        y_min_var = -y_min_var
-                    y_max_var = slope_var * x_max + intercept_var
-                    if y_max_var < 0:
-                        y_max_var = -y_max_var
-
                     scatter = go.Scatter(
                         x=[x_min, x_max],
                         y=[y_min, y_max],
@@ -495,26 +495,20 @@ class MethylationRunStrategy(RunStrategy):
                     )
                     curr_plot_data.append(scatter)
 
-                    scatter = go.Scatter(
-                        x=[x_min, x_max, x_max, x_min, x_min],
-                        y=[y_min - y_min_var,
-                           y_max - y_max_var,
-                           y_max + y_max_var,
-                           y_min + y_min_var,
-                           y_min - y_min_var],
-                        fill='tozerox',
-                        mode='lines',
-                        marker=dict(
-                            opacity=0.75,
-                            color=color,
-                            line=dict(width=4)
-                        ),
-                        showlegend=False
+                    # Adding polygon area
+                    pr = PolygonRoutines(
+                        x=target,
+                        y=[],
+                        params={
+                            'intercept': intercept,
+                            'slope': slope,
+                            'intercept_var': intercept_var,
+                            'slope_var': slope_var,
+                        },
+                        method=config_child.experiment.method
                     )
+                    scatter = pr.get_scatter(color)
                     curr_plot_data.append(scatter)
-
-                elif config_child.experiment.method == Method.cluster:
-                    pass
 
                 plot_data += curr_plot_data
 

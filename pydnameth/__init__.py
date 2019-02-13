@@ -30,6 +30,7 @@ from pydnameth.scripts.develop import \
     cpg_proc_table_variance_linreg_dev, \
     cpg_proc_table_polygon_dev, \
     cpg_proc_table_z_test_linreg_dev, \
+    cpg_proc_table_aggregator_dev, \
     cpg_proc_clock_linreg_dev, \
     cpg_proc_special_clock_linreg_dev, \
     cpg_plot_methylation_scatter_dev, \
