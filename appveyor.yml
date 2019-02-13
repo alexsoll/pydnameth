@@ -36,4 +36,4 @@ install:
 
 test_script:
     - python.exe -m flake8 pydnameth, tests
-    - python.exe -m tox
+    - python.exe setup.py test
