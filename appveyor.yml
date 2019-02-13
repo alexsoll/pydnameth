@@ -31,6 +31,7 @@ install:
     - "set PATH=%MINICONDA%\\envs\\test-env\\Lib\\site-packages\\numpy\\.libs;%PATH%"
     - conda install shapely --channel=conda-forge
     - conda install -c plotly plotly-orca psutil
+    - conda install msvc_runtime
     - python.exe -m pip install --upgrade pip
     - python.exe -m pip install -U flake8
     - python.exe -m pip install -r requirements_dev.txt"
