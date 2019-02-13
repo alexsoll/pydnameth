@@ -27,8 +27,6 @@ install:
     - conda update -q conda
     - conda create -n test-env python=%PYTHON_VERSION%
     - activate test-env
-    - "set PATH=%MINICONDA%\\envs\\test-env;%MINICONDA%\\envs\\test-env\\Scripts;%MINICONDA%\\envs\\test-env\\Library\\bin;%PATH%"
-    - "set PATH=%MINICONDA%\\envs\\test-env\\Lib\\site-packages\\numpy\\.libs;%PATH%"
     - conda install shapely --channel=conda-forge
     - conda install -c plotly plotly-orca psutil
     - conda install msvc_runtime
