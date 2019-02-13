@@ -22,7 +22,7 @@ init:
 
 install:
     # set up environment
-    - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+    - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%MINICONDA%\\Lib\\site-packages\\numpy\\.libs;%PATH%"
     - conda config --set always_yes yes
     - conda update -q conda
     - conda create -n test-env python=%PYTHON_VERSION%
