@@ -28,8 +28,8 @@ install:
     - conda create -n test-env python=%PYTHON_VERSION%
     - activate test-env
     - conda install shapely --channel=conda-forge
+    - conda install certifi --channel=conda-forge
     - conda install -c plotly plotly-orca psutil
-    - python.exe -m pip uninstall -y numpy
     - python.exe -m pip install --upgrade pip
     - python.exe -m pip install -U flake8
     - python.exe -m pip install -r requirements_dev.txt"
