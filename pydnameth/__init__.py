@@ -34,5 +34,6 @@ from pydnameth.scripts.develop import \
     cpg_proc_clock_linreg_dev, \
     cpg_proc_special_clock_linreg_dev, \
     cpg_plot_methylation_scatter_dev, \
-    attributes_plot_observables_histogram_dev
+    attributes_plot_observables_histogram_dev, \
+    cpg_plot_methylation_variance_histogram_dev
 from pydnameth.routines.clock.types import ClockExogType

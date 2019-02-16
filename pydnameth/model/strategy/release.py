@@ -4,6 +4,9 @@ from pydnameth.config.experiment.types import Method
 from pydnameth.config.experiment.types import get_main_metric
 import plotly.graph_objs as go
 from statsmodels.stats.multitest import multipletests
+import plotly.figure_factory as ff
+import pydnameth.routines.methylation.functions as methylation_routines
+import pydnameth.routines.observables.functions as observables_routines
 
 
 class ReleaseStrategy(metaclass=abc.ABCMeta):
@@ -42,74 +45,30 @@ class MethylationReleaseStrategy(ReleaseStrategy):
 
         if config.experiment.method == Method.scatter:
 
-            item = config.experiment.params['item']
-            aux = config.cpg_gene_dict[item]
-            if isinstance(aux, list):
-                aux_str = ';'.join(aux)
-            else:
-                aux_str = str(aux)
-
-            layout = go.Layout(
-                title=item + '(' + aux_str + ')',
-                autosize=True,
-                barmode='overlay',
-                legend=dict(
-                    font=dict(
-                        family='sans-serif',
-                        size=16,
-                    ),
-                    orientation="h",
-                    x=0,
-                    y=1.15,
-                ),
-                xaxis=dict(
-                    title=config.attributes.target,
-                    showgrid=True,
-                    showline=True,
-                    mirror='ticks',
-                    titlefont=dict(
-                        family='Arial, sans-serif',
-                        size=24,
-                        color='black'
-                    ),
-                    showticklabels=True,
-                    tickangle=0,
-                    tickfont=dict(
-                        family='Old Standard TT, serif',
-                        size=20,
-                        color='black'
-                    ),
-                    exponentformat='e',
-                    showexponent='all'
-                ),
-                yaxis=dict(
-                    title='$\\beta$',
-                    showgrid=True,
-                    showline=True,
-                    mirror='ticks',
-                    titlefont=dict(
-                        family='Arial, sans-serif',
-                        size=24,
-                        color='black'
-                    ),
-                    showticklabels=True,
-                    tickangle=0,
-                    tickfont=dict(
-                        family='Old Standard TT, serif',
-                        size=20,
-                        color='black'
-                    ),
-                    exponentformat='e',
-                    showexponent='all'
-                ),
-
-            )
+            layout = methylation_routines.get_layout(config)
 
             if 'x_range' in config.experiment.params:
                 if config.experiment.params['x_range'] != 'auto':
                     layout.xaxis.range = config.experiment.params['x_range']
 
             config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
+
+        elif config.experiment.method == Method.variance_histogram:
+
+            layout = methylation_routines.get_layout(config)
+            layout.xaxis.title = '$\\Delta$'
+            layout.yaxis.title = '$PDF$'
+
+            fig = ff.create_distplot(
+                config.experiment_data['data']['hist_data'],
+                config.experiment_data['data']['group_labels'],
+                show_hist=False,
+                show_rug=False,
+                colors=config.experiment_data['data']['colors']
+            )
+            fig['layout'] = layout
+
+            config.experiment_data['fig'] = fig
 
 
 class ObservablesReleaseStrategy(ReleaseStrategy):
@@ -118,59 +77,6 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
 
         if config.experiment.method == Method.histogram:
 
-            layout = go.Layout(
-                autosize=True,
-                barmode=config.experiment.params['barmode'],
-                legend=dict(
-                    font=dict(
-                        family='sans-serif',
-                        size=16,
-                    ),
-                    orientation="h",
-                    x=0,
-                    y=1.15,
-                ),
-                xaxis=dict(
-                    title=config.attributes.target,
-                    showgrid=True,
-                    showline=True,
-                    mirror='ticks',
-                    titlefont=dict(
-                        family='Arial, sans-serif',
-                        size=24,
-                        color='black'
-                    ),
-                    showticklabels=True,
-                    tickangle=0,
-                    tickfont=dict(
-                        family='Old Standard TT, serif',
-                        size=20,
-                        color='black'
-                    ),
-                    exponentformat='e',
-                    showexponent='all'
-                ),
-                yaxis=dict(
-                    title='count',
-                    showgrid=True,
-                    showline=True,
-                    mirror='ticks',
-                    titlefont=dict(
-                        family='Arial, sans-serif',
-                        size=24,
-                        color='black'
-                    ),
-                    showticklabels=True,
-                    tickangle=0,
-                    tickfont=dict(
-                        family='Old Standard TT, serif',
-                        size=20,
-                        color='black'
-                    ),
-                    exponentformat='e',
-                    showexponent='all'
-                ),
-
-            )
+            layout = observables_routines.get_layout(config)
 
             config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)

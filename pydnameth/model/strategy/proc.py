@@ -412,9 +412,8 @@ class MethylationRunStrategy(RunStrategy):
 
                 if config_child.experiment.method == Method.linreg:
 
-                    target = self.get_strategy.get_target(config_child)
                     x = sm.add_constant(target)
-                    y = self.get_strategy.get_single_base(config_child, [item])[0]
+                    y = methylation
 
                     results = sm.OLS(y, x).fit()
 
@@ -457,9 +456,8 @@ class MethylationRunStrategy(RunStrategy):
 
                 elif config_child.experiment.method == Method.variance_linreg:
 
-                    target = self.get_strategy.get_target(config_child)
                     x = sm.add_constant(target)
-                    y = self.get_strategy.get_single_base(config_child, [item])[0]
+                    y = methylation
 
                     results = sm.OLS(y, x).fit()
 
@@ -511,6 +509,35 @@ class MethylationRunStrategy(RunStrategy):
                     curr_plot_data.append(scatter)
 
                 plot_data += curr_plot_data
+
+            config.experiment_data['data'] = plot_data
+
+        elif config.experiment.method == Method.variance_histogram:
+
+            item = config.experiment.params['item']
+
+            plot_data = {
+                'hist_data': [],
+                'group_labels': [],
+                'colors': []
+            }
+
+            for config_child in configs_child:
+
+                plot_data['group_labels'].append(str(config_child.attributes.observables))
+                plot_data['colors'].append(cl.scales['8']['qual']['Set1'][configs_child.index(config_child)])
+
+                target = self.get_strategy.get_target(config_child)
+                methylation = self.get_strategy.get_single_base(config_child, [item])[0]
+
+                if config_child.experiment.method == Method.linreg:
+
+                    x = sm.add_constant(target)
+                    y = methylation
+
+                    results = sm.OLS(y, x).fit()
+
+                    plot_data['hist_data'].append(results.resid)
 
             config.experiment_data['data'] = plot_data
 
