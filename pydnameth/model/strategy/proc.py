@@ -537,30 +537,9 @@ class MethylationRunStrategy(RunStrategy):
 
                     results = sm.OLS(y, x).fit()
 
-                    intercept = results.params[0]
-                    slope = results.params[1]
-
-                    x_min = np.min(target)
-                    x_max = np.max(target)
-                    y_min = slope * x_min + intercept
-                    y_max = slope * x_max + intercept
-
-                    line = geometry.LineString([(x_min, y_min), (x_max, y_max)])
-
-                    distances = []
-                    for p_id in range(0, len(target)):
-                        point = geometry.Point(target[p_id], y[p_id])
-                        d = point.distance(line)
-                        y_linreg = slope * target[p_id] + intercept
-                        if y[p_id] > y_linreg:
-                            distances.append(d)
-                        else:
-                            distances.append(-d)
-
-                    plot_data['hist_data'].append(distances)
+                    plot_data['hist_data'].append(results.resid)
 
             config.experiment_data['data'] = plot_data
-
 
 
 class ObservablesRunStrategy(RunStrategy):
