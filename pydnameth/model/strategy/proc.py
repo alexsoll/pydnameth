@@ -9,7 +9,7 @@ from pydnameth.routines.clock.linreg.processing import build_clock_linreg
 import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry
-from scipy.stats import norm
+from scipy.stats import norm, shapiro, kstest, normaltest
 from pydnameth.routines.common import is_float
 from pydnameth.routines.polygon.types import PolygonRoutines
 
@@ -43,6 +43,15 @@ class TableRunStrategy(RunStrategy):
             y = self.get_strategy.get_single_base(config, [item])[0]
 
             results = sm.OLS(y, x).fit()
+            residuals = results.resid
+
+            res_mean = np.mean(residuals)
+            res_std = np.std(residuals)
+
+            _, normality_p_value_shapiro = shapiro(residuals)
+            _, normality_p_value_ks_wo_params = kstest(residuals, 'norm')
+            _, normality_p_value_ks_with_params = kstest(residuals, 'norm', (res_mean, res_std))
+            _, normality_p_value_dagostino = normaltest(residuals)
 
             config.metrics['item'].append(item)
             aux = self.get_strategy.get_aux(config, item)
@@ -54,6 +63,10 @@ class TableRunStrategy(RunStrategy):
             config.metrics['slope_std'].append(results.bse[1])
             config.metrics['intercept_p_value'].append(results.pvalues[0])
             config.metrics['slope_p_value'].append(results.pvalues[1])
+            config.metrics['normality_p_value_shapiro'].append(normality_p_value_shapiro)
+            config.metrics['normality_p_value_ks_wo_params'].append(normality_p_value_ks_wo_params)
+            config.metrics['normality_p_value_ks_with_params'].append(normality_p_value_ks_with_params)
+            config.metrics['normality_p_value_dagostino'].append(normality_p_value_dagostino)
 
         elif config.experiment.method == Method.variance_linreg:
 

@@ -55,7 +55,11 @@ def get_metrics_keys(setup):
                 'intercept_std',
                 'slope_std',
                 'intercept_p_value',
-                'slope_p_value'
+                'slope_p_value',
+                'normality_p_value_shapiro',
+                'normality_p_value_ks_wo_params',
+                'normality_p_value_ks_with_params',
+                'normality_p_value_dagostino'
             ]
         elif setup.method == Method.variance_linreg:
             metrics = [
