@@ -412,9 +412,8 @@ class MethylationRunStrategy(RunStrategy):
 
                 if config_child.experiment.method == Method.linreg:
 
-                    target = self.get_strategy.get_target(config_child)
                     x = sm.add_constant(target)
-                    y = self.get_strategy.get_single_base(config_child, [item])[0]
+                    y = methylation
 
                     results = sm.OLS(y, x).fit()
 
@@ -457,9 +456,8 @@ class MethylationRunStrategy(RunStrategy):
 
                 elif config_child.experiment.method == Method.variance_linreg:
 
-                    target = self.get_strategy.get_target(config_child)
                     x = sm.add_constant(target)
-                    y = self.get_strategy.get_single_base(config_child, [item])[0]
+                    y = methylation
 
                     results = sm.OLS(y, x).fit()
 
@@ -513,6 +511,56 @@ class MethylationRunStrategy(RunStrategy):
                 plot_data += curr_plot_data
 
             config.experiment_data['data'] = plot_data
+
+        elif config.experiment.method == Method.variance_histogram:
+
+            item = config.experiment.params['item']
+
+            plot_data = {
+                'hist_data': [],
+                'group_labels': [],
+                'colors': []
+            }
+
+            for config_child in configs_child:
+
+                plot_data['group_labels'].append(str(config_child.attributes.observables))
+                plot_data['colors'].append(cl.scales['8']['qual']['Set1'][configs_child.index(config_child)])
+
+                target = self.get_strategy.get_target(config_child)
+                methylation = self.get_strategy.get_single_base(config_child, [item])[0]
+
+                if config_child.experiment.method == Method.linreg:
+
+                    x = sm.add_constant(target)
+                    y = methylation
+
+                    results = sm.OLS(y, x).fit()
+
+                    intercept = results.params[0]
+                    slope = results.params[1]
+
+                    x_min = np.min(target)
+                    x_max = np.max(target)
+                    y_min = slope * x_min + intercept
+                    y_max = slope * x_max + intercept
+
+                    line = geometry.LineString([(x_min, y_min), (x_max, y_max)])
+
+                    distances = []
+                    for p_id in range(0, len(target)):
+                        point = geometry.Point(target[p_id], y[p_id])
+                        d = point.distance(line)
+                        y_linreg = slope * target[p_id] + intercept
+                        if y[p_id] > y_linreg:
+                            distances.append(d)
+                        else:
+                            distances.append(-d)
+
+                    plot_data['hist_data'].append(distances)
+
+            config.experiment_data['data'] = plot_data
+
 
 
 class ObservablesRunStrategy(RunStrategy):

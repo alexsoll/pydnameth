@@ -21,6 +21,7 @@ class Method(Enum):
     polygon = 'polygon'
     special = 'special'
     z_test_linreg = 'z_test_linreg'
+    variance_histogram = 'variance_histogram'
     aggregator = 'aggregator'
 
     def __str__(self):
@@ -183,6 +184,10 @@ def get_default_params(setup):
             params = {
                 'item': 'cg01620164',
                 'x_range': 'auto'
+            }
+        elif setup.method == Method.variance_histogram:
+            params = {
+                'item': 'cg01620164',
             }
 
     elif setup.task == Task.dependence_2d:
