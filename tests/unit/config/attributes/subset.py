@@ -8,9 +8,11 @@ from pydnameth import Cells
 from pydnameth import Attributes
 from pydnameth import Config
 from pydnameth.infrastucture.load.attributes import load_attributes_dict
+from pydnameth.infrastucture.load.attributes import load_cells_dict
 from pydnameth.config.attributes.subset import pass_indexes
 from pydnameth.config.attributes.subset import get_indexes
 from pydnameth.config.attributes.subset import subset_attributes
+from pydnameth.config.attributes.subset import subset_cells
 
 
 class TestLoadAnnotations(unittest.TestCase):
@@ -113,6 +115,12 @@ class TestLoadAnnotations(unittest.TestCase):
         self.config.attributes_indexes = list(range(5))
         subset_attributes(self.config)
         self.assertEqual(self.config.attributes_dict['gender'], ['M']*5)
+
+    def test_subset_cells(self):
+        self.config.cells_dict = load_cells_dict(self.config)
+        self.config.attributes_indexes = list(range(5))
+        subset_cells(self.config)
+        self.assertEqual(self.config.cells_dict['CD8T'], [0, 0, 0.006011666, 0, 0])
 
 
 if __name__ == '__main__':
