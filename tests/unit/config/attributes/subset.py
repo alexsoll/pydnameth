@@ -101,6 +101,12 @@ class TestLoadAnnotations(unittest.TestCase):
         indexes = get_indexes(self.config)
         self.assertEqual(len(indexes), 341)
 
+    def test_get_indexes_num_f_m(self):
+        self.config.attributes.observables.types = {'gender': ['F', 'M']}
+        self.config.attributes_dict = load_attributes_dict(self.config)
+        indexes = get_indexes(self.config)
+        self.assertEqual(len(indexes), 729)
+
 
 if __name__ == '__main__':
     unittest.main()
