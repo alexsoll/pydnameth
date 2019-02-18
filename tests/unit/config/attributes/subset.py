@@ -10,6 +10,7 @@ from pydnameth import Config
 from pydnameth.infrastucture.load.attributes import load_attributes_dict
 from pydnameth.config.attributes.subset import pass_indexes
 from pydnameth.config.attributes.subset import get_indexes
+from pydnameth.config.attributes.subset import subset_attributes
 
 
 class TestLoadAnnotations(unittest.TestCase):
@@ -106,6 +107,12 @@ class TestLoadAnnotations(unittest.TestCase):
         self.config.attributes_dict = load_attributes_dict(self.config)
         indexes = get_indexes(self.config)
         self.assertEqual(len(indexes), 729)
+
+    def test_subset_attributes(self):
+        self.config.attributes_dict = load_attributes_dict(self.config)
+        self.config.attributes_indexes = list(range(5))
+        subset_attributes(self.config)
+        self.assertEqual(self.config.attributes_dict['gender'], ['M']*5)
 
 
 if __name__ == '__main__':
