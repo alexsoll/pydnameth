@@ -93,7 +93,8 @@ def get_metrics_keys(setup):
                 'aux',
                 'area_intersection_rel',
                 'slope_intersection_rel',
-                'max_abs_slope'
+                'max_abs_slope',
+                'is_inside'
             ]
         elif setup.method == Method.special:
             metrics = [
