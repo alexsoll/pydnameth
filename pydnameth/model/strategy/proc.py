@@ -127,7 +127,17 @@ class TableRunStrategy(RunStrategy):
 
             polygons_region = []
             polygons_slope = []
+            polygons_region_min = []
             max_abs_slope = 0.0
+            is_inside = False
+
+            mins = [min(self.get_strategy.get_target(config_child)) for config_child in configs_child]
+            maxs = [max(self.get_strategy.get_target(config_child)) for config_child in configs_child]
+            border_l = max(mins)
+            border_r = min(maxs)
+            if border_l > border_r:
+                raise ValueError('Polygons borders are not consistent')
+
 
             for config_child in configs_child:
 
@@ -146,6 +156,7 @@ class TableRunStrategy(RunStrategy):
 
                 points_region = []
                 points_slope = []
+                points_region_min = []
 
                 if config_child.experiment.method == Method.linreg:
 
@@ -165,7 +176,6 @@ class TableRunStrategy(RunStrategy):
                         },
                         method=config_child.experiment.method
                     )
-
                     points_region = pr.get_border_points()
 
                     points_slope = [
@@ -176,6 +186,19 @@ class TableRunStrategy(RunStrategy):
                     ]
 
                     max_abs_slope = max(max_abs_slope, abs(slope))
+
+                    pr_min = PolygonRoutines(
+                        x=[border_l, border_r],
+                        y=[],
+                        params={
+                            'intercept': intercept,
+                            'slope': slope,
+                            'intercept_std': intercept_std,
+                            'slope_std': slope_std
+                        },
+                        method=config_child.experiment.method
+                    )
+                    points_region_min = pr_min.get_border_points()
 
                 elif config_child.experiment.method == Method.linreg.variance_linreg:
 
@@ -214,12 +237,22 @@ class TableRunStrategy(RunStrategy):
                 polygon = geometry.Polygon([[point.x, point.y] for point in points_slope])
                 polygons_slope.append(polygon)
 
+                polygon = geometry.Polygon([[point.x, point.y] for point in points_region_min])
+                polygons_region_min.append(polygon)
+
             intersection = polygons_region[0]
             union = polygons_region[0]
             for polygon in polygons_region[1::]:
                 intersection = intersection.intersection(polygon)
                 union = union.union(polygon)
             area_intersection_rel = intersection.area / union.area
+
+            union = polygons_region_min[0]
+            for polygon in polygons_region_min[1::]:
+                union = union.union(polygon)
+            for polygon in polygons_region_min:
+                if union.area == polygon.area:
+                    is_inside = True
 
             intersection = polygons_slope[0]
             union = polygons_slope[0]
@@ -234,6 +267,7 @@ class TableRunStrategy(RunStrategy):
             config.metrics['area_intersection_rel'].append(area_intersection_rel)
             config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
             config.metrics['max_abs_slope'].append(max_abs_slope)
+            config.metrics['is_inside'].append(is_inside)
             
         elif config.experiment.method == Method.z_test_linreg:
             
