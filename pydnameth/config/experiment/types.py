@@ -21,6 +21,7 @@ class Method(Enum):
     polygon = 'polygon'
     special = 'special'
     z_test_linreg = 'z_test_linreg'
+    variance_histogram = 'variance_histogram'
     aggregator = 'aggregator'
 
     def __str__(self):
@@ -54,7 +55,11 @@ def get_metrics_keys(setup):
                 'intercept_std',
                 'slope_std',
                 'intercept_p_value',
-                'slope_p_value'
+                'slope_p_value',
+                'normality_p_value_shapiro',
+                'normality_p_value_ks_wo_params',
+                'normality_p_value_ks_with_params',
+                'normality_p_value_dagostino'
             ]
         elif setup.method == Method.variance_linreg:
             metrics = [
@@ -183,6 +188,10 @@ def get_default_params(setup):
             params = {
                 'item': 'cg01620164',
                 'x_range': 'auto'
+            }
+        elif setup.method == Method.variance_histogram:
+            params = {
+                'item': 'cg01620164',
             }
 
     elif setup.task == Task.dependence_2d:
