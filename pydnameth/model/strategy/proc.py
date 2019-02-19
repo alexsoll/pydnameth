@@ -125,9 +125,6 @@ class TableRunStrategy(RunStrategy):
 
         elif config.experiment.method == Method.polygon:
 
-            if item == 'cg03851309':
-                aaa = 1
-
             polygons_region = []
             polygons_slope = []
             polygons_region_min = []
