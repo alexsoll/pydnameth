@@ -13,7 +13,7 @@ from pydnameth.config.annotations.conditions import exclude_condition
 from pydnameth.config.annotations.conditions import snp_condition
 from pydnameth.config.annotations.conditions import gene_region_condition
 from pydnameth.config.annotations.conditions import probe_class_condition
-
+from pydnameth.config.annotations.conditions import check_conditions
 
 class TestAnnotationsConditions(unittest.TestCase):
     def setUp(self):
@@ -114,6 +114,24 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual((True, True, False, False, False),
                          (condition1, condition2, condition3, condition4, condition5))
+
+    def test_check_conditions(self):
+        self.config.excluded = load_excluded(self.config)
+
+        annotations_dict = {AnnotationKey.cpg.value: 'cg00001249',
+                            AnnotationKey.cross_reactive.value: '0',
+                            AnnotationKey.Probe_SNPs.value: '',
+                            AnnotationKey.Probe_SNPs_10.value: '',
+                            AnnotationKey.chr.value: '14',
+                            AnnotationKey.gene.value: ['PRR4', 'TAS2R20'],
+                            AnnotationKey.geo.value: 'S_Shelf',
+                            AnnotationKey.probe_class.value: 'A'}
+        condition1 = check_conditions(self.config, annotations_dict)
+
+        annotations_dict[AnnotationKey.chr.value] = 'X'
+        condition2 = check_conditions(self.config, annotations_dict)
+
+        self.assertEqual((True, False), (condition1, condition2))
 
 
 if __name__ == '__main__':
