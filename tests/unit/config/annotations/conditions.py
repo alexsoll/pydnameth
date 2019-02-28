@@ -11,6 +11,7 @@ from pydnameth.infrastucture.load.excluded import load_excluded
 from pydnameth.config.annotations.types import AnnotationKey
 from pydnameth.config.annotations.conditions import exclude_condition
 from pydnameth.config.annotations.conditions import snp_condition
+from pydnameth.config.annotations.conditions import gene_region_condition
 
 
 class TestAnnotationsConditions(unittest.TestCase):
@@ -84,6 +85,15 @@ class TestAnnotationsConditions(unittest.TestCase):
         condition3 = snp_condition(self.config, annotations_dict)
 
         self.assertEqual(False, condition1 or condition2 or condition3)
+
+    def test_gene_region_condition(self):
+        annotations_dict = {AnnotationKey.gene.value: ['PRR4', 'TAS2R20']}
+        condition1 = gene_region_condition(self.config, annotations_dict)
+
+        annotations_dict = {AnnotationKey.gene.value: []}
+        condition2 = gene_region_condition(self.config, annotations_dict)
+
+        self.assertEqual((True, False), (condition1, condition2))
 
 
 if __name__ == '__main__':
