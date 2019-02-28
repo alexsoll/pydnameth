@@ -12,6 +12,7 @@ from pydnameth.config.annotations.types import AnnotationKey
 from pydnameth.config.annotations.conditions import exclude_condition
 from pydnameth.config.annotations.conditions import snp_condition
 from pydnameth.config.annotations.conditions import gene_region_condition
+from pydnameth.config.annotations.conditions import probe_class_condition
 
 
 class TestAnnotationsConditions(unittest.TestCase):
@@ -37,7 +38,7 @@ class TestAnnotationsConditions(unittest.TestCase):
             chr='NS',
             gene_region='yes',
             geo='any',
-            probe_class='any'
+            probe_class='A_B'
         )
 
         observables = Observables(
@@ -94,6 +95,25 @@ class TestAnnotationsConditions(unittest.TestCase):
         condition2 = gene_region_condition(self.config, annotations_dict)
 
         self.assertEqual((True, False), (condition1, condition2))
+
+    def test_probe_class_condition(self):
+        annotations_dict = {AnnotationKey.probe_class.value: 'A'}
+        condition1 = probe_class_condition(self.config, annotations_dict)
+
+        annotations_dict = {AnnotationKey.probe_class.value: 'B'}
+        condition2 = probe_class_condition(self.config, annotations_dict)
+
+        annotations_dict = {AnnotationKey.probe_class.value: 'C'}
+        condition3 = probe_class_condition(self.config, annotations_dict)
+
+        annotations_dict = {AnnotationKey.probe_class.value: 'D'}
+        condition4 = probe_class_condition(self.config, annotations_dict)
+
+        annotations_dict = {AnnotationKey.probe_class.value: ''}
+        condition5 = probe_class_condition(self.config, annotations_dict)
+
+        self.assertEqual((True, True, False, False, False),
+                         (condition1, condition2, condition3, condition4, condition5))
 
 
 if __name__ == '__main__':
