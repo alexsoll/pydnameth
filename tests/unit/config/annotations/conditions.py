@@ -15,6 +15,7 @@ from pydnameth.config.annotations.conditions import gene_region_condition
 from pydnameth.config.annotations.conditions import probe_class_condition
 from pydnameth.config.annotations.conditions import check_conditions
 
+
 class TestAnnotationsConditions(unittest.TestCase):
     def setUp(self):
         data = Data(
