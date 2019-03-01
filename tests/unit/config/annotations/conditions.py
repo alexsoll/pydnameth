@@ -155,6 +155,14 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual(count, 297)
 
+    def test_count_snp_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        self.config.annotations_dict = load_annotations_dict(self.config)
+
+        count = self.iterate(snp_condition)
+
+        self.assertEqual(count, 250)
+
 
 if __name__ == '__main__':
     unittest.main()
