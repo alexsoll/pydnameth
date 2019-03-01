@@ -8,6 +8,7 @@ from pydnameth import Cells
 from pydnameth import Attributes
 from pydnameth import Config
 from pydnameth.infrastucture.load.excluded import load_excluded
+from pydnameth.infrastucture.load.annotations import load_annotations_dict
 from pydnameth.config.annotations.types import AnnotationKey
 from pydnameth.config.annotations.conditions import exclude_condition
 from pydnameth.config.annotations.conditions import snp_condition
@@ -133,6 +134,26 @@ class TestAnnotationsConditions(unittest.TestCase):
         condition2 = check_conditions(self.config, annotations_dict)
 
         self.assertEqual((True, False), (condition1, condition2))
+
+    def iterate(self, condition):
+        count = 0
+        keys = list(self.config.annotations_dict.keys())
+        values = list(self.config.annotations_dict.values())
+
+        for i, value in enumerate(values[0]):
+            current = dict(zip(keys, [row[i] for row in values]))
+            if condition(self.config, current):
+                count += 1
+
+        return count
+
+    def test_count_exclude_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        self.config.annotations_dict = load_annotations_dict(self.config)
+
+        count = self.iterate(exclude_condition)
+
+        self.assertEqual(count, 297)
 
 
 if __name__ == '__main__':
