@@ -15,6 +15,7 @@ from pydnameth.config.annotations.conditions import snp_condition
 from pydnameth.config.annotations.conditions import gene_region_condition
 from pydnameth.config.annotations.conditions import probe_class_condition
 from pydnameth.config.annotations.conditions import check_conditions
+from pydnameth.config.annotations.conditions import cross_reactive_condition
 
 
 class TestAnnotationsConditions(unittest.TestCase):
