@@ -163,6 +163,14 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual(count, 250)
 
+    def test_count_gene_region_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        self.config.annotations_dict = load_annotations_dict(self.config)
+
+        count = self.iterate(gene_region_condition)
+
+        self.assertEqual(count, 292)
+
 
 if __name__ == '__main__':
     unittest.main()
