@@ -171,6 +171,26 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual(count, 292)
 
+    def test_count_probe_class_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        tmp_dict = load_annotations_dict(self.config)
+
+        for i, value in enumerate(tmp_dict['Class']):
+            if value == 'ClassA':
+                tmp_dict['Class'][i] = 'A'
+            elif value == 'ClassB':
+                tmp_dict['Class'][i] = 'B'
+            elif value == 'ClassC':
+                tmp_dict['Class'][i] = 'C'
+            elif value == 'ClassD':
+                tmp_dict['Class'][i] = 'D'
+
+        self.config.annotations_dict = tmp_dict
+
+        count = self.iterate(probe_class_condition)
+
+        self.assertEqual(count, 202)
+
 
 if __name__ == '__main__':
     unittest.main()
