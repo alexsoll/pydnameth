@@ -347,6 +347,32 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual(False, condition)
 
+    def test_exclude_cross_r_cpg(self):
+        annotations_dict = {AnnotationKey.cross_reactive.value: 1}
+
+        condition = cross_reactive_condition(self.config, annotations_dict)
+
+        self.assertEqual(False, condition)
+
+    def test_considered_cross_r_cpg(self):
+        annotations_dict = {AnnotationKey.cross_reactive.value: 0}
+
+        condition = cross_reactive_condition(self.config, annotations_dict)
+
+        self.assertEqual(True, condition)
+
+    def test_considered_any_cross_r(self):
+        self.config.annotations.cross_reactive = 'any'
+        annotations_dict = {AnnotationKey.cross_reactive.value: 0}
+
+        condition1 = cross_reactive_condition(self.config, annotations_dict)
+
+        annotations_dict = {AnnotationKey.cross_reactive.value: 1}
+
+        condition2 = cross_reactive_condition(self.config, annotations_dict)
+
+        self.assertEqual(True, condition1 and condition2)
+
 
 if __name__ == '__main__':
     unittest.main()
