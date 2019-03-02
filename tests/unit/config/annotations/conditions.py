@@ -8,6 +8,7 @@ from pydnameth import Cells
 from pydnameth import Attributes
 from pydnameth import Config
 from pydnameth.infrastucture.load.excluded import load_excluded
+from pydnameth.infrastucture.load.annotations import load_annotations_dict
 from pydnameth.config.annotations.types import AnnotationKey
 from pydnameth.config.annotations.conditions import exclude_condition
 from pydnameth.config.annotations.conditions import snp_condition
@@ -133,6 +134,82 @@ class TestAnnotationsConditions(unittest.TestCase):
         condition2 = check_conditions(self.config, annotations_dict)
 
         self.assertEqual((True, False), (condition1, condition2))
+
+    def get_count(self, condition):
+        count = 0
+        keys = list(self.config.annotations_dict.keys())
+        values = list(self.config.annotations_dict.values())
+
+        for i, value in enumerate(values[0]):
+            current = dict(zip(keys, [row[i] for row in values]))
+            if condition(self.config, current):
+                count += 1
+
+        return count
+
+    def test_count_exclude_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        self.config.annotations_dict = load_annotations_dict(self.config)
+
+        count = self.get_count(exclude_condition)
+
+        self.assertEqual(count, 297)
+
+    def test_count_snp_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        self.config.annotations_dict = load_annotations_dict(self.config)
+
+        count = self.get_count(snp_condition)
+
+        self.assertEqual(count, 250)
+
+    def test_count_gene_region_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        self.config.annotations_dict = load_annotations_dict(self.config)
+
+        count = self.get_count(gene_region_condition)
+
+        self.assertEqual(count, 292)
+
+    def test_count_probe_class_condition(self):
+        self.config.excluded = load_excluded(self.config)
+        tmp_dict = load_annotations_dict(self.config)
+
+        for i, value in enumerate(tmp_dict['Class']):
+            if value == 'ClassA':
+                tmp_dict['Class'][i] = 'A'
+            elif value == 'ClassB':
+                tmp_dict['Class'][i] = 'B'
+            elif value == 'ClassC':
+                tmp_dict['Class'][i] = 'C'
+            elif value == 'ClassD':
+                tmp_dict['Class'][i] = 'D'
+
+        self.config.annotations_dict = tmp_dict
+
+        count = self.get_count(probe_class_condition)
+
+        self.assertEqual(count, 202)
+
+    def test_count_check_conditions(self):
+        self.config.excluded = load_excluded(self.config)
+        tmp_dict = load_annotations_dict(self.config)
+
+        for i, value in enumerate(tmp_dict['Class']):
+            if value == 'ClassA':
+                tmp_dict['Class'][i] = 'A'
+            elif value == 'ClassB':
+                tmp_dict['Class'][i] = 'B'
+            elif value == 'ClassC':
+                tmp_dict['Class'][i] = 'C'
+            elif value == 'ClassD':
+                tmp_dict['Class'][i] = 'D'
+
+        self.config.annotations_dict = tmp_dict
+
+        count = self.get_count(check_conditions)
+
+        self.assertEqual(count, 151)
 
 
 if __name__ == '__main__':
