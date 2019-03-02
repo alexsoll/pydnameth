@@ -135,7 +135,7 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual((True, False), (condition1, condition2))
 
-    def iterate(self, condition):
+    def get_count(self, condition):
         count = 0
         keys = list(self.config.annotations_dict.keys())
         values = list(self.config.annotations_dict.values())
@@ -151,7 +151,7 @@ class TestAnnotationsConditions(unittest.TestCase):
         self.config.excluded = load_excluded(self.config)
         self.config.annotations_dict = load_annotations_dict(self.config)
 
-        count = self.iterate(exclude_condition)
+        count = self.get_count(exclude_condition)
 
         self.assertEqual(count, 297)
 
@@ -159,7 +159,7 @@ class TestAnnotationsConditions(unittest.TestCase):
         self.config.excluded = load_excluded(self.config)
         self.config.annotations_dict = load_annotations_dict(self.config)
 
-        count = self.iterate(snp_condition)
+        count = self.get_count(snp_condition)
 
         self.assertEqual(count, 250)
 
@@ -167,7 +167,7 @@ class TestAnnotationsConditions(unittest.TestCase):
         self.config.excluded = load_excluded(self.config)
         self.config.annotations_dict = load_annotations_dict(self.config)
 
-        count = self.iterate(gene_region_condition)
+        count = self.get_count(gene_region_condition)
 
         self.assertEqual(count, 292)
 
@@ -187,7 +187,7 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.config.annotations_dict = tmp_dict
 
-        count = self.iterate(probe_class_condition)
+        count = self.get_count(probe_class_condition)
 
         self.assertEqual(count, 202)
 
@@ -207,7 +207,7 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.config.annotations_dict = tmp_dict
 
-        count = self.iterate(check_conditions)
+        count = self.get_count(check_conditions)
 
         self.assertEqual(count, 151)
 
