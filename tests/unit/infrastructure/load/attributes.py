@@ -1,4 +1,5 @@
 import unittest
+import os
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
 from pydnameth.config.experiment.experiment import Experiment
@@ -70,6 +71,35 @@ class TestLoadAnnotations(unittest.TestCase):
     def test_load_attributes_dict_age_range(self):
         attributes_dict = load_attributes_dict(self.config)
         self.assertEqual(max(attributes_dict['age']) - min(attributes_dict['age']), 80)
+
+    def test_load_attributes_dict_check_pkl_file_creation(self):
+        load_attributes_dict(self.config)
+
+        create = os.path.isfile(self.config.data.path + '/' + self.config.data.base + '/' +
+                                self.config.attributes.observables.name + '.pkl')
+
+        self.assertEqual(True, create)
+
+    def test_load_attributes_dict_check_sum_smoke(self):
+        attributes_dict = load_attributes_dict(self.config)
+
+        sum_smoke = sum(list(map(int, attributes_dict['smoke'])))
+
+        self.assertEqual(188, sum_smoke)
+
+    def test_load_attributes_dict_num_Male(self):
+        attributes_dict = load_attributes_dict(self.config)
+
+        indexes = [ind for ind, val in enumerate(attributes_dict['gender']) if val == 'M']
+
+        self.assertEqual(341, len(indexes))
+
+    def test_load_attributes_dict_num_Female(self):
+        attributes_dict = load_attributes_dict(self.config)
+
+        indexes = [ind for ind, val in enumerate(attributes_dict['gender']) if val == 'F']
+
+        self.assertEqual(388, len(indexes))
 
 
 if __name__ == '__main__':
