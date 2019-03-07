@@ -75,3 +75,10 @@ class TestLoadCpG(unittest.TestCase):
         self.config.excluded = load_excluded(self.config)
 
         self.assertEqual(True, os.path.isfile(fn))
+
+    def test_load_excluded_check_len_excluded(self):
+        self.config.annotations.exclude = 'excluded'
+
+        self.config.excluded = load_excluded(self.config)
+
+        self.assertEqual(3, len(self.config.excluded))
