@@ -77,3 +77,7 @@ class TestLoadCpG(unittest.TestCase):
     def test_load_cpg_check_len_cpg_dict(self):
         load_cpg(self.config)
         self.assertEqual(300, len(list(self.config.cpg_dict)))
+
+    def test_load_cpg_check_shape_cpg_data(self):
+        load_cpg(self.config)
+        self.assertEqual((300, 729), self.config.cpg_data.shape)
