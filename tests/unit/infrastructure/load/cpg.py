@@ -65,7 +65,7 @@ class TestLoadCpG(unittest.TestCase):
             is_root=True
         )
 
-    def test_files_creation(self):
+    def test_load_cpg_files_creation(self):
         fn_dict = get_data_base_path(self.config) + '/' + 'cpg_dict.pkl'
         fn_data = get_data_base_path(self.config) + '/' + self.config.data.name
         fn_npz = fn_data + '.npz'
@@ -73,3 +73,7 @@ class TestLoadCpG(unittest.TestCase):
         load_cpg(self.config)
 
         self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_npz))
+
+    def test_load_cpg_check_len_cpg_dict(self):
+        load_cpg(self.config)
+        self.assertEqual(300, len(list(self.config.cpg_dict)))
