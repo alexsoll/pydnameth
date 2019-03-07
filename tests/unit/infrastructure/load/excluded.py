@@ -1,5 +1,4 @@
 import unittest
-import os
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
 from pydnameth.config.experiment.experiment import Experiment
@@ -8,8 +7,7 @@ from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
-from pydnameth.infrastucture.load.cpg import load_cpg
-from pydnameth.infrastucture.path import get_data_base_path
+from pydnameth.infrastucture.load.excluded import load_excluded
 
 
 class TestLoadCpG(unittest.TestCase):
@@ -65,19 +63,5 @@ class TestLoadCpG(unittest.TestCase):
             is_root=True
         )
 
-    def test_load_cpg_check_files_creation(self):
-        fn_dict = get_data_base_path(self.config) + '/' + 'cpg_dict.pkl'
-        fn_data = get_data_base_path(self.config) + '/' + self.config.data.name
-        fn_npz = fn_data + '.npz'
-
-        load_cpg(self.config)
-
-        self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_npz))
-
-    def test_load_cpg_check_len_cpg_dict(self):
-        load_cpg(self.config)
-        self.assertEqual(300, len(list(self.config.cpg_dict)))
-
-    def test_load_cpg_check_shape_cpg_data(self):
-        load_cpg(self.config)
-        self.assertEqual((300, 729), self.config.cpg_data.shape)
+    def test_load_excluded_check_none_excluded(self):
+        self.assertEqual([], load_excluded(self.config))
