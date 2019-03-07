@@ -1,4 +1,5 @@
 import unittest
+import os
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
 from pydnameth.config.experiment.experiment import Experiment
@@ -8,6 +9,7 @@ from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.excluded import load_excluded
+from pydnameth.infrastucture.path import get_data_base_path
 
 
 class TestLoadCpG(unittest.TestCase):
@@ -65,3 +67,11 @@ class TestLoadCpG(unittest.TestCase):
 
     def test_load_excluded_check_none_excluded(self):
         self.assertEqual([], load_excluded(self.config))
+
+    def test_load_excluded_check_pkl_creation(self):
+        self.config.annotations.exclude = 'excluded'
+        fn = get_data_base_path(self.config) + '/' + self.config.annotations.exclude + '.pkl'
+
+        self.config.excluded = load_excluded(self.config)
+
+        self.assertEqual(True, os.path.isfile(fn))
