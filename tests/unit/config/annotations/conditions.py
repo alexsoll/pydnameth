@@ -18,6 +18,7 @@ from pydnameth.config.annotations.conditions import check_conditions
 from pydnameth.config.annotations.conditions import cross_reactive_condition
 from pydnameth.config.annotations.conditions import chromosome_condition
 from pydnameth.config.annotations.conditions import geo_condition
+from pydnameth.config.annotations.conditions import cpg_name_condition
 
 
 class TestAnnotationsConditions(unittest.TestCase):
@@ -331,9 +332,9 @@ class TestAnnotationsConditions(unittest.TestCase):
 
         self.assertEqual(True, condition)
 
-    def test_exclude_islands_for_shore_geo(self):
+    def test_exclude_n_shelf_for_shore_geo(self):
         self.config.annotations.geo = "shores"
-        annotations_dict = {AnnotationKey.geo.value: "islands"}
+        annotations_dict = {AnnotationKey.geo.value: "N_Shelf"}
 
         condition = geo_condition(self.config, annotations_dict)
 
@@ -372,6 +373,119 @@ class TestAnnotationsConditions(unittest.TestCase):
         condition2 = cross_reactive_condition(self.config, annotations_dict)
 
         self.assertEqual(True, condition1 and condition2)
+
+    def test_exclude_n_shore_for_s_shore_geo(self):
+        self.config.annotations.geo = "S_Shore"
+        annotations_dict = {AnnotationKey.geo.value: "N_Shore"}
+
+        condition = geo_condition(self.config, annotations_dict)
+
+        self.assertEqual(False, condition)
+
+    def test_not_empty_cpg_name(self):
+        annotations_dict = {AnnotationKey.cpg.value: "cg00001269"}
+
+        condition = cpg_name_condition(annotations_dict)
+
+        self.assertEqual(True, condition)
+
+    def test_empty_cpg_name(self):
+        annotations_dict = {AnnotationKey.cpg.value: ""}
+
+        condition = cpg_name_condition(annotations_dict)
+
+        self.assertEqual(False, condition)
+
+    def test_cross_reactive_condition(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.cross_reactive = 'ex'
+
+        count = self.get_count(cross_reactive_condition)
+
+        self.assertEqual(count, 278)
+
+    def test_get_num_NS_chr(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.chr = 'NS'
+
+        count = self.get_count(chromosome_condition)
+
+        self.assertEqual(count, 276)
+
+    def test_get_num_X_chr(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.chr = 'X'
+
+        count = self.get_count(chromosome_condition)
+
+        self.assertEqual(count, 24)
+
+    def test_get_num_island_geo(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.geo = 'islands'
+
+        count = self.get_count(geo_condition)
+
+        self.assertEqual(count, 92)
+
+    def test_get_num_shores_geo(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.geo = 'shores'
+
+        count = self.get_count(geo_condition)
+
+        self.assertEqual(count, 81)
+
+    def test_get_num_s_shore_geo(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.geo = 'shores_s'
+
+        count = self.get_count(geo_condition)
+
+        self.assertEqual(count, 40)
+
+    def modified_get_count(self, *args):
+        count = 0
+        keys = list(self.config.annotations_dict.keys())
+        values = list(self.config.annotations_dict.values())
+
+        for i, value in enumerate(values[0]):
+            current = dict(zip(keys, [row[i] for row in values]))
+            flag = True
+            for func in args:
+                if not func(self.config, current):
+                    flag = False
+                    break
+            if flag:
+                count += 1
+        return count
+
+    def test_comb_conditions_X_Island(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.chr = 'X'
+        self.config.annotations.geo = 'islands'
+
+        count = self.modified_get_count(geo_condition, chromosome_condition)
+
+        self.assertEqual(count, 5)
+
+    def test_comb_conditions_S_Shore_ClassA(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.probe_class = 'ClassA'
+        self.config.annotations.geo = 'shores_s'
+
+        count = self.modified_get_count(probe_class_condition, geo_condition)
+
+        self.assertEqual(count, 39)
+
+    def test_comb_conditions_N_Shore_cross_react(self):
+        self.config.annotations_dict = load_annotations_dict(self.config)
+        self.config.annotations.geo = 'shores_n'
+        self.config.annotations.cross_reactive = 'ex'
+
+        count = self.modified_get_count(cross_reactive_condition, geo_condition)
+
+        self.assertEqual(count, 40)
 
 
 if __name__ == '__main__':
