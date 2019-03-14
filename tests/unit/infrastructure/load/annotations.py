@@ -10,6 +10,7 @@ from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.annotations import load_annotations_dict
 from pydnameth.config.annotations.types import AnnotationKey
+from pydnameth.infrastucture.path import get_data_base_path
 
 
 class TestLoadAnnotations(unittest.TestCase):
@@ -63,6 +64,15 @@ class TestLoadAnnotations(unittest.TestCase):
             is_run=True,
             is_root=True
         )
+        self.config.initialize()
+
+    def tearDown(self):
+        path = get_data_base_path(self.config)
+        exts = ('.npz', '.pkl')
+        for root, dirs, files in os.walk(path):
+            for currentFile in files:
+                if currentFile.lower().endswith(exts):
+                    os.remove(os.path.join(root, currentFile))
 
     def compare_cross_r_cpg(self, cpg_list, ann_dict):
         compare = True

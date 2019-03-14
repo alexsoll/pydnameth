@@ -10,6 +10,24 @@ class LoadStrategy(metaclass=abc.ABCMeta):
     def load(self, config, configs_child):
         pass
 
+    def inherit_childs(self, config, configs_child):
+        for config_child in configs_child:
+            config_child.base_list = config.base_list
+            config_child.base_dict = config.base_dict
+            config_child.base_data = config.base_data
+
+    def load_child(self, config_child):
+
+        if config_child.experiment.task == Task.table:
+
+            config_child.advanced_data = load_table_dict(config_child)
+            config_child.advanced_list = config_child.base_list
+            config_child.advanced_dict = {}
+            row_id = 0
+            for item in config_child.advanced_data['item']:
+                config_child.advanced_dict[item] = row_id
+                row_id += 1
+
 
 class CPGLoadStrategy(LoadStrategy):
 
@@ -19,24 +37,28 @@ class CPGLoadStrategy(LoadStrategy):
         config.base_dict = config.cpg_dict
         config.base_data = config.cpg_data
 
-        for config_child in configs_child:
-            config_child.base_list = config.base_list
-            config_child.base_dict = config.base_dict
-            config_child.base_data = config.base_data
+        self.inherit_childs(config, configs_child)
 
         if config.experiment.task == Task.table or config.experiment.task == Task.clock:
 
             for config_child in configs_child:
+                self.load_child(config_child)
 
-                if config_child.experiment.task == Task.table:
 
-                    config_child.advanced_data = load_table_dict(config_child)
-                    config_child.advanced_list = config_child.base_list
-                    config_child.advanced_dict = {}
-                    row_id = 0
-                    for item in config_child.advanced_data['item']:
-                        config_child.advanced_dict[item] = row_id
-                        row_id += 1
+class ResidualsLoadStrategy(LoadStrategy):
+
+    def load(self, config, configs_child):
+        load_cpg(config)
+        config.base_list = config.residuals_list
+        config.base_dict = config.residuals_dict
+        config.base_data = config.residuals_data
+
+        self.inherit_childs(config, configs_child)
+
+        if config.experiment.task == Task.table or config.experiment.task == Task.clock:
+
+            for config_child in configs_child:
+                self.load_child(config_child)
 
 
 class AttributesLoadStrategy(LoadStrategy):

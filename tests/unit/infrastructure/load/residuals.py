@@ -8,11 +8,11 @@ from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
-from pydnameth.infrastucture.load.attributes import load_attributes_dict
+from pydnameth.infrastucture.load.residuals import load_residuals
 from pydnameth.infrastucture.path import get_data_base_path
 
 
-class TestLoadAnnotations(unittest.TestCase):
+class TestLoadResiduals(unittest.TestCase):
 
     def setUp(self):
 
@@ -74,43 +74,19 @@ class TestLoadAnnotations(unittest.TestCase):
                 if currentFile.lower().endswith(exts):
                     os.remove(os.path.join(root, currentFile))
 
-    def test_load_attributes_dict_num_elems(self):
-        attributes_dict = load_attributes_dict(self.config)
-        self.assertEqual(len(attributes_dict['age']), 729)
+    def test_load_residuals_check_files_creation(self):
+        suffix = 'cells(' + str(self.config.attributes.cells) + ')'
+        fn_dict = get_data_base_path(self.config) + '/' + 'residuals_dict_' + suffix + '.pkl'
+        fn_data = get_data_base_path(self.config) + '/' + 'residuals_' + suffix + '.npz'
 
-    def test_load_attributes_dict_age_range(self):
-        attributes_dict = load_attributes_dict(self.config)
-        self.assertEqual(max(attributes_dict['age']) - min(attributes_dict['age']), 80)
+        load_residuals(self.config)
 
-    def test_load_attributes_dict_check_pkl_file_creation(self):
-        load_attributes_dict(self.config)
+        self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_data))
 
-        create = os.path.isfile(self.config.data.path + '/' + self.config.data.base + '/' +
-                                self.config.attributes.observables.name + '.pkl')
+    def test_load_residuals_check_len_cpg_dict(self):
+        load_residuals(self.config)
+        self.assertEqual(300, len(list(self.config.residuals_dict)))
 
-        self.assertEqual(True, create)
-
-    def test_load_attributes_dict_check_sum_smoke(self):
-        attributes_dict = load_attributes_dict(self.config)
-
-        sum_smoke = sum(list(map(int, attributes_dict['smoke'])))
-
-        self.assertEqual(188, sum_smoke)
-
-    def test_load_attributes_dict_num_Male(self):
-        attributes_dict = load_attributes_dict(self.config)
-
-        indexes = [ind for ind, val in enumerate(attributes_dict['gender']) if val == 'M']
-
-        self.assertEqual(341, len(indexes))
-
-    def test_load_attributes_dict_num_Female(self):
-        attributes_dict = load_attributes_dict(self.config)
-
-        indexes = [ind for ind, val in enumerate(attributes_dict['gender']) if val == 'F']
-
-        self.assertEqual(388, len(indexes))
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_load_residuals_check_shape_cpg_data(self):
+        load_residuals(self.config)
+        self.assertEqual((300, 729), self.config.residuals_data.shape)

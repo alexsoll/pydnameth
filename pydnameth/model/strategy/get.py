@@ -32,6 +32,16 @@ class CPGGetStrategy(GetStrategy):
         return ';'.join(config.cpg_gene_dict[item])
 
 
+class ResidualsGetStrategy(GetStrategy):
+
+    def get_single_base(self, config, items):
+        rows = [config.base_dict[item] for item in items]
+        return config.base_data[np.ix_(rows, config.attributes_indexes)]
+
+    def get_aux(self, config, item):
+        return ';'.join(config.cpg_gene_dict[item])
+
+
 class AttributesGetStrategy(GetStrategy):
 
     def get_single_base(self, config, items):

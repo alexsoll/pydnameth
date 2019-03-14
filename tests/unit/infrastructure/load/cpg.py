@@ -64,6 +64,15 @@ class TestLoadCpG(unittest.TestCase):
             is_run=True,
             is_root=True
         )
+        self.config.initialize()
+
+    def tearDown(self):
+        path = get_data_base_path(self.config)
+        exts = ('.npz', '.pkl')
+        for root, dirs, files in os.walk(path):
+            for currentFile in files:
+                if currentFile.lower().endswith(exts):
+                    os.remove(os.path.join(root, currentFile))
 
     def test_load_cpg_check_files_creation(self):
         fn_dict = get_data_base_path(self.config) + '/' + 'cpg_dict.pkl'
