@@ -23,5 +23,4 @@ XlsxWriter==1.1.5
 psutil==5.6.0
 coverage==4.5.3
 codecov==2.0.15
-psutil==5.6.0
 anytree==2.6.0
