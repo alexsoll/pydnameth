@@ -35,9 +35,6 @@ def subset_annotations(config):
         map_infos = config.annotations_dict[AnnotationKey.map_info.value]
         for id in range(0, len(cpgs)):
 
-            if id % 10000 == 0:
-                print('id: ' + str(id))
-
             curr_ann_dict = {}
             for key in config.annotations_dict:
                 curr_ann_dict[key] = config.annotations_dict[key][id]

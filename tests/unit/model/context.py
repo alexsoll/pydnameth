@@ -111,7 +111,6 @@ class TestAnnotationsConditions(unittest.TestCase):
                                          MethylationRunStrategy, MethylationReleaseStrategy, MethylationSaveStrategy])
         self.assertEqual(condition, True)
 
-
     def test_strategy_creation_attr_observables(self):
         condition = self.check_strategy(DataType.attributes, Task.observables,
                                         [AttributesLoadStrategy, AttributesGetStrategy, ObservablesSetUpStrategy,
