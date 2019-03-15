@@ -70,15 +70,6 @@ class TestLoadResiduals(unittest.TestCase):
     def tearDown(self):
         clear_cache(self.config)
 
-    def test_load_residuals_check_files_creation(self):
-        suffix = 'cells(' + str(self.config.attributes.cells) + ')'
-        fn_dict = get_data_base_path(self.config) + '/' + 'residuals_dict_' + suffix + '.pkl'
-        fn_data = get_data_base_path(self.config) + '/' + 'residuals_' + suffix + '.npz'
-
-        load_residuals(self.config)
-
-        self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_data))
-
     def test_load_residuals_check_len_cpg_dict(self):
         load_residuals(self.config)
         self.assertEqual(300, len(list(self.config.residuals_dict)))
