@@ -10,6 +10,7 @@ from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.residuals import load_residuals
 from pydnameth.infrastucture.path import get_data_base_path
+from tests.tear_down import clear_cache
 
 
 class TestLoadResiduals(unittest.TestCase):
@@ -67,12 +68,7 @@ class TestLoadResiduals(unittest.TestCase):
         self.config.initialize()
 
     def tearDown(self):
-        path = get_data_base_path(self.config)
-        exts = ('.npz', '.pkl')
-        for root, dirs, files in os.walk(path):
-            for currentFile in files:
-                if currentFile.lower().endswith(exts):
-                    os.remove(os.path.join(root, currentFile))
+        clear_cache(self.config)
 
     def test_load_residuals_check_files_creation(self):
         suffix = 'cells(' + str(self.config.attributes.cells) + ')'

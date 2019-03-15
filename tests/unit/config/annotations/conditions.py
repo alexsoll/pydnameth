@@ -19,6 +19,7 @@ from pydnameth.config.annotations.conditions import cross_reactive_condition
 from pydnameth.config.annotations.conditions import chromosome_condition
 from pydnameth.config.annotations.conditions import geo_condition
 from pydnameth.config.annotations.conditions import cpg_name_condition
+from tests.tear_down import clear_cache
 
 
 class TestAnnotationsConditions(unittest.TestCase):
@@ -71,6 +72,9 @@ class TestAnnotationsConditions(unittest.TestCase):
             is_run=True,
             is_root=True
         )
+
+    def tearDown(self):
+        clear_cache(self.config)
 
     def test_exclude_condition(self):
         self.config.excluded = load_excluded(self.config)

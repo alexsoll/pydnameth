@@ -30,6 +30,7 @@ from pydnameth.model.strategy.save import MethylationSaveStrategy
 from pydnameth.model.strategy.save import ObservablesSaveStrategy
 from pydnameth.config.experiment.types import Task
 from pydnameth.config.experiment.types import DataType
+from tests.tear_down import clear_cache
 
 
 class TestAnnotationsConditions(unittest.TestCase):
@@ -76,6 +77,9 @@ class TestAnnotationsConditions(unittest.TestCase):
             is_root=True
         )
         self.config.initialize()
+
+    def tearDown(self):
+        clear_cache(self.config)
 
     def check_strategy(self, data_type, task, needed_list):
         experiment = Experiment(type=data_type, task=task, method=None, params=None)

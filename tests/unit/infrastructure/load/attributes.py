@@ -9,7 +9,7 @@ from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.attributes import load_attributes_dict
-from pydnameth.infrastucture.path import get_data_base_path
+from tests.tear_down import clear_cache
 
 
 class TestLoadAnnotations(unittest.TestCase):
@@ -67,12 +67,7 @@ class TestLoadAnnotations(unittest.TestCase):
         self.config.initialize()
 
     def tearDown(self):
-        path = get_data_base_path(self.config)
-        exts = ('.npz', '.pkl')
-        for root, dirs, files in os.walk(path):
-            for currentFile in files:
-                if currentFile.lower().endswith(exts):
-                    os.remove(os.path.join(root, currentFile))
+        clear_cache(self.config)
 
     def test_load_attributes_dict_num_elems(self):
         attributes_dict = load_attributes_dict(self.config)

@@ -14,6 +14,7 @@ from pydnameth.config.attributes.subset import get_indexes
 from pydnameth.config.attributes.subset import subset_attributes
 from pydnameth.config.attributes.subset import subset_cells
 from pydnameth.config.common import CommonTypes
+from tests.tear_down import clear_cache
 
 
 class TestLoadAnnotations(unittest.TestCase):
@@ -68,6 +69,9 @@ class TestLoadAnnotations(unittest.TestCase):
             is_run=True,
             is_root=True
         )
+
+    def tearDown(self):
+        clear_cache(self.config)
 
     def test_pass_indexes_num_elems(self):
         self.config.attributes.observables.types = {'gender': 'any'}
