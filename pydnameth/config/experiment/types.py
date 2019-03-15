@@ -32,6 +32,7 @@ class DataType(Enum):
     cpg = 'cpg'
     gene = 'gene'
     bop = 'bop'
+    residuals = 'residuals'
     attributes = 'attributes'
     suppl = 'suppl'
     cache = 'cache'

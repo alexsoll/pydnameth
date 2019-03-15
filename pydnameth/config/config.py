@@ -53,6 +53,10 @@ class Config:
         self.bop_dict = {}
         self.bop_data = []
 
+        self.residuals_list = []
+        self.residuals_dict = {}
+        self.residuals_data = []
+
         self.attributes_indexes = []
 
         self.excluded = None

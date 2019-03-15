@@ -9,6 +9,7 @@ from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.attributes import load_attributes_dict
+from tests.tear_down import clear_cache
 
 
 class TestLoadAnnotations(unittest.TestCase):
@@ -63,6 +64,10 @@ class TestLoadAnnotations(unittest.TestCase):
             is_run=True,
             is_root=True
         )
+        self.config.initialize()
+
+    def tearDown(self):
+        clear_cache(self.config)
 
     def test_load_attributes_dict_num_elems(self):
         attributes_dict = load_attributes_dict(self.config)
