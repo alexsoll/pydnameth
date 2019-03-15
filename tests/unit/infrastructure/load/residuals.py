@@ -1,5 +1,4 @@
 import unittest
-import os
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
 from pydnameth.config.experiment.experiment import Experiment
@@ -9,7 +8,6 @@ from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.residuals import load_residuals
-from pydnameth.infrastucture.path import get_data_base_path
 from tests.tear_down import clear_cache
 
 
