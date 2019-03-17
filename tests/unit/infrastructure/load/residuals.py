@@ -1,4 +1,5 @@
 import unittest
+import os
 from tests.definitions import ROOT_DIR
 from pydnameth.config.data.data import Data
 from pydnameth.config.experiment.experiment import Experiment
@@ -9,6 +10,7 @@ from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.residuals import load_residuals
 from tests.tear_down import clear_cache
+from pydnameth.infrastucture.path import get_data_base_path
 
 
 class TestLoadResiduals(unittest.TestCase):
@@ -64,6 +66,15 @@ class TestLoadResiduals(unittest.TestCase):
             is_root=True
         )
         self.config.initialize()
+
+    def test_load_residuals_check_files_creation(self):
+        suffix = 'cells(' + str(self.config.attributes.cells) + ')'
+        fn_dict = get_data_base_path(self.config) + '/' + 'residuals_dict_' + suffix + '.pkl'
+        fn_data = get_data_base_path(self.config) + '/' + 'residuals_' + suffix + '.npz'
+
+        load_residuals(self.config)
+
+        self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_data))
 
     def tearDown(self):
         clear_cache(self.config)
