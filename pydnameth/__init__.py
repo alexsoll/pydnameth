@@ -27,6 +27,7 @@ from pydnameth.scripts.release import \
     attributes_plot_observables_histogram
 from pydnameth.scripts.develop import \
     cpg_proc_table_linreg_dev, \
+    residuals_proc_table_linreg_dev, \
     cpg_proc_table_variance_linreg_dev, \
     cpg_proc_table_polygon_dev, \
     cpg_proc_table_z_test_linreg_dev, \
@@ -36,5 +37,6 @@ from pydnameth.scripts.develop import \
     cpg_proc_special_clock_linreg_dev, \
     cpg_plot_methylation_scatter_dev, \
     attributes_plot_observables_histogram_dev, \
-    cpg_plot_methylation_variance_histogram_dev
+    cpg_plot_methylation_variance_histogram_dev, \
+    residuals_plot_methylation_scatter_dev
 from pydnameth.routines.clock.types import ClockExogType
