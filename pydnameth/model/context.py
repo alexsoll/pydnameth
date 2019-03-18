@@ -1,9 +1,11 @@
 from pydnameth.model.strategy.load import CPGLoadStrategy
 from pydnameth.model.strategy.load import AttributesLoadStrategy
-from pydnameth.model.strategy.load import ResidualsLoadStrategy
+from pydnameth.model.strategy.load import ResidualsCommonLoadStrategy
+from pydnameth.model.strategy.load import ResidualsSpecialLoadStrategy
 from pydnameth.model.strategy.get import CPGGetStrategy
 from pydnameth.model.strategy.get import AttributesGetStrategy
-from pydnameth.model.strategy.get import ResidualsGetStrategy
+from pydnameth.model.strategy.get import ResidualsCommonGetStrategy
+from pydnameth.model.strategy.get import ResidualsSpecialGetStrategy
 from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
 from pydnameth.model.strategy.setup import MethylationSetUpStrategy
@@ -32,15 +34,19 @@ class Context:
             self.load_strategy = CPGLoadStrategy()
         elif config.experiment.type == DataType.attributes:
             self.load_strategy = AttributesLoadStrategy()
-        elif config.experiment.type == DataType.residuals:
-            self.load_strategy = ResidualsLoadStrategy()
+        elif config.experiment.type == DataType.residuals_common:
+            self.load_strategy = ResidualsCommonLoadStrategy()
+        elif config.experiment.type == DataType.residuals_special:
+            self.load_strategy = ResidualsSpecialLoadStrategy()
 
         if config.experiment.type == DataType.cpg:
             self.get_strategy = CPGGetStrategy()
         elif config.experiment.type == DataType.attributes:
             self.get_strategy = AttributesGetStrategy()
-        elif config.experiment.type == DataType.residuals:
-            self.get_strategy = ResidualsGetStrategy()
+        elif config.experiment.type == DataType.residuals_common:
+            self.get_strategy = ResidualsCommonGetStrategy()
+        elif config.experiment.type == DataType.residuals_special:
+            self.get_strategy = ResidualsSpecialGetStrategy()
 
         if config.experiment.task == Task.table:
             self.setup_strategy = TableSetUpStrategy(self.get_strategy)

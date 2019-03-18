@@ -17,26 +17,47 @@ def cpg_proc_table_linreg_dev(
     attributes,
     params=None
 ):
-    config_root = Config(
-        data=copy.deepcopy(data),
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=Method.linreg,
-            params=copy.deepcopy(params)
-        ),
-        annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes),
-        is_run=True,
-        is_root=True
+    proc_table_linreg(
+        DataType.cpg,
+        data,
+        annotations,
+        attributes,
+        params
     )
 
-    root = Node(name=str(config_root), config=config_root)
-    build_tree(root)
-    calc_tree(root)
+
+def residuals_common_proc_table_linreg_dev(
+    data,
+    annotations,
+    attributes,
+    params=None
+):
+    proc_table_linreg(
+        DataType.residuals_common,
+        data,
+        annotations,
+        attributes,
+        params
+    )
 
 
-def residuals_proc_table_linreg_dev(
+def residuals_special_proc_table_linreg_dev(
+    data,
+    annotations,
+    attributes,
+    params=None
+):
+    proc_table_linreg(
+        DataType.residuals_special,
+        data,
+        annotations,
+        attributes,
+        params
+    )
+
+
+def proc_table_linreg(
+    data_type,
     data,
     annotations,
     attributes,
@@ -45,7 +66,7 @@ def residuals_proc_table_linreg_dev(
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.residuals,
+            type=data_type,
             task=Task.table,
             method=Method.linreg,
             params=copy.deepcopy(params)
@@ -59,6 +80,7 @@ def residuals_proc_table_linreg_dev(
     root = Node(name=str(config_root), config=config_root)
     build_tree(root)
     calc_tree(root)
+
 
 
 def cpg_proc_table_variance_linreg_dev(
@@ -211,78 +233,50 @@ def cpg_proc_table_aggregator_dev(
     observables_list,
     params=None
 ):
-    child_methods_lvl_1 = [Method.polygon, Method.z_test_linreg]
-    child_methods_lvl_2 = [Method.linreg]
-
-    config_root = Config(
-        data=copy.deepcopy(data),
-        experiment=Experiment(
-            type=DataType.cpg,
-            task=Task.table,
-            method=Method.aggregator,
-            params=copy.deepcopy(params)
-        ),
-        annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes),
-        is_run=True,
-        is_root=True
+    proc_table_aggregator(
+        DataType.cpg,
+        data,
+        annotations,
+        attributes,
+        observables_list,
+        params
     )
-    root = Node(name=str(config_root), config=config_root)
-
-    for child_method_lvl_1 in child_methods_lvl_1:
-        config_lvl_1 = Config(
-            data=copy.deepcopy(data),
-            experiment=Experiment(
-                type=DataType.cpg,
-                task=Task.table,
-                method=child_method_lvl_1,
-                params={}
-            ),
-            annotations=copy.deepcopy(annotations),
-            attributes=copy.deepcopy(attributes),
-            is_run=True,
-            is_root=False
-        )
-        node_lvl_1 = Node(name=str(config_lvl_1), config=config_lvl_1, parent=root)
-
-        for child_method_lvl_2 in child_methods_lvl_2:
-            for d in observables_list:
-                observables_lvl_2 = Observables(
-                    name=copy.deepcopy(attributes.observables.name),
-                    types=d
-                )
-
-                cells_lvl_2 = Cells(
-                    name=copy.deepcopy(attributes.cells.name),
-                    types=copy.deepcopy(attributes.cells.types)
-                )
-
-                attributes_lvl_2 = Attributes(
-                    target=copy.deepcopy(attributes.target),
-                    observables=observables_lvl_2,
-                    cells=cells_lvl_2,
-                )
-
-                config_lvl_2 = Config(
-                    data=copy.deepcopy(data),
-                    experiment=Experiment(
-                        type=DataType.cpg,
-                        task=Task.table,
-                        method=copy.deepcopy(child_method_lvl_2),
-                        params={}
-                    ),
-                    annotations=copy.deepcopy(annotations),
-                    attributes=attributes_lvl_2,
-                    is_run=True,
-                    is_root=False
-                )
-                Node(name=str(config_lvl_2), config=config_lvl_2, parent=node_lvl_1)
-
-    build_tree(root)
-    calc_tree(root)
 
 
-def residuals_proc_table_aggregator_dev(
+def residuals_common_proc_table_aggregator_dev(
+    data,
+    annotations,
+    attributes,
+    observables_list,
+    params=None
+):
+    proc_table_aggregator(
+        DataType.residuals_common,
+        data,
+        annotations,
+        attributes,
+        observables_list,
+        params
+    )
+
+def residuals_special_proc_table_aggregator_dev(
+    data,
+    annotations,
+    attributes,
+    observables_list,
+    params=None
+):
+    proc_table_aggregator(
+        DataType.residuals_special,
+        data,
+        annotations,
+        attributes,
+        observables_list,
+        params
+    )
+
+def proc_table_aggregator(
+    data_type,
     data,
     annotations,
     attributes,
@@ -295,7 +289,7 @@ def residuals_proc_table_aggregator_dev(
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.residuals,
+            type=data_type,
             task=Task.table,
             method=Method.aggregator,
             params=copy.deepcopy(params)
@@ -311,7 +305,7 @@ def residuals_proc_table_aggregator_dev(
         config_lvl_1 = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.residuals,
+                type=data_type,
                 task=Task.table,
                 method=child_method_lvl_1,
                 params={}
@@ -344,7 +338,7 @@ def residuals_proc_table_aggregator_dev(
                 config_lvl_2 = Config(
                     data=copy.deepcopy(data),
                     experiment=Experiment(
-                        type=DataType.residuals,
+                        type=data_type,
                         task=Task.table,
                         method=copy.deepcopy(child_method_lvl_2),
                         params={}
@@ -527,7 +521,7 @@ def cpg_plot_methylation_scatter_dev(
         calc_tree(root)
 
 
-def residuals_plot_methylation_scatter_dev(
+def residuals_common_plot_methylation_scatter_dev(
     data,
     annotations,
     attributes,
@@ -541,7 +535,7 @@ def residuals_plot_methylation_scatter_dev(
         config_root = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.residuals,
+                type=DataType.residuals_common,
                 task=Task.methylation,
                 method=Method.scatter,
                 params=copy.deepcopy(params)
@@ -579,7 +573,7 @@ def residuals_plot_methylation_scatter_dev(
             config_child = Config(
                 data=copy.deepcopy(data),
                 experiment=Experiment(
-                    type=DataType.residuals,
+                    type=DataType.residuals_common,
                     task=Task.table,
                     method=copy.deepcopy(child_method),
                     params={}
