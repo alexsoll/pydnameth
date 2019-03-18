@@ -1,7 +1,7 @@
 import abc
 from pydnameth.config.experiment.types import Task
 from pydnameth.infrastucture.load.cpg import load_cpg
-from pydnameth.infrastucture.load.residuals import load_residuals
+from pydnameth.infrastucture.load.residuals_common import load_residuals_common
 from pydnameth.infrastucture.load.table import load_table_dict
 
 
@@ -46,10 +46,10 @@ class CPGLoadStrategy(LoadStrategy):
                 self.load_child(config_child)
 
 
-class ResidualsLoadStrategy(LoadStrategy):
+class ResidualsCommonLoadStrategy(LoadStrategy):
 
     def load(self, config, configs_child):
-        load_residuals(config)
+        load_residuals_common(config)
         config.base_list = config.cpg_list
         config.base_dict = config.residuals_dict
         config.base_data = config.residuals_data
@@ -60,6 +60,12 @@ class ResidualsLoadStrategy(LoadStrategy):
 
             for config_child in configs_child:
                 self.load_child(config_child)
+
+
+class ResidualsSpecialLoadStrategy(LoadStrategy):
+
+    def load(self, config, configs_child):
+        CPGLoadStrategy.load(self, config, configs_child)
 
 
 class AttributesLoadStrategy(LoadStrategy):
