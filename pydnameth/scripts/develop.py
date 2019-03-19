@@ -82,7 +82,6 @@ def proc_table_linreg(
     calc_tree(root)
 
 
-
 def cpg_proc_table_variance_linreg_dev(
     data,
     annotations,
