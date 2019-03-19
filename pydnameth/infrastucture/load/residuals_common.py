@@ -8,7 +8,7 @@ import pickle
 import os.path
 
 
-def load_residuals(config):
+def load_residuals_common(config):
 
     suffix = 'cells(' + str(config.attributes.cells) + ')'
 

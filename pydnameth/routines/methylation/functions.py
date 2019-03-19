@@ -12,7 +12,7 @@ def get_layout(config):
         aux_str = str(aux)
 
     y_title = '$\\beta$'
-    if config.experiment.type == DataType.residuals:
+    if config.experiment.type == DataType.residuals_common or config.experiment.type == DataType.residuals_special:
         y_title = 'residuals'
 
     layout = go.Layout(
