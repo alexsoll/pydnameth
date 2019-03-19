@@ -64,15 +64,14 @@ def load_cells_dict(config):
         f = open(fn_txt)
         key_line = f.readline()
         keys = key_line.split('\t')
-        # First column is always sample name
-        keys = [x.rstrip() for x in keys][1::]
+        keys = [x.rstrip() for x in keys]
 
         cells_dict = {}
         for key in keys:
             cells_dict[key] = []
 
         for line in f:
-            values = line.split('\t')[1::]
+            values = line.split('\t')
             for key_id in range(0, len(keys)):
                 key = keys[key_id]
                 value = values[key_id].rstrip()

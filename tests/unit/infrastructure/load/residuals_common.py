@@ -8,12 +8,12 @@ from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
-from pydnameth.infrastucture.load.excluded import load_excluded
-from pydnameth.infrastucture.path import get_data_base_path
+from pydnameth.infrastucture.load.residuals_common import load_residuals_common
 from tests.tear_down import clear_cache
+from pydnameth.infrastucture.path import get_data_base_path
 
 
-class TestLoadCpG(unittest.TestCase):
+class TestLoadResidualsCommon(unittest.TestCase):
 
     def setUp(self):
 
@@ -67,23 +67,22 @@ class TestLoadCpG(unittest.TestCase):
         )
         self.config.initialize()
 
+    def test_load_residuals_check_files_creation(self):
+        suffix = 'cells(' + str(self.config.attributes.cells) + ')'
+        fn_dict = get_data_base_path(self.config) + '/' + 'residuals_dict_' + suffix + '.pkl'
+        fn_data = get_data_base_path(self.config) + '/' + 'residuals_' + suffix + '.npz'
+
+        load_residuals_common(self.config)
+
+        self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_data))
+
     def tearDown(self):
         clear_cache(self.config)
 
-    def test_load_excluded_check_none_excluded(self):
-        self.assertEqual([], load_excluded(self.config))
+    def test_load_residuals_check_len_cpg_dict(self):
+        load_residuals_common(self.config)
+        self.assertEqual(300, len(list(self.config.residuals_dict)))
 
-    def test_load_excluded_check_pkl_creation(self):
-        self.config.annotations.exclude = 'excluded'
-        fn = get_data_base_path(self.config) + '/' + self.config.annotations.exclude + '.pkl'
-
-        self.config.excluded = load_excluded(self.config)
-
-        self.assertEqual(True, os.path.isfile(fn))
-
-    def test_load_excluded_check_len_excluded(self):
-        self.config.annotations.exclude = 'excluded'
-
-        self.config.excluded = load_excluded(self.config)
-
-        self.assertEqual(3, len(self.config.excluded))
+    def test_load_residuals_check_shape_cpg_data(self):
+        load_residuals_common(self.config)
+        self.assertEqual((300, 729), self.config.residuals_data.shape)

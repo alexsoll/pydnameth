@@ -10,6 +10,7 @@ from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.cpg import load_cpg
 from pydnameth.infrastucture.path import get_data_base_path
+from tests.tear_down import clear_cache
 
 
 class TestLoadCpG(unittest.TestCase):
@@ -64,6 +65,10 @@ class TestLoadCpG(unittest.TestCase):
             is_run=True,
             is_root=True
         )
+        self.config.initialize()
+
+    def tearDown(self):
+        clear_cache(self.config)
 
     def test_load_cpg_check_files_creation(self):
         fn_dict = get_data_base_path(self.config) + '/' + 'cpg_dict.pkl'

@@ -1,4 +1,5 @@
 import plotly.graph_objs as go
+from pydnameth.config.experiment.types import DataType
 
 
 def get_layout(config):
@@ -9,6 +10,10 @@ def get_layout(config):
         aux_str = ';'.join(aux)
     else:
         aux_str = str(aux)
+
+    y_title = '$\\beta$'
+    if config.experiment.type == DataType.residuals_common or config.experiment.type == DataType.residuals_special:
+        y_title = 'residuals'
 
     layout = go.Layout(
         title=item + '(' + aux_str + ')',
@@ -44,7 +49,7 @@ def get_layout(config):
             showexponent='all'
         ),
         yaxis=dict(
-            title='$\\beta$',
+            title=y_title,
             showgrid=True,
             showline=True,
             mirror='ticks',

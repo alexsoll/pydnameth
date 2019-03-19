@@ -1,15 +1,19 @@
 from pydnameth.model.strategy.load import CPGLoadStrategy
 from pydnameth.model.strategy.load import AttributesLoadStrategy
+from pydnameth.model.strategy.load import ResidualsCommonLoadStrategy
+from pydnameth.model.strategy.load import ResidualsSpecialLoadStrategy
 from pydnameth.model.strategy.get import CPGGetStrategy
 from pydnameth.model.strategy.get import AttributesGetStrategy
+from pydnameth.model.strategy.get import ResidualsCommonGetStrategy
+from pydnameth.model.strategy.get import ResidualsSpecialGetStrategy
 from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
 from pydnameth.model.strategy.setup import MethylationSetUpStrategy
 from pydnameth.model.strategy.setup import ObservablesSetUpStrategy
-from pydnameth.model.strategy.proc import TableRunStrategy
-from pydnameth.model.strategy.proc import ClockRunStrategy
-from pydnameth.model.strategy.proc import MethylationRunStrategy
-from pydnameth.model.strategy.proc import ObservablesRunStrategy
+from pydnameth.model.strategy.run import TableRunStrategy
+from pydnameth.model.strategy.run import ClockRunStrategy
+from pydnameth.model.strategy.run import MethylationRunStrategy
+from pydnameth.model.strategy.run import ObservablesRunStrategy
 from pydnameth.model.strategy.release import TableReleaseStrategy
 from pydnameth.model.strategy.release import ClockReleaseStrategy
 from pydnameth.model.strategy.release import MethylationReleaseStrategy
@@ -30,11 +34,19 @@ class Context:
             self.load_strategy = CPGLoadStrategy()
         elif config.experiment.type == DataType.attributes:
             self.load_strategy = AttributesLoadStrategy()
+        elif config.experiment.type == DataType.residuals_common:
+            self.load_strategy = ResidualsCommonLoadStrategy()
+        elif config.experiment.type == DataType.residuals_special:
+            self.load_strategy = ResidualsSpecialLoadStrategy()
 
         if config.experiment.type == DataType.cpg:
             self.get_strategy = CPGGetStrategy()
         elif config.experiment.type == DataType.attributes:
             self.get_strategy = AttributesGetStrategy()
+        elif config.experiment.type == DataType.residuals_common:
+            self.get_strategy = ResidualsCommonGetStrategy()
+        elif config.experiment.type == DataType.residuals_special:
+            self.get_strategy = ResidualsSpecialGetStrategy()
 
         if config.experiment.task == Task.table:
             self.setup_strategy = TableSetUpStrategy(self.get_strategy)
