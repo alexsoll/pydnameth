@@ -67,7 +67,7 @@ class ResidualsSpecialGetStrategy(GetStrategy):
         return result
 
     def get_aux(self, config, item):
-        CPGGetStrategy.get_aux(self, config, item)
+        return CPGGetStrategy.get_aux(self, config, item)
 
 
 class AttributesGetStrategy(GetStrategy):
