@@ -1,6 +1,7 @@
 from pydnameth.infrastucture.load.cpg import load_cpg
 from pydnameth.infrastucture.path import get_data_base_path
 from pydnameth.infrastucture.load.attributes import load_cells_dict
+from pydnameth.config.common import CommonTypes
 import numpy as np
 import pandas as pd
 from statsmodels import api as sm
@@ -36,6 +37,14 @@ def load_residuals_common(config):
         config.residuals_dict = config.cpg_dict
 
         cells_dict = load_cells_dict(config)
+
+        if config.attributes.cells.types != CommonTypes.any:
+            if isinstance(config.attributes.cells.types, list):
+                all_cells_types = list(cells_dict.keys())
+                for key in all_cells_types:
+                    if key not in config.attributes.cells.types:
+                        cells_dict.pop(key)
+
         exog_df = pd.DataFrame(cells_dict)
 
         num_cpgs = config.cpg_data.shape[0]
