@@ -41,7 +41,7 @@ class ResidualsCommonGetStrategy(GetStrategy):
         return config.base_data[np.ix_(rows, config.attributes_indexes)]
 
     def get_aux(self, config, item):
-        CPGGetStrategy.get_aux(self, config, item)
+        return CPGGetStrategy.get_aux(self, config, item)
 
 
 class ResidualsSpecialGetStrategy(GetStrategy):
@@ -67,7 +67,7 @@ class ResidualsSpecialGetStrategy(GetStrategy):
         return result
 
     def get_aux(self, config, item):
-        CPGGetStrategy.get_aux(self, config, item)
+        return CPGGetStrategy.get_aux(self, config, item)
 
 
 class AttributesGetStrategy(GetStrategy):
