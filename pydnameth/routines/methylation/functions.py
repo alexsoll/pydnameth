@@ -6,11 +6,14 @@ from pydnameth.routines.common import get_axis, get_legend, get_margin
 def get_layout(config):
 
     item = config.experiment.params['item']
-    aux = config.cpg_gene_dict[item]
-    if isinstance(aux, list):
-        aux_str = ';'.join(aux)
+    if item in config.cpg_gene_dict:
+        aux = config.cpg_gene_dict[item]
+        if isinstance(aux, list):
+            aux_str = ';'.join(aux)
+        else:
+            aux_str = str(aux)
     else:
-        aux_str = str(aux)
+        aux_str = 'non-genic'
 
     y_title = 'Methylation level'
     if config.experiment.type == DataType.residuals_common or config.experiment.type == DataType.residuals_special:
