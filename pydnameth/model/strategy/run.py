@@ -12,6 +12,7 @@ from shapely import geometry
 from scipy.stats import norm, shapiro, kstest, normaltest
 from pydnameth.routines.common import is_float
 from pydnameth.routines.polygon.types import PolygonRoutines
+from pydnameth.routines.observables.functions import get_names
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -624,11 +625,15 @@ class ObservablesRunStrategy(RunStrategy):
 
                     histogram = go.Histogram(
                         x=target,
-                        name=str(config_child.attributes.observables),
+                        name=get_names(config_child),
                         xbins=xbins,
                         marker=dict(
                             opacity=config.experiment.params['opacity'],
-                            color=color
+                            color=color,
+                            line=dict(
+                                color='#444444',
+                                width=1
+                            )
                         )
                     )
 
