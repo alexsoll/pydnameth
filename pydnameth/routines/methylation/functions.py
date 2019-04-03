@@ -1,5 +1,6 @@
 import plotly.graph_objs as go
 from pydnameth.config.experiment.types import DataType
+from pydnameth.routines.common import get_axis, get_legend, get_margin
 
 
 def get_layout(config):
@@ -11,13 +12,26 @@ def get_layout(config):
     else:
         aux_str = str(aux)
 
-    y_title = '$\\beta$'
+    y_title = 'Methylation level'
     if config.experiment.type == DataType.residuals_common or config.experiment.type == DataType.residuals_special:
         y_title = 'residuals'
 
     layout = go.Layout(
-        title=item + '(' + aux_str + ')',
+        title=dict(
+            text=item + '(' + aux_str + ')',
+            font=dict(
+                family='sans-serif',
+                size=33,
+            )
+        ),
         autosize=True,
+        margin=go.layout.Margin(
+            l=95,
+            r=10,
+            b=80,
+            t=85,
+            pad=0
+        ),
         barmode='overlay',
         legend=dict(
             font=dict(
@@ -25,50 +39,11 @@ def get_layout(config):
                 size=16,
             ),
             orientation="h",
-            x=0,
-            y=1.15,
+            x=0.33,
+            y=1.11,
         ),
-        xaxis=dict(
-            title=config.attributes.target,
-            showgrid=True,
-            showline=True,
-            mirror='ticks',
-            titlefont=dict(
-                family='Arial, sans-serif',
-                size=24,
-                color='black'
-            ),
-            showticklabels=True,
-            tickangle=0,
-            tickfont=dict(
-                family='Old Standard TT, serif',
-                size=20,
-                color='black'
-            ),
-            exponentformat='e',
-            showexponent='all'
-        ),
-        yaxis=dict(
-            title=y_title,
-            showgrid=True,
-            showline=True,
-            mirror='ticks',
-            titlefont=dict(
-                family='Arial, sans-serif',
-                size=24,
-                color='black'
-            ),
-            showticklabels=True,
-            tickangle=0,
-            tickfont=dict(
-                family='Old Standard TT, serif',
-                size=20,
-                color='black'
-            ),
-            exponentformat='e',
-            showexponent='all'
-        ),
-
+        xaxis=get_axis(config.attributes.target),
+        yaxis=get_axis(y_title),
     )
 
     return layout

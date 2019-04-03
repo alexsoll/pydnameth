@@ -191,7 +191,8 @@ def get_default_params(setup):
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',
-                'x_range': 'auto'
+                'x_range': 'auto',
+                'details': 2
             }
         elif setup.method == Method.variance_histogram:
             params = {

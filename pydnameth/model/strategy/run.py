@@ -10,9 +10,8 @@ import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry
 from scipy.stats import norm, shapiro, kstest, normaltest
-from pydnameth.routines.common import is_float
+from pydnameth.routines.common import is_float, get_names
 from pydnameth.routines.polygon.types import PolygonRoutines
-from pydnameth.routines.observables.functions import get_names
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -433,6 +432,7 @@ class MethylationRunStrategy(RunStrategy):
         if config.experiment.method == Method.scatter:
 
             item = config.experiment.params['item']
+            details = config.experiment.params['details']
 
             plot_data = []
 
@@ -443,17 +443,18 @@ class MethylationRunStrategy(RunStrategy):
                 target = self.get_strategy.get_target(config_child)
                 methylation = self.get_strategy.get_single_base(config_child, [item])[0]
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
+                coordinates = color[4:-1].split(',')
+                color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.7) + ')'
 
                 scatter = go.Scatter(
                     x=target,
                     y=methylation,
-                    name=str(config_child.attributes.observables),
+                    name=get_names(config_child),
                     mode='markers',
                     marker=dict(
-                        opacity=0.75,
-                        size=15,
-                        color=color,
-                        line=dict(width=2)
+                        size=10,
+                        color=color_transparent,
+                        line=dict(width=1)
                     ),
                 )
                 curr_plot_data.append(scatter)
@@ -471,36 +472,42 @@ class MethylationRunStrategy(RunStrategy):
                     slope_std = results.bse[1]
 
                     # Adding regression line
-                    x_min = np.min(target)
-                    x_max = np.max(target)
-                    y_min = slope * x_min + intercept
-                    y_max = slope * x_max + intercept
-                    scatter = go.Scatter(
-                        x=[x_min, x_max],
-                        y=[y_min, y_max],
-                        mode='lines',
-                        marker=dict(
-                            color=color,
-                            line=dict(width=8)
-                        ),
-                        showlegend=False
-                    )
-                    curr_plot_data.append(scatter)
+                    if details >= 1:
+                        x_min = np.min(target)
+                        x_max = np.max(target)
+                        y_min = slope * x_min + intercept
+                        y_max = slope * x_max + intercept
+                        scatter = go.Scatter(
+                            x=[x_min, x_max],
+                            y=[y_min, y_max],
+                            mode='lines',
+                            marker=dict(
+                                color=color
+                            ),
+                            line=dict(
+                                width=6,
+                                color=color
+                            ),
+                            showlegend=False
+                        )
+
+                        curr_plot_data.append(scatter)
 
                     # Adding polygon area
-                    pr = PolygonRoutines(
-                        x=target,
-                        y=[],
-                        params={
-                            'intercept': intercept,
-                            'slope': slope,
-                            'intercept_std': intercept_std,
-                            'slope_std': slope_std
-                        },
-                        method=config_child.experiment.method
-                    )
-                    scatter = pr.get_scatter(color)
-                    curr_plot_data.append(scatter)
+                    if details >= 2:
+                        pr = PolygonRoutines(
+                            x=target,
+                            y=[],
+                            params={
+                                'intercept': intercept,
+                                'slope': slope,
+                                'intercept_std': intercept_std,
+                                'slope_std': slope_std
+                            },
+                            method=config_child.experiment.method
+                        )
+                        scatter = pr.get_scatter(color_transparent)
+                        curr_plot_data.append(scatter)
 
                 elif config_child.experiment.method == Method.variance_linreg:
 
@@ -525,36 +532,41 @@ class MethylationRunStrategy(RunStrategy):
                     slope_var = results_var.params[1]
 
                     # Adding regression line
-                    x_min = np.min(target)
-                    x_max = np.max(target)
-                    y_min = slope * x_min + intercept
-                    y_max = slope * x_max + intercept
-                    scatter = go.Scatter(
-                        x=[x_min, x_max],
-                        y=[y_min, y_max],
-                        mode='lines',
-                        marker=dict(
-                            color=color,
-                            line=dict(width=8)
-                        ),
-                        showlegend=False
-                    )
-                    curr_plot_data.append(scatter)
+                    if details >= 1:
+                        x_min = np.min(target)
+                        x_max = np.max(target)
+                        y_min = slope * x_min + intercept
+                        y_max = slope * x_max + intercept
+                        scatter = go.Scatter(
+                            x=[x_min, x_max],
+                            y=[y_min, y_max],
+                            mode='lines',
+                            marker=dict(
+                                color=color,
+                            ),
+                            line=dict(
+                                width=8,
+                                color=color
+                            ),
+                            showlegend=False
+                        )
+                        curr_plot_data.append(scatter)
 
                     # Adding polygon area
-                    pr = PolygonRoutines(
-                        x=target,
-                        y=[],
-                        params={
-                            'intercept': intercept,
-                            'slope': slope,
-                            'intercept_var': intercept_var,
-                            'slope_var': slope_var,
-                        },
-                        method=config_child.experiment.method
-                    )
-                    scatter = pr.get_scatter(color)
-                    curr_plot_data.append(scatter)
+                    if details >= 1:
+                        pr = PolygonRoutines(
+                            x=target,
+                            y=[],
+                            params={
+                                'intercept': intercept,
+                                'slope': slope,
+                                'intercept_var': intercept_var,
+                                'slope_var': slope_var,
+                            },
+                            method=config_child.experiment.method
+                        )
+                        scatter = pr.get_scatter(color)
+                        curr_plot_data.append(scatter)
 
                 plot_data += curr_plot_data
 
