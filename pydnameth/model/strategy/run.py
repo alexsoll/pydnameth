@@ -444,7 +444,7 @@ class MethylationRunStrategy(RunStrategy):
                 methylation = self.get_strategy.get_single_base(config_child, [item])[0]
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
                 coordinates = color[4:-1].split(',')
-                color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.7) + ')'
+                color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.3) + ')'
 
                 scatter = go.Scatter(
                     x=target,
@@ -452,9 +452,12 @@ class MethylationRunStrategy(RunStrategy):
                     name=get_names(config_child),
                     mode='markers',
                     marker=dict(
-                        size=10,
+                        size=8,
                         color=color_transparent,
-                        line=dict(width=1)
+                        line=dict(
+                            width=1,
+                            color=color_transparent,
+                        )
                     ),
                 )
                 curr_plot_data.append(scatter)
@@ -545,7 +548,7 @@ class MethylationRunStrategy(RunStrategy):
                                 color=color,
                             ),
                             line=dict(
-                                width=8,
+                                width=6,
                                 color=color
                             ),
                             showlegend=False
