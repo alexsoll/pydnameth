@@ -31,7 +31,11 @@ class CPGGetStrategy(GetStrategy):
         return config.base_data[np.ix_(rows, config.attributes_indexes)]
 
     def get_aux(self, config, item):
-        return ';'.join(config.cpg_gene_dict[item])
+        aux = ''
+        if item in config.cpg_gene_dict:
+            aux = ';'.join(config.cpg_gene_dict[item])
+        return aux
+
 
 
 class ResidualsCommonGetStrategy(GetStrategy):

@@ -33,6 +33,7 @@ def subset_annotations(config):
         genes = config.annotations_dict[AnnotationKey.gene.value]
         bops = config.annotations_dict[AnnotationKey.bop.value]
         map_infos = config.annotations_dict[AnnotationKey.map_info.value]
+
         for id in range(0, len(cpgs)):
 
             curr_ann_dict = {}
@@ -42,35 +43,33 @@ def subset_annotations(config):
             if check_conditions(config, curr_ann_dict):
 
                 cpg = cpgs[id]
-                gene_raw = genes[id]
-                curr_genes = list(set(gene_raw.split(';')))
-                bop = bops[id]
-
                 config.cpg_list.append(cpg)
 
-                config.cpg_gene_dict[cpg] = curr_genes
+                gene_raw = genes[id]
+                if gene_raw != '':
+                    curr_genes = list(set(gene_raw.split(';')))
+                    config.cpg_gene_dict[cpg] = curr_genes
+                    for gene in curr_genes:
+                        if gene in config.gene_cpg_dict:
+                            config.gene_cpg_dict[gene].append(cpg)
+                        else:
+                            config.gene_cpg_dict[gene] = [cpg]
 
-                config.cpg_bop_dict[cpg] = bop
-
-                for gene in curr_genes:
-                    if gene in config.gene_cpg_dict:
-                        config.gene_cpg_dict[gene].append(cpg)
-                    else:
-                        config.gene_cpg_dict[gene] = [cpg]
-
-                for gene in curr_genes:
-                    if gene in config.gene_bop_dict:
-                        config.gene_bop_dict[gene].append(bop)
-                    else:
-                        config.gene_bop_dict[gene] = [bop]
-
-                if len(bop) > 0:
+                bop = bops[id]
+                if bop != '':
+                    config.cpg_bop_dict[cpg] = bop
                     if bop in config.bop_cpg_dict:
                         config.bop_cpg_dict[bop].append(cpg)
                     else:
                         config.bop_cpg_dict[bop] = [cpg]
 
-                config.bop_gene_dict[bop] = curr_genes
+                if gene_raw != '' and bop != '':
+                    for gene in curr_genes:
+                        if gene in config.gene_bop_dict:
+                            config.gene_bop_dict[gene].append(bop)
+                        else:
+                            config.gene_bop_dict[gene] = [bop]
+                    config.bop_gene_dict[bop] = curr_genes
 
         # Sorting cpgs by map_info in gene dict
         for curr_gene, curr_cpgs in config.gene_cpg_dict.items():

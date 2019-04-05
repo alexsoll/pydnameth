@@ -181,8 +181,9 @@ def get_default_params(setup):
         if setup.method == Method.histogram:
             params = {
                 'bin_size': 1.0,
-                'opacity': 0.5,
-                'barmode': 'stack'
+                'opacity': 0.8,
+                'barmode': 'stack',
+                'x_range': 'auto'
             }
 
     elif setup.task == Task.methylation:
@@ -190,7 +191,8 @@ def get_default_params(setup):
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',
-                'x_range': 'auto'
+                'x_range': 'auto',
+                'details': 2
             }
         elif setup.method == Method.variance_histogram:
             params = {
