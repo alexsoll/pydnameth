@@ -1,6 +1,6 @@
 import plotly.graph_objs as go
 from pydnameth.config.experiment.types import DataType
-from pydnameth.routines.common import get_axis, get_legend, get_margin
+from pydnameth.routines.common import get_axis
 
 
 def get_layout(config):
