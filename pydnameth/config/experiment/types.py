@@ -74,13 +74,21 @@ def get_metrics_keys(setup):
                 'slope_std',
                 'intercept_p_value',
                 'slope_p_value',
+                'normality_p_value_shapiro',
+                'normality_p_value_ks_wo_params',
+                'normality_p_value_ks_with_params',
+                'normality_p_value_dagostino',
                 'R2_var',
                 'intercept_var',
                 'slope_var',
                 'intercept_std_var',
                 'slope_std_var',
                 'intercept_p_value_var',
-                'slope_p_value_var'
+                'slope_p_value_var',
+                'normality_p_value_shapiro_var',
+                'normality_p_value_ks_wo_params_var',
+                'normality_p_value_ks_with_params_var',
+                'normality_p_value_dagostino_var'
             ]
         elif setup.method == Method.cluster:
             metrics = [

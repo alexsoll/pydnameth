@@ -17,7 +17,7 @@ def get_layout(config):
 
     y_title = 'Methylation level'
     if config.experiment.type == DataType.residuals_common or config.experiment.type == DataType.residuals_special:
-        y_title = 'residuals'
+        y_title = 'Residuals'
 
     layout = go.Layout(
         title=dict(
@@ -45,7 +45,7 @@ def get_layout(config):
             x=0.33,
             y=1.11,
         ),
-        xaxis=get_axis(config.attributes.target),
+        xaxis=get_axis(config.attributes.target.capitalize()),
         yaxis=get_axis(y_title),
     )
 

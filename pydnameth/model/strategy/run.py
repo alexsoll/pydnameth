@@ -75,6 +75,15 @@ class TableRunStrategy(RunStrategy):
             y = self.get_strategy.get_single_base(config, [item])[0]
 
             results = sm.OLS(y, x).fit()
+            residuals = results.resid
+
+            res_mean = np.mean(residuals)
+            res_std = np.std(residuals)
+
+            _, normality_p_value_shapiro = shapiro(residuals)
+            _, normality_p_value_ks_wo_params = kstest(residuals, 'norm')
+            _, normality_p_value_ks_with_params = kstest(residuals, 'norm', (res_mean, res_std))
+            _, normality_p_value_dagostino = normaltest(residuals)
 
             config.metrics['item'].append(item)
             aux = self.get_strategy.get_aux(config, item)
@@ -86,15 +95,23 @@ class TableRunStrategy(RunStrategy):
             config.metrics['slope_std'].append(results.bse[1])
             config.metrics['intercept_p_value'].append(results.pvalues[0])
             config.metrics['slope_p_value'].append(results.pvalues[1])
+            config.metrics['normality_p_value_shapiro'].append(normality_p_value_shapiro)
+            config.metrics['normality_p_value_ks_wo_params'].append(normality_p_value_ks_wo_params)
+            config.metrics['normality_p_value_ks_with_params'].append(normality_p_value_ks_with_params)
+            config.metrics['normality_p_value_dagostino'].append(normality_p_value_dagostino)
 
-            diffs = []
-            for p_id in range(0, len(target)):
-                curr_x = target[p_id]
-                curr_y = y[p_id]
-                pred_y = results.params[1] * curr_x + results.params[0]
-                diffs.append(abs(pred_y - curr_y))
+            diffs = np.abs(residuals)
 
             results_var = sm.OLS(diffs, x).fit()
+            residuals_var = results_var.resid
+
+            res_mean_var = np.mean(residuals_var)
+            res_std_var = np.std(residuals_var)
+
+            _, normality_p_value_shapiro_var = shapiro(residuals_var)
+            _, normality_p_value_ks_wo_params_var = kstest(residuals_var, 'norm')
+            _, normality_p_value_ks_with_params_var = kstest(residuals_var, 'norm', (res_mean_var, res_std_var))
+            _, normality_p_value_dagostino_var = normaltest(residuals_var)
 
             config.metrics['R2_var'].append(results_var.rsquared)
             config.metrics['intercept_var'].append(results_var.params[0])
@@ -103,6 +120,10 @@ class TableRunStrategy(RunStrategy):
             config.metrics['slope_std_var'].append(results_var.bse[1])
             config.metrics['intercept_p_value_var'].append(results_var.pvalues[0])
             config.metrics['slope_p_value_var'].append(results_var.pvalues[1])
+            config.metrics['normality_p_value_shapiro_var'].append(normality_p_value_shapiro_var)
+            config.metrics['normality_p_value_ks_wo_params_var'].append(normality_p_value_ks_wo_params_var)
+            config.metrics['normality_p_value_ks_with_params_var'].append(normality_p_value_ks_with_params_var)
+            config.metrics['normality_p_value_dagostino_var'].append(normality_p_value_dagostino_var)
 
         elif config.experiment.method == Method.cluster:
 
@@ -444,7 +465,8 @@ class MethylationRunStrategy(RunStrategy):
                 methylation = self.get_strategy.get_single_base(config_child, [item])[0]
                 color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
                 coordinates = color[4:-1].split(',')
-                color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.3) + ')'
+                color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.1) + ')'
+                color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.8) + ')'
 
                 scatter = go.Scatter(
                     x=target,
@@ -452,11 +474,11 @@ class MethylationRunStrategy(RunStrategy):
                     name=get_names(config_child),
                     mode='markers',
                     marker=dict(
-                        size=8,
+                        size=4,
                         color=color_transparent,
                         line=dict(
                             width=1,
-                            color=color_transparent,
+                            color=color_border,
                         )
                     ),
                 )
