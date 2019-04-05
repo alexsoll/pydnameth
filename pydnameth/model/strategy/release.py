@@ -79,4 +79,8 @@ class ObservablesReleaseStrategy(ReleaseStrategy):
 
             layout = observables_routines.get_layout(config)
 
+            if 'x_range' in config.experiment.params:
+                if config.experiment.params['x_range'] != 'auto':
+                    layout.xaxis.range = config.experiment.params['x_range']
+
             config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)

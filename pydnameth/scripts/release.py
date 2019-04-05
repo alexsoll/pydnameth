@@ -286,6 +286,11 @@ def cpg_plot_methylation_scatter(
     Possible parameters of experiment:
 
      * ``'x_range'``: can be ``'auto'`` or list with two elements, which are borders of target axis.
+     * ``'details'``: what to plot?.
+     Possible options: \n
+      ``0``: display only methylation levels points. \n
+      ``1``: display levels: ``0``. Also display linear regression line. \n
+      ``2``: display levels: ``0``, ``1``. Also display polygon. \n
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
@@ -329,6 +334,7 @@ def attributes_plot_observables_histogram(
       Possible options: \n
       ``'overlay'`` for overlaid histograms. \n
       ``'stack'`` for stacked histograms. \n
+    * ``'x_range'``: can be ``'auto'`` or list with two elements, which are borders of target axis.
 
     :param data: pdm.Data instance, which specifies information about dataset.
     :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
