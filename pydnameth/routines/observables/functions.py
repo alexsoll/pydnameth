@@ -9,8 +9,8 @@ def get_layout(config):
         margin=get_margin(),
         barmode=config.experiment.params['barmode'],
         legend=get_legend(),
-        xaxis=get_axis(config.attributes.target),
-        yaxis=get_axis('count'),
+        xaxis=get_axis(config.attributes.target.capitalize()),
+        yaxis=get_axis('Count'),
     )
 
     return layout

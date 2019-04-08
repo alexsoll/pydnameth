@@ -17,13 +17,13 @@ def get_layout(config):
 
     y_title = 'Methylation level'
     if config.experiment.type == DataType.residuals_common or config.experiment.type == DataType.residuals_special:
-        y_title = 'residuals'
+        y_title = 'Residuals'
 
     layout = go.Layout(
         title=dict(
             text=item + '(' + aux_str + ')',
             font=dict(
-                family='sans-serif',
+                family='Arial',
                 size=33,
             )
         ),
@@ -38,14 +38,14 @@ def get_layout(config):
         barmode='overlay',
         legend=dict(
             font=dict(
-                family='sans-serif',
+                family='Arial',
                 size=16,
             ),
             orientation="h",
             x=0.33,
             y=1.11,
         ),
-        xaxis=get_axis(config.attributes.target),
+        xaxis=get_axis(config.attributes.target.capitalize()),
         yaxis=get_axis(y_title),
     )
 

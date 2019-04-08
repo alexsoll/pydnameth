@@ -14,13 +14,8 @@ class GetStrategy(metaclass=abc.ABCMeta):
     def get_aux(self, config, item):
         pass
 
-    def get_target(self, config, normed=False):
+    def get_target(self, config):
         target = config.attributes_dict[config.attributes.target]
-        if normed:
-            target_normed = [(float(x) - min(target)) /
-                             (float(max(target)) - float(min(target)))
-                             for x in target]
-            target = target_normed
         return target
 
 
