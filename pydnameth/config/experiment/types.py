@@ -52,6 +52,20 @@ def get_metrics_keys(setup):
                 'item',
                 'aux',
                 'R2',
+                'R2_adj',
+                'f_stat',
+                'prob(f_stat)',
+                'log_likelihood',
+                'AIC',
+                'BIC',
+                'omnibus',
+                'prob(omnibus)',
+                'skew',
+                'kurtosis',
+                'durbin_watson',
+                'jarque_bera',
+                'prob(jarque_bera)',
+                'cond_no',
                 'intercept',
                 'slope',
                 'intercept_std',
@@ -74,13 +88,21 @@ def get_metrics_keys(setup):
                 'slope_std',
                 'intercept_p_value',
                 'slope_p_value',
+                'normality_p_value_shapiro',
+                'normality_p_value_ks_wo_params',
+                'normality_p_value_ks_with_params',
+                'normality_p_value_dagostino',
                 'R2_var',
                 'intercept_var',
                 'slope_var',
                 'intercept_std_var',
                 'slope_std_var',
                 'intercept_p_value_var',
-                'slope_p_value_var'
+                'slope_p_value_var',
+                'normality_p_value_shapiro_var',
+                'normality_p_value_ks_wo_params_var',
+                'normality_p_value_ks_with_params_var',
+                'normality_p_value_dagostino_var'
             ]
         elif setup.method == Method.cluster:
             metrics = [
@@ -160,8 +182,8 @@ def get_default_params(setup):
 
         if setup.method == Method.cluster:
             params = {
-                'eps': 0.2,
-                'min_samples': 5
+                'eps': 0.1,
+                'min_samples_percentage': 1
             }
         elif setup.method == Method.polygon:
             params = {}
@@ -181,8 +203,9 @@ def get_default_params(setup):
         if setup.method == Method.histogram:
             params = {
                 'bin_size': 1.0,
-                'opacity': 0.5,
-                'barmode': 'stack'
+                'opacity': 0.8,
+                'barmode': 'stack',
+                'x_range': 'auto'
             }
 
     elif setup.task == Task.methylation:
@@ -190,7 +213,9 @@ def get_default_params(setup):
         if setup.method == Method.scatter:
             params = {
                 'item': 'cg01620164',
-                'x_range': 'auto'
+                'x_range': 'auto',
+                'y_range': 'auto',
+                'details': 2
             }
         elif setup.method == Method.variance_histogram:
             params = {
