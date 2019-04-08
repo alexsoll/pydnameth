@@ -51,6 +51,10 @@ class MethylationReleaseStrategy(ReleaseStrategy):
                 if config.experiment.params['x_range'] != 'auto':
                     layout.xaxis.range = config.experiment.params['x_range']
 
+            if 'y_range' in config.experiment.params:
+                if config.experiment.params['y_range'] != 'auto':
+                    layout.yaxis.range = config.experiment.params['y_range']
+
             config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
         elif config.experiment.method == Method.variance_histogram:

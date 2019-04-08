@@ -9,6 +9,11 @@ def is_float(value):
         return False
 
 
+def normalize_to_0_1(values):
+    values_normed = [(float(val) - min(values)) / (float(max(values)) - float(min(values))) for val in values]
+    return values_normed
+
+
 def get_axis(title):
     axis = dict(
         title=title,
@@ -16,14 +21,14 @@ def get_axis(title):
         showline=True,
         mirror='ticks',
         titlefont=dict(
-            family='Arial, sans-serif',
+            family='Arial',
             size=33,
             color='black'
         ),
         showticklabels=True,
         tickangle=0,
         tickfont=dict(
-            family='Old Standard TT, serif',
+            family='Arial',
             size=30,
             color='black'
         ),
@@ -36,7 +41,7 @@ def get_axis(title):
 def get_legend():
     legend = dict(
         font=dict(
-            family='sans-serif',
+            family='Arial',
             size=33,
         ),
         orientation="h",

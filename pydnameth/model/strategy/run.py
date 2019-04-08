@@ -10,8 +10,10 @@ import plotly.graph_objs as go
 import colorlover as cl
 from shapely import geometry
 from scipy.stats import norm, shapiro, kstest, normaltest
-from pydnameth.routines.common import is_float, get_names
+from pydnameth.routines.common import is_float, get_names, normalize_to_0_1
 from pydnameth.routines.polygon.types import PolygonRoutines
+from statsmodels.stats.stattools import jarque_bera, omni_normtest, durbin_watson
+from tqdm import tqdm
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -43,7 +45,11 @@ class TableRunStrategy(RunStrategy):
             y = self.get_strategy.get_single_base(config, [item])[0]
 
             results = sm.OLS(y, x).fit()
+
             residuals = results.resid
+
+            jb, jbpv, skew, kurtosis = jarque_bera(results.wresid)
+            omni, omnipv = omni_normtest(results.wresid)
 
             res_mean = np.mean(residuals)
             res_std = np.std(residuals)
@@ -57,16 +63,30 @@ class TableRunStrategy(RunStrategy):
             aux = self.get_strategy.get_aux(config, item)
             config.metrics['aux'].append(aux)
             config.metrics['R2'].append(results.rsquared)
+            config.metrics['R2_adj'].append(results.rsquared_adj)
+            config.metrics['f_stat'].append(results.fvalue)
+            config.metrics['prob(f_stat)'].append(results.f_pvalue)
+            config.metrics['log_likelihood'].append(results.llf)
+            config.metrics['AIC'].append(results.aic)
+            config.metrics['BIC'].append(results.bic)
+            config.metrics['omnibus'].append(omni)
+            config.metrics['prob(omnibus)'].append(omnipv)
+            config.metrics['skew'].append(skew)
+            config.metrics['kurtosis'].append(kurtosis)
+            config.metrics['durbin_watson'].append(durbin_watson(results.wresid))
+            config.metrics['jarque_bera'].append(jb)
+            config.metrics['prob(jarque_bera)'].append(jbpv)
+            config.metrics['cond_no'].append(results.condition_number)
+            config.metrics['normality_p_value_shapiro'].append(normality_p_value_shapiro)
+            config.metrics['normality_p_value_ks_wo_params'].append(normality_p_value_ks_wo_params)
+            config.metrics['normality_p_value_ks_with_params'].append(normality_p_value_ks_with_params)
+            config.metrics['normality_p_value_dagostino'].append(normality_p_value_dagostino)
             config.metrics['intercept'].append(results.params[0])
             config.metrics['slope'].append(results.params[1])
             config.metrics['intercept_std'].append(results.bse[0])
             config.metrics['slope_std'].append(results.bse[1])
             config.metrics['intercept_p_value'].append(results.pvalues[0])
             config.metrics['slope_p_value'].append(results.pvalues[1])
-            config.metrics['normality_p_value_shapiro'].append(normality_p_value_shapiro)
-            config.metrics['normality_p_value_ks_wo_params'].append(normality_p_value_ks_wo_params)
-            config.metrics['normality_p_value_ks_with_params'].append(normality_p_value_ks_with_params)
-            config.metrics['normality_p_value_dagostino'].append(normality_p_value_dagostino)
 
         elif config.experiment.method == Method.variance_linreg:
 
@@ -127,12 +147,15 @@ class TableRunStrategy(RunStrategy):
 
         elif config.experiment.method == Method.cluster:
 
-            x = self.get_strategy.get_target(config, True)
+            x = self.get_strategy.get_target(config)
+            x_normed = normalize_to_0_1(x)
             y = self.get_strategy.get_single_base(config, [item])[0]
+            y_normed = normalize_to_0_1(y)
 
-            X = np.array([x, y]).T
-            db = DBSCAN(eps=config.experiment.params['eps'],
-                        min_samples=config.experiment.params['min_samples']).fit(X)
+            min_samples = max(1, int(config.experiment.params['min_samples_percentage'] * len(x) / 100.0))
+
+            X = np.array([x_normed, y_normed]).T
+            db = DBSCAN(eps=config.experiment.params['eps'], min_samples=min_samples).fit(X)
             core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
             core_samples_mask[db.core_sample_indices_] = True
             labels = db.labels_
@@ -344,7 +367,7 @@ class TableRunStrategy(RunStrategy):
             config.metrics['aux'].append(aux)
 
     def iterate(self, config, configs_child):
-        for item in config.base_list:
+        for item in tqdm(config.base_list):
             if item in config.base_dict:
                 self.single(item, config, configs_child)
 
@@ -475,7 +498,7 @@ class MethylationRunStrategy(RunStrategy):
                     mode='markers',
                     marker=dict(
                         size=4,
-                        color=color_transparent,
+                        color=color_border,
                         line=dict(
                             width=1,
                             color=color_border,
@@ -540,17 +563,11 @@ class MethylationRunStrategy(RunStrategy):
                     y = methylation
 
                     results = sm.OLS(y, x).fit()
-
                     intercept = results.params[0]
                     slope = results.params[1]
 
-                    diffs = []
-                    for p_id in range(0, len(target)):
-                        curr_x = target[p_id]
-                        curr_y = y[p_id]
-                        pred_y = slope * curr_x + intercept
-                        diffs.append(abs(pred_y - curr_y))
-
+                    residuals = results.resid
+                    diffs = np.abs(residuals)
                     results_var = sm.OLS(diffs, x).fit()
 
                     intercept_var = results_var.params[0]
