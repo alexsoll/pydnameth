@@ -41,5 +41,7 @@ from pydnameth.scripts.develop import \
     attributes_plot_observables_histogram_dev, \
     cpg_plot_methylation_variance_histogram_dev, \
     residuals_common_plot_methylation_scatter_dev, \
-    residuals_special_plot_methylation_scatter_dev
+    residuals_special_plot_methylation_scatter_dev, \
+    cpg_proc_table_aggregator_var_dev, \
+    cpg_plot_methylation_scatter_var_dev
 from pydnameth.routines.clock.types import ClockExogType

@@ -52,6 +52,20 @@ def get_metrics_keys(setup):
                 'item',
                 'aux',
                 'R2',
+                'R2_adj',
+                'f_stat',
+                'prob(f_stat)',
+                'log_likelihood',
+                'AIC',
+                'BIC',
+                'omnibus',
+                'prob(omnibus)',
+                'skew',
+                'kurtosis',
+                'durbin_watson',
+                'jarque_bera',
+                'prob(jarque_bera)',
+                'cond_no',
                 'intercept',
                 'slope',
                 'intercept_std',
@@ -168,8 +182,8 @@ def get_default_params(setup):
 
         if setup.method == Method.cluster:
             params = {
-                'eps': 0.2,
-                'min_samples': 5
+                'eps': 0.1,
+                'min_samples_percentage': 1
             }
         elif setup.method == Method.polygon:
             params = {}
@@ -200,6 +214,7 @@ def get_default_params(setup):
             params = {
                 'item': 'cg01620164',
                 'x_range': 'auto',
+                'y_range': 'auto',
                 'details': 2
             }
         elif setup.method == Method.variance_histogram:

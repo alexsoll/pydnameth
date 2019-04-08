@@ -23,7 +23,7 @@ def get_layout(config):
         title=dict(
             text=item + '(' + aux_str + ')',
             font=dict(
-                family='sans-serif',
+                family='Arial',
                 size=33,
             )
         ),
@@ -38,7 +38,7 @@ def get_layout(config):
         barmode='overlay',
         legend=dict(
             font=dict(
-                family='sans-serif',
+                family='Arial',
                 size=16,
             ),
             orientation="h",
