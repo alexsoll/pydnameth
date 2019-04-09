@@ -5,6 +5,8 @@ class DataPath(Enum):
     local_1 = 'D:/YandexDisk/Work/pydnameth'
     local_2 = 'E:/YandexDisk/Work/pydnameth'
     local_3 = 'C:/Users/User/YandexDisk/pydnameth'
+    unn_yi = '/common/home/yusipov_i/pydnameth'
+    unn_ka = '/common/home/kalyakulina_a/pydnameth'
 
 
 class DataBase(Enum):

@@ -1,6 +1,7 @@
 from pydnameth.config.data.types import DataPath
 from pydnameth.config.data.types import DataBase
 import socket
+import getpass
 
 """
 type can use only predefined enums
@@ -28,7 +29,13 @@ class Data:
             elif host_name == 'DESKTOP-4BEQ7MS':
                 self.path = DataPath.local_3.value
             elif host_name == 'master' or host_name[0:4] == 'node':
-                self.path = DataPath.cluster.value
+                user = getpass.getuser()
+                if user == 'yusipov_i':
+                    self.fs = DataPath.unn_yi
+                elif user == 'kalyakulina_a':
+                    self.fs = DataPath.unn_ka
+                else:
+                    self.fs = DataPath.unn_yi
 
     def __str__(self):
         name = f'{self.base}'
