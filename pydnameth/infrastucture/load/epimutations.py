@@ -7,23 +7,6 @@ from tqdm import tqdm
 from pydnameth.infrastucture.save.table import save_table_dict_csv
 
 
-def process_epimutation_row(row, epimutations_data, cpg_data, num_subjects):
-    betas = cpg_data[row, :]
-
-    for subject_id in range(0, num_subjects):
-        curr_point = betas[subject_id]
-        curr_betas = np.delete(betas, subject_id)
-        quartiles = np.percentile(curr_betas, [25, 75])
-        iqr = quartiles[1] - quartiles[0]
-        left = quartiles[0] - (3.0 * iqr)
-        right = quartiles[1] + (3.0 * iqr)
-        if curr_point < left or curr_point > right:
-            epimutations_data[row][subject_id] = 1
-        else:
-            epimutations_data[row][subject_id] = 0
-
-
-
 def load_epimutations(config):
     fn_dict = get_data_base_path(config) + '/' + 'epimutations_dict'
     fn_data = get_data_base_path(config) + '/' + 'epimutations'
