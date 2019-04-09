@@ -1,13 +1,10 @@
 from pydnameth.infrastucture.load.cpg import load_cpg
 from pydnameth.infrastucture.path import get_data_base_path
-import copy
 import numpy as np
 import pickle
 import os.path
 from tqdm import tqdm
-import csv
 from pydnameth.infrastucture.save.table import save_table_dict_csv
-from joblib import Parallel, delayed
 
 
 def process_epimutation_row(row, epimutations_data, cpg_data, num_subjects):
@@ -29,27 +26,23 @@ def process_epimutation_row(row, epimutations_data, cpg_data, num_subjects):
 
 def load_epimutations(config):
     fn_dict = get_data_base_path(config) + '/' + 'epimutations_dict'
-    fn_dict_pkl = fn_dict + '.pkl'
-    fn_dict_csv = fn_dict + '.csv'
     fn_data = get_data_base_path(config) + '/' + 'epimutations'
-    fn_data_npz = fn_data + '.npz'
-    fn_data_csv = fn_data + '.csv'
 
-    if os.path.isfile(fn_dict_pkl) and os.path.isfile(fn_data_npz):
+    if os.path.isfile(fn_dict + '.pkl') and os.path.isfile(fn_data + '.npz'):
 
-        f = open(fn_dict_pkl, 'rb')
+        f = open(fn_dict + '.pkl', 'rb')
         config.epimutations_dict = pickle.load(f)
         f.close()
 
-        data = np.load(fn_data_npz)
-        config.epimutations_data = data['residuals_data']
+        data = np.load(fn_data + '.npz')
+        config.epimutations_data = data['epimutations_data']
 
     else:
 
         load_cpg(config)
 
         config.epimutations_dict = config.cpg_dict
-        f = open(fn_dict_pkl, 'wb')
+        f = open(fn_dict + '.pkl', 'wb')
         pickle.dump(config.epimutations_dict, f, pickle.HIGHEST_PROTOCOL)
         f.close()
 
@@ -80,13 +73,10 @@ def load_epimutations(config):
                 if curr_point < left or curr_point > right:
                     curr_row[subject_id] = 1
 
-            if 1 in curr_row:
-                break
-
             config.epimutations_data[row] = curr_row
 
-        np.savez_compressed(fn_data_npz, epimutations_data=config.epimutations_data)
-        np.savetxt(fn_data_csv, config.epimutations_data, delimiter=",")
+        np.savez_compressed(fn_data + '.npz', epimutations_data=config.epimutations_data)
+        np.savetxt(fn_data + '.txt', config.epimutations_data, delimiter='\t', fmt='%d')
 
         # Clear cpg_data
         del config.cpg_data
