@@ -2,13 +2,7 @@ import pandas as pd
 import csv
 
 
-def save_table_dict(fn, table_dict):
-    fn_xls = fn + '.xlsx'
-    df = pd.DataFrame(table_dict)
-    writer = pd.ExcelWriter(fn_xls, engine='xlsxwriter')
-    df.to_excel(writer, index=False)
-    writer.save()
-
+def save_table_dict_csv(fn, table_dict):
     fn_csv = fn + '.csv'
     with open(fn_csv, 'w') as csvfile:
         writer = csv.DictWriter(csvfile,
@@ -20,3 +14,12 @@ def save_table_dict(fn, table_dict):
             for key, values in table_dict.items():
                 tmp_dict[key] = values[id]
             writer.writerow(tmp_dict)
+
+def save_table_dict(fn, table_dict):
+    fn_xls = fn + '.xlsx'
+    df = pd.DataFrame(table_dict)
+    writer = pd.ExcelWriter(fn_xls, engine='xlsxwriter')
+    df.to_excel(writer, index=False)
+    writer.save()
+
+    save_table_dict_csv(fn, table_dict)
