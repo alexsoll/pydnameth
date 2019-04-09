@@ -41,7 +41,7 @@ def load_epimutations(config):
         num_subjects = config.cpg_data.shape[1]
         config.epimutations_data = np.zeros((num_cpgs, num_subjects), dtype=np.int)
 
-        for cpg, row in tqdm(config.cpg_dict.items()):
+        for cpg, row in tqdm(config.cpg_dict.items(), mininterval=100.0):
             betas = config.cpg_data[row, :]
 
             curr_row = np.zeros(num_subjects, dtype=np.int)
