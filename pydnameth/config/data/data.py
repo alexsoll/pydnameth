@@ -31,11 +31,11 @@ class Data:
             elif host_name == 'master' or host_name[0:4] == 'node':
                 user = getpass.getuser()
                 if user == 'yusipov_i':
-                    self.fs = DataPath.unn_yi
+                    self.fs = DataPath.unn_yi.value
                 elif user == 'kalyakulina_a':
-                    self.fs = DataPath.unn_ka
+                    self.fs = DataPath.unn_ka.value
                 else:
-                    self.fs = DataPath.unn_yi
+                    self.fs = DataPath.unn_yi.value
 
     def __str__(self):
         name = f'{self.base}'
