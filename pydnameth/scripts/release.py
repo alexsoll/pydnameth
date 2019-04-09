@@ -218,6 +218,7 @@ def cpg_proc_table_z_test_linreg(
         params=params
     )
 
+
 def cpg_proc_clock_linreg(
     data,
     annotations,
@@ -249,9 +250,11 @@ def cpg_proc_clock_linreg(
 
     * ``'type'``: type of clocks. \n
       Possible options: \n
-      ``'all'``: iterative building of clocks starting from one element in the model, ending with ``'size'`` elements in the model. \n
+      ``'all'``: iterative building of clocks starting from one element in the model,
+      ending with ``'size'`` elements in the model. \n
       ``'single '``: building of clocks only with ``'size'`` elements in the model. \n
-      ``'deep'``: iterative building of clocks starting from one element in the model, ending with ``'size'`` elements in the model, but choosing all posible combinations from ``'size'`` elements.
+      ``'deep'``: iterative building of clocks starting from one element in the model,
+      ending with ``'size'`` elements in the model, but choosing all posible combinations from ``'size'`` elements.
     * ``'part'``: the proportion of considered number of subject in the test set. From ``0.0`` to ``1.0``.
     * ``'size'``: maximum number of exogenous variables in a model.
     * ``'runs'`` number of bootstrap runs in model
@@ -271,6 +274,7 @@ def cpg_proc_clock_linreg(
         child_method=child_method,
         params=params
     )
+
 
 def cpg_plot_methylation_scatter(
     data,
@@ -351,4 +355,3 @@ def attributes_plot_observables_histogram(
         observables_list=observables_list,
         params=params
     )
-

@@ -32,7 +32,6 @@ class CPGGetStrategy(GetStrategy):
         return aux
 
 
-
 class ResidualsCommonGetStrategy(GetStrategy):
 
     def get_single_base(self, config, items):
