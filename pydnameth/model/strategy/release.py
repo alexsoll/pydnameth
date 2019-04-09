@@ -20,11 +20,13 @@ class TableReleaseStrategy(ReleaseStrategy):
 
     def release(self, config, configs_child):
         if config.experiment.method == Method.z_test_linreg:
-            reject, pvals_corr, alphacSidak, alphacBonf = multipletests(config.metrics['p_value'], 0.05, method='fdr_bh')
+            reject, pvals_corr, alphacSidak, alphacBonf = multipletests(config.metrics['p_value'],
+                                                                        0.05,
+                                                                        method='fdr_bh')
             config.metrics['p_value'] = pvals_corr
 
         (key, direction) = get_main_metric(config.experiment)
-        
+
         order = list(np.argsort(config.metrics[key]))
         if direction == 'descending':
             order.reverse()

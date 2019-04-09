@@ -182,7 +182,6 @@ class TableRunStrategy(RunStrategy):
             if border_l > border_r:
                 raise ValueError('Polygons borders are not consistent')
 
-
             for config_child in configs_child:
 
                 target = self.get_strategy.get_target(config_child)
@@ -312,9 +311,9 @@ class TableRunStrategy(RunStrategy):
             config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
             config.metrics['max_abs_slope'].append(max_abs_slope)
             config.metrics['is_inside'].append(is_inside)
-            
+
         elif config.experiment.method == Method.z_test_linreg:
-            
+
             slopes = []
             slopes_std = []
             num_subs = []
@@ -336,7 +335,7 @@ class TableRunStrategy(RunStrategy):
                 slopes_std.append(config_child.advanced_data['slope_std'][item_id])
                 num_subs.append(len(config_child.attributes_dict['age']))
 
-            std_errors = [slopes_std[i] / np.sqrt(num_subs[i]) for i in range (0, len(slopes_std))]
+            std_errors = [slopes_std[i] / np.sqrt(num_subs[i]) for i in range(0, len(slopes_std))]
             z_value = (slopes[0] - slopes[1]) / np.sqrt(sum([std_error * std_error for std_error in std_errors]))
             p_value = norm.sf(abs(z_value)) * 2.0
 

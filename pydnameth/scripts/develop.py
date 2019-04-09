@@ -347,6 +347,7 @@ def residuals_common_proc_table_aggregator_dev(
         params
     )
 
+
 def residuals_special_proc_table_aggregator_dev(
     data,
     annotations,
@@ -362,6 +363,7 @@ def residuals_special_proc_table_aggregator_dev(
         observables_list,
         params
     )
+
 
 def proc_table_aggregator(
     data_type,
@@ -531,7 +533,7 @@ def cpg_proc_special_clock_linreg_dev(
         build_tree(root)
 
         new_file = get_save_path(config_child) + '/' + \
-             get_file_name(config_child) + ext
+            get_file_name(config_child) + ext
 
         copyfile(file, new_file)
 

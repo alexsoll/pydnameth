@@ -35,4 +35,3 @@ class Experiment:
             name = 'default'
 
         return name
-

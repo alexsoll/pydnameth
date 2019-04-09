@@ -16,7 +16,6 @@ class PolygonRoutines:
         self.params = params
         self.method = method
 
-
     def get_border_points(self):
 
         if self.method == Method.linreg:
@@ -102,5 +101,3 @@ class PolygonRoutines:
             showlegend=False
         )
         return scatter
-
-
