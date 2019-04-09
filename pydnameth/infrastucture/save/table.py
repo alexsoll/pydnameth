@@ -15,6 +15,7 @@ def save_table_dict_csv(fn, table_dict):
                 tmp_dict[key] = values[id]
             writer.writerow(tmp_dict)
 
+
 def save_table_dict(fn, table_dict):
     fn_xls = fn + '.xlsx'
     df = pd.DataFrame(table_dict)
