@@ -119,7 +119,7 @@ class TestLoadAnnotations(unittest.TestCase):
         self.config.attributes_dict = load_attributes_dict(self.config)
         self.config.attributes_indexes = list(range(5))
         subset_attributes(self.config)
-        self.assertEqual(self.config.attributes_dict['gender'], ['M']*5)
+        self.assertEqual(self.config.attributes_dict['gender'], ['M'] * 5)
 
     def test_subset_cells(self):
         self.config.cells_dict = load_cells_dict(self.config)
