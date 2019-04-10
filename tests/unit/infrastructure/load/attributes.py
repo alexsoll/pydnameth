@@ -9,13 +9,13 @@ from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.attributes import load_attributes_dict
+from pydnameth.infrastucture.path import get_data_base_path
 from tests.tear_down import clear_cache
 
 
 class TestLoadAnnotations(unittest.TestCase):
 
     def setUp(self):
-
         data = Data(
             name='cpg_beta',
             path=ROOT_DIR,
@@ -80,8 +80,7 @@ class TestLoadAnnotations(unittest.TestCase):
     def test_load_attributes_dict_check_pkl_file_creation(self):
         load_attributes_dict(self.config)
 
-        create = os.path.isfile(self.config.data.path + '/' + self.config.data.base + '/' +
-                                self.config.attributes.observables.name + '.pkl')
+        create = os.path.isfile(get_data_base_path(self.config) + '/' + self.config.attributes.observables.name + '.pkl')
 
         self.assertEqual(True, create)
 

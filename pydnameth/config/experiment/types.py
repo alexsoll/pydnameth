@@ -34,6 +34,7 @@ class DataType(Enum):
     bop = 'bop'
     residuals_common = 'residuals_common'
     residuals_special = 'residuals_special'
+    epimutations = 'epimutations'
     attributes = 'attributes'
     suppl = 'suppl'
     cache = 'cache'

@@ -366,7 +366,7 @@ class TableRunStrategy(RunStrategy):
             config.metrics['aux'].append(aux)
 
     def iterate(self, config, configs_child):
-        for item in tqdm(config.base_list):
+        for item in tqdm(config.base_list, mininterval=100.0):
             if item in config.base_dict:
                 self.single(item, config, configs_child)
 
