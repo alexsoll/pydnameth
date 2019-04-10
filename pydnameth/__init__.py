@@ -26,6 +26,7 @@ from pydnameth.scripts.release import \
     cpg_plot_methylation_scatter, \
     attributes_plot_observables_histogram
 from pydnameth.scripts.develop import \
+    load_epimutations_dev, \
     cpg_proc_table_linreg_dev, \
     residuals_common_proc_table_linreg_dev, \
     residuals_special_proc_table_linreg_dev, \

@@ -1,14 +1,48 @@
 from anytree import Node
 from pydnameth.config.experiment.experiment import Experiment
+from pydnameth.config.annotations.annotations import Annotations
 from pydnameth.config.experiment.types import DataType, Task, Method
 from pydnameth.config.config import Config
 from pydnameth.model.tree import build_tree, calc_tree
 from pydnameth.config.attributes.attributes import Attributes, Observables, Cells
 from pydnameth.infrastucture.path import get_save_path
 from pydnameth.infrastucture.file_name import get_file_name
+from pydnameth.infrastucture.load.epimutations import load_epimutations
 import copy
 from shutil import copyfile
 import os
+
+
+def load_epimutations_dev(data):
+
+    config = Config(
+        data=copy.deepcopy(data),
+        experiment=Experiment(
+            type=DataType.epimutations,
+            task=None,
+            method=None,
+            params=None
+        ),
+        annotations=Annotations(
+            name='annotations',
+            exclude='bad_cpgs',
+            cross_reactive='any',
+            snp='any',
+            chr='NS',
+            gene_region='any',
+            geo='any',
+            probe_class='any'
+        ),
+        attributes=Attributes(
+            target=None,
+            observables=None,
+            cells=None
+        ),
+        is_run=True,
+        is_root=True
+    )
+
+    load_epimutations(config)
 
 
 def cpg_proc_table_linreg_dev(
