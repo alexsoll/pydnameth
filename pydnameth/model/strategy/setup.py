@@ -1,6 +1,6 @@
 import abc
 from pydnameth.config.experiment.params import get_default_params
-from pydnameth.config.experiment.types import get_metrics_keys
+from pydnameth.config.experiment.metrics import get_metrics_keys
 import math
 
 
@@ -24,7 +24,7 @@ class SetupStrategy(metaclass=abc.ABCMeta):
 
     def setup_metrics(self, config):
         config.metrics = {}
-        for key in get_metrics_keys(config.experiment):
+        for key in get_metrics_keys(config):
             config.metrics[key] = []
 
 
@@ -35,7 +35,7 @@ class TableSetUpStrategy(SetupStrategy):
         self.setup_metrics(config)
 
         for config_child in configs_child:
-            metrics_keys = get_metrics_keys(config.experiment)
+            metrics_keys = get_metrics_keys(config)
             for key in config_child.advanced_data:
                 if key not in metrics_keys:
                     suffix = str(config_child.attributes.observables)
@@ -68,29 +68,6 @@ class ClockSetUpStrategy(SetupStrategy):
 
 
 class PlotSetUpStrategy(SetupStrategy):
-
-    def setup(self, config, configs_child):
-        self.setup_params(config)
-        self.setup_metrics(config)
-
-        config.experiment_data = {
-            'data': [],
-            'fig': []
-        }
-
-class MethylationSetUpStrategy(SetupStrategy):
-
-    def setup(self, config, configs_child):
-        self.setup_params(config)
-        self.setup_metrics(config)
-
-        config.experiment_data = {
-            'data': [],
-            'fig': []
-        }
-
-
-class ObservablesSetUpStrategy(SetupStrategy):
 
     def setup(self, config, configs_child):
         self.setup_params(config)

@@ -1,33 +1,25 @@
-from pydnameth.model.strategy.load import CPGLoadStrategy
-from pydnameth.model.strategy.load import AttributesLoadStrategy
+from pydnameth.model.strategy.load import BetasLoadStrategy
+from pydnameth.model.strategy.load import ObservablesLoadStrategy
 from pydnameth.model.strategy.load import ResidualsCommonLoadStrategy
 from pydnameth.model.strategy.load import ResidualsSpecialLoadStrategy
 from pydnameth.model.strategy.load import EpimutationsLoadStrategy
-from pydnameth.model.strategy.get import CPGGetStrategy
-from pydnameth.model.strategy.get import AttributesGetStrategy
+from pydnameth.model.strategy.get import BetasGetStrategy
+from pydnameth.model.strategy.get import ObservablesGetStrategy
 from pydnameth.model.strategy.get import ResidualsCommonGetStrategy
 from pydnameth.model.strategy.get import ResidualsSpecialGetStrategy
 from pydnameth.model.strategy.get import EpimutationsGetStrategy
 from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
 from pydnameth.model.strategy.setup import PlotSetUpStrategy
-from pydnameth.model.strategy.setup import MethylationSetUpStrategy
-from pydnameth.model.strategy.setup import ObservablesSetUpStrategy
 from pydnameth.model.strategy.run import TableRunStrategy
 from pydnameth.model.strategy.run import ClockRunStrategy
 from pydnameth.model.strategy.run import PlotRunStrategy
-from pydnameth.model.strategy.run import MethylationRunStrategy
-from pydnameth.model.strategy.run import ObservablesRunStrategy
 from pydnameth.model.strategy.release import ClockReleaseStrategy
 from pydnameth.model.strategy.release import TableReleaseStrategy
 from pydnameth.model.strategy.release import PlotReleaseStrategy
-from pydnameth.model.strategy.release import MethylationReleaseStrategy
-from pydnameth.model.strategy.release import ObservablesReleaseStrategy
 from pydnameth.model.strategy.save import TableSaveStrategy
 from pydnameth.model.strategy.save import ClockSaveStrategy
 from pydnameth.model.strategy.save import PlotSaveStrategy
-from pydnameth.model.strategy.save import MethylationSaveStrategy
-from pydnameth.model.strategy.save import ObservablesSaveStrategy
 from pydnameth.config.experiment.types import Task
 from pydnameth.config.experiment.types import DataType
 
@@ -36,10 +28,10 @@ class Context:
 
     def __init__(self, config):
 
-        if config.experiment.type == DataType.cpg:
-            self.load_strategy = CPGLoadStrategy()
-        elif config.experiment.type == DataType.attributes:
-            self.load_strategy = AttributesLoadStrategy()
+        if config.experiment.type == DataType.betas:
+            self.load_strategy = BetasLoadStrategy()
+        elif config.experiment.type == DataType.observables:
+            self.load_strategy = ObservablesLoadStrategy()
         elif config.experiment.type == DataType.residuals_common:
             self.load_strategy = ResidualsCommonLoadStrategy()
         elif config.experiment.type == DataType.residuals_special:
@@ -47,10 +39,10 @@ class Context:
         elif config.experiment.type == DataType.epimutations:
             self.load_strategy = EpimutationsLoadStrategy()
 
-        if config.experiment.type == DataType.cpg:
-            self.get_strategy = CPGGetStrategy()
-        elif config.experiment.type == DataType.attributes:
-            self.get_strategy = AttributesGetStrategy()
+        if config.experiment.type == DataType.betas:
+            self.get_strategy = BetasGetStrategy()
+        elif config.experiment.type == DataType.observables:
+            self.get_strategy = ObservablesGetStrategy()
         elif config.experiment.type == DataType.residuals_common:
             self.get_strategy = ResidualsCommonGetStrategy()
         elif config.experiment.type == DataType.residuals_special:
@@ -64,10 +56,6 @@ class Context:
             self.setup_strategy = ClockSetUpStrategy(self.get_strategy)
         elif config.experiment.task == Task.plot:
             self.setup_strategy = PlotSetUpStrategy(self.get_strategy)
-        elif config.experiment.task == Task.methylation:
-            self.setup_strategy = MethylationSetUpStrategy(self.get_strategy)
-        elif config.experiment.task == Task.observables:
-            self.setup_strategy = ObservablesSetUpStrategy(self.get_strategy)
 
         if config.experiment.task == Task.table:
             self.run_strategy = TableRunStrategy(self.get_strategy)
@@ -75,10 +63,6 @@ class Context:
             self.run_strategy = ClockRunStrategy(self.get_strategy)
         elif config.experiment.task == Task.plot:
             self.run_strategy = PlotRunStrategy(self.get_strategy)
-        elif config.experiment.task == Task.methylation:
-            self.run_strategy = MethylationRunStrategy(self.get_strategy)
-        elif config.experiment.task == Task.observables:
-            self.run_strategy = ObservablesRunStrategy(self.get_strategy)
 
         if config.experiment.task == Task.table:
             self.release_strategy = TableReleaseStrategy()
@@ -86,10 +70,6 @@ class Context:
             self.release_strategy = ClockReleaseStrategy()
         elif config.experiment.task == Task.plot:
             self.release_strategy = PlotReleaseStrategy()
-        elif config.experiment.task == Task.methylation:
-            self.release_strategy = MethylationReleaseStrategy()
-        elif config.experiment.task == Task.observables:
-            self.release_strategy = ObservablesReleaseStrategy()
 
         if config.experiment.task == Task.table:
             self.save_strategy = TableSaveStrategy()
@@ -97,10 +77,6 @@ class Context:
             self.save_strategy = ClockSaveStrategy()
         elif config.experiment.task == Task.plot:
             self.save_strategy = PlotSaveStrategy()
-        elif config.experiment.task == Task.methylation:
-            self.save_strategy = MethylationSaveStrategy()
-        elif config.experiment.task == Task.observables:
-            self.save_strategy = ObservablesSaveStrategy()
 
     def pipeline(self, config, configs_child):
 

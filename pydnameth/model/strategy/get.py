@@ -19,7 +19,7 @@ class GetStrategy(metaclass=abc.ABCMeta):
         return target
 
 
-class CPGGetStrategy(GetStrategy):
+class BetasGetStrategy(GetStrategy):
 
     def get_single_base(self, config, items):
         rows = [config.base_dict[item] for item in items]
@@ -39,7 +39,7 @@ class ResidualsCommonGetStrategy(GetStrategy):
         return config.base_data[np.ix_(rows, config.attributes_indexes)]
 
     def get_aux(self, config, item):
-        return CPGGetStrategy.get_aux(self, config, item)
+        return BetasGetStrategy.get_aux(self, config, item)
 
 
 class ResidualsSpecialGetStrategy(GetStrategy):
@@ -65,7 +65,7 @@ class ResidualsSpecialGetStrategy(GetStrategy):
         return result
 
     def get_aux(self, config, item):
-        return CPGGetStrategy.get_aux(self, config, item)
+        return BetasGetStrategy.get_aux(self, config, item)
 
 
 class EpimutationsGetStrategy(GetStrategy):
@@ -78,7 +78,7 @@ class EpimutationsGetStrategy(GetStrategy):
     def get_aux(self, config, item):
         pass
 
-class AttributesGetStrategy(GetStrategy):
+class ObservablesGetStrategy(GetStrategy):
 
     def get_single_base(self, config, items):
         pass

@@ -8,10 +8,10 @@ from pydnameth import Cells
 from pydnameth import Attributes
 from pydnameth import Config
 from pydnameth.model.context import Context
-from pydnameth.model.strategy.load import CPGLoadStrategy
-from pydnameth.model.strategy.load import AttributesLoadStrategy
-from pydnameth.model.strategy.get import CPGGetStrategy
-from pydnameth.model.strategy.get import AttributesGetStrategy
+from pydnameth.model.strategy.load import BetasLoadStrategy
+from pydnameth.model.strategy.load import ObservablesLoadStrategy
+from pydnameth.model.strategy.get import BetasGetStrategy
+from pydnameth.model.strategy.get import ObservablesGetStrategy
 from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
 from pydnameth.model.strategy.setup import MethylationSetUpStrategy
@@ -98,25 +98,25 @@ class TestAnnotationsConditions(unittest.TestCase):
         return condition
 
     def test_strategy_creation_cpg_table(self):
-        condition = self.check_strategy(DataType.cpg, Task.table,
-                                        [CPGLoadStrategy, CPGGetStrategy, TableSetUpStrategy,
+        condition = self.check_strategy(DataType.betas, Task.table,
+                                        [BetasLoadStrategy, BetasGetStrategy, TableSetUpStrategy,
                                          TableRunStrategy, TableReleaseStrategy, TableSaveStrategy])
         self.assertEqual(condition, True)
 
     def test_strategy_creation_cpg_clock(self):
-        condition = self.check_strategy(DataType.cpg, Task.clock,
-                                        [CPGLoadStrategy, CPGGetStrategy, ClockSetUpStrategy,
+        condition = self.check_strategy(DataType.betas, Task.clock,
+                                        [BetasLoadStrategy, BetasGetStrategy, ClockSetUpStrategy,
                                          ClockRunStrategy, ClockReleaseStrategy, ClockSaveStrategy])
         self.assertEqual(condition, True)
 
     def test_strategy_creation_cpg_methylation(self):
-        condition = self.check_strategy(DataType.cpg, Task.methylation,
-                                        [CPGLoadStrategy, CPGGetStrategy, MethylationSetUpStrategy,
+        condition = self.check_strategy(DataType.betas, Task.methylation,
+                                        [BetasLoadStrategy, BetasGetStrategy, MethylationSetUpStrategy,
                                          MethylationRunStrategy, MethylationReleaseStrategy, MethylationSaveStrategy])
         self.assertEqual(condition, True)
 
     def test_strategy_creation_attr_observables(self):
-        condition = self.check_strategy(DataType.attributes, Task.observables,
-                                        [AttributesLoadStrategy, AttributesGetStrategy, ObservablesSetUpStrategy,
+        condition = self.check_strategy(DataType.observables, Task.observables,
+                                        [ObservablesLoadStrategy, ObservablesGetStrategy, ObservablesSetUpStrategy,
                                          ObservablesRunStrategy, ObservablesReleaseStrategy, ObservablesSaveStrategy])
         self.assertEqual(condition, True)

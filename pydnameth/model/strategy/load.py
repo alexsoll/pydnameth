@@ -31,7 +31,7 @@ class LoadStrategy(metaclass=abc.ABCMeta):
                 row_id += 1
 
 
-class CPGLoadStrategy(LoadStrategy):
+class BetasLoadStrategy(LoadStrategy):
 
     def load(self, config, configs_child):
         load_cpg(config)
@@ -66,7 +66,7 @@ class ResidualsCommonLoadStrategy(LoadStrategy):
 class ResidualsSpecialLoadStrategy(LoadStrategy):
 
     def load(self, config, configs_child):
-        CPGLoadStrategy.load(self, config, configs_child)
+        BetasLoadStrategy.load(self, config, configs_child)
 
 
 class EpimutationsLoadStrategy(LoadStrategy):
@@ -80,7 +80,7 @@ class EpimutationsLoadStrategy(LoadStrategy):
         self.inherit_childs(config, configs_child)
 
 
-class AttributesLoadStrategy(LoadStrategy):
+class ObservablesLoadStrategy(LoadStrategy):
 
     def load(self, config, configs_child):
         pass

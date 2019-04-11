@@ -7,7 +7,7 @@ from pydnameth.config.attributes.attributes import Observables, Cells, Attribute
 from pydnameth.model.tree import build_tree, calc_tree
 
 
-def epimutations_plot_scatter_dev(
+def observables_plot_histogram_dev(
     data,
     annotations,
     attributes,
@@ -17,9 +17,9 @@ def epimutations_plot_scatter_dev(
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.epimutations,
-            task=Task.plot,
-            method=Method.scatter,
+            type=DataType.observables,
+            task=Task.observables,
+            method=Method.histogram,
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),
@@ -27,13 +27,12 @@ def epimutations_plot_scatter_dev(
         is_run=True,
         is_root=True
     )
-
     root = Node(name=str(config_root), config=config_root)
 
-    for types in observables_list:
+    for d in observables_list:
         observables_child = Observables(
             name=copy.deepcopy(attributes.observables.name),
-            types=types
+            types=d
         )
 
         cells_child = Cells(
@@ -49,16 +48,11 @@ def epimutations_plot_scatter_dev(
 
         config_child = Config(
             data=copy.deepcopy(data),
-            experiment=Experiment(
-                type=DataType.epimutations,
-                task=Task.table,
-                method=Method.mock,
-                params={}
-            ),
+            experiment=config_root.experiment,
             annotations=copy.deepcopy(annotations),
             attributes=attributes_child,
             is_run=False,
-            is_root=False
+            is_root=True
         )
         Node(name=str(config_child), config=config_child, parent=root)
 
