@@ -68,6 +68,16 @@ class ResidualsSpecialGetStrategy(GetStrategy):
         return CPGGetStrategy.get_aux(self, config, item)
 
 
+class EpimutationsGetStrategy(GetStrategy):
+
+    def get_single_base(self, config, items):
+        rows = [config.base_dict[item] for item in config.base_list if item in config.base_dict]
+        data = config.base_data[np.ix_(rows, items)]
+        return data
+
+    def get_aux(self, config, item):
+        pass
+
 class AttributesGetStrategy(GetStrategy):
 
     def get_single_base(self, config, items):

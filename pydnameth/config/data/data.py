@@ -16,7 +16,6 @@ class Data:
                  base=DataBase.GSE87571.value
                  ):
         self.name = name
-        self.type = type
         self.path = path
         self.base = base
 

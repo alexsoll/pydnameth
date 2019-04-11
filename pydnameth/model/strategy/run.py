@@ -1,5 +1,5 @@
 import abc
-from pydnameth.config.experiment.types import Method
+from pydnameth.config.experiment.types import Method, DataType
 from pydnameth.config.experiment.types import get_metrics_keys
 import statsmodels.api as sm
 import numpy as np
@@ -641,6 +641,57 @@ class MethylationRunStrategy(RunStrategy):
                     plot_data['hist_data'].append(results.resid)
 
             config.experiment_data['data'] = plot_data
+
+
+class PlotRunStrategy(RunStrategy):
+
+    def single(self, item, config_child, configs_child):
+        pass
+
+    def iterate(self, config, configs_child):
+        pass
+
+    def run(self, config, configs_child):
+
+        if config.experiment.type == DataType.epimutations:
+
+            if config.experiment.method == Method.scatter:
+
+                plot_data = []
+
+                for config_child in configs_child:
+
+                    indexes = config_child.attributes_indexes
+
+                    x = self.get_strategy.get_target(config_child)
+                    y = np.zeros(len(indexes), dtype=int)
+
+                    for subj_id in range(0, len(indexes)):
+                        subj_col = self.get_strategy.get_single_base(config_child, [subj_id])
+                        y[subj_id] = np.sum(subj_col)
+
+                    color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
+                    coordinates = color[4:-1].split(',')
+                    color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.5) + ')'
+                    color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.8) + ')'
+
+                    scatter = go.Scatter(
+                        x=x,
+                        y=y,
+                        name=get_names(config_child),
+                        mode='markers',
+                        marker=dict(
+                            size=7,
+                            color=color_transparent,
+                            line=dict(
+                                width=1,
+                                color=color_border,
+                            )
+                        ),
+                    )
+                    plot_data.append(scatter)
+
+                config.experiment_data['data'] = plot_data
 
 
 class ObservablesRunStrategy(RunStrategy):

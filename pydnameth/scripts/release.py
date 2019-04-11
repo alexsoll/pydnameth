@@ -1,5 +1,5 @@
 from pydnameth.config.experiment.types import Method
-from pydnameth.scripts.develop import \
+from pydnameth.scripts.develop.develop import \
     cpg_proc_table_linreg_dev, \
     cpg_proc_table_variance_linreg_dev, \
     cpg_proc_table_polygon_dev, \

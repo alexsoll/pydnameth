@@ -1,10 +1,11 @@
 import abc
 import numpy as np
-from pydnameth.config.experiment.types import Method
+from pydnameth.config.experiment.types import DataType, Method
 from pydnameth.config.experiment.types import get_main_metric
 import plotly.graph_objs as go
 from statsmodels.stats.multitest import multipletests
 import plotly.figure_factory as ff
+import pydnameth.routines.plot.functions as plot_routines
 import pydnameth.routines.methylation.functions as methylation_routines
 import pydnameth.routines.observables.functions as observables_routines
 
@@ -75,6 +76,34 @@ class MethylationReleaseStrategy(ReleaseStrategy):
             fig['layout'] = layout
 
             config.experiment_data['fig'] = fig
+
+
+class PlotReleaseStrategy(ReleaseStrategy):
+
+    def release(self, config, configs_child):
+
+        if config.experiment.type == DataType.epimutations:
+
+            if config.experiment.method == Method.scatter:
+
+                layout = plot_routines.get_layout(config)
+
+                if config.experiment.params['x_range'] != 'auto':
+                    layout.xaxis.range = config.experiment.params['x_range']
+
+                if config.experiment.params['y_range'] != 'auto':
+                    layout.yaxis.range = config.experiment.params['y_range']
+
+                layout.yaxis.type = config.experiment.params['y_type']
+                if layout.yaxis.type == 'log':
+                    layout.yaxis.tickvals = [1, 2, 5,
+                                             10, 20, 50,
+                                             100, 200, 500,
+                                             1000, 2000, 5000,
+                                             10000, 20000, 50000,
+                                             100000, 200000, 500000]
+
+                config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
 
 class ObservablesReleaseStrategy(ReleaseStrategy):

@@ -1,5 +1,5 @@
 import abc
-from pydnameth.config.experiment.types import get_default_params
+from pydnameth.config.experiment.params import get_default_params
 from pydnameth.config.experiment.types import get_metrics_keys
 import math
 
@@ -14,7 +14,7 @@ class SetupStrategy(metaclass=abc.ABCMeta):
         pass
 
     def setup_params(self, config):
-        default_params = get_default_params(config.experiment)
+        default_params = get_default_params(config)
         if not bool(config.experiment.params):
             config.experiment.params = default_params
         else:
@@ -66,6 +66,17 @@ class ClockSetUpStrategy(SetupStrategy):
             'train_size': train_size
         }
 
+
+class PlotSetUpStrategy(SetupStrategy):
+
+    def setup(self, config, configs_child):
+        self.setup_params(config)
+        self.setup_metrics(config)
+
+        config.experiment_data = {
+            'data': [],
+            'fig': []
+        }
 
 class MethylationSetUpStrategy(SetupStrategy):
 

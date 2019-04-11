@@ -4,9 +4,9 @@ from enum import Enum
 class Task(Enum):
     table = 'table'
     clock = 'clock'
+    plot = 'plot'
     observables = 'observables'
     methylation = 'methylation'
-    dependence_2d = 'dependence_2d'
 
     def __str__(self):
         return str(self.value)
@@ -23,6 +23,7 @@ class Method(Enum):
     z_test_linreg = 'z_test_linreg'
     variance_histogram = 'variance_histogram'
     aggregator = 'aggregator'
+    mock = 'mock'
 
     def __str__(self):
         return str(self.value)
@@ -174,61 +175,3 @@ def get_main_metric(setup):
             metric = ('item', 'ascending')
 
     return metric
-
-
-def get_default_params(setup):
-    params = {}
-
-    if setup.task == Task.table:
-
-        if setup.method == Method.cluster:
-            params = {
-                'eps': 0.1,
-                'min_samples_percentage': 1
-            }
-        elif setup.method == Method.polygon:
-            params = {}
-
-    elif setup.task == Task.clock:
-
-        if setup.method == Method.linreg:
-            params = {
-                'type': 'all',
-                'part': 0.25,
-                'size': 100,
-                'runs': 100,
-            }
-
-    elif setup.task == Task.observables:
-
-        if setup.method == Method.histogram:
-            params = {
-                'bin_size': 1.0,
-                'opacity': 0.8,
-                'barmode': 'stack',
-                'x_range': 'auto'
-            }
-
-    elif setup.task == Task.methylation:
-
-        if setup.method == Method.scatter:
-            params = {
-                'item': 'cg01620164',
-                'x_range': 'auto',
-                'y_range': 'auto',
-                'details': 2
-            }
-        elif setup.method == Method.variance_histogram:
-            params = {
-                'item': 'cg01620164',
-            }
-
-    elif setup.task == Task.dependence_2d:
-
-        if setup.method == Method.scatter:
-            params = {
-                'x': 'count',
-                'y': 'count',
-            }
-
-    return params

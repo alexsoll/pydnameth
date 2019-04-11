@@ -3,6 +3,7 @@ from pydnameth.config.experiment.types import Task
 from pydnameth.infrastucture.load.cpg import load_cpg
 from pydnameth.infrastucture.load.residuals_common import load_residuals_common
 from pydnameth.infrastucture.load.table import load_table_dict
+from pydnameth.infrastucture.load.epimutations import load_epimutations
 
 
 class LoadStrategy(metaclass=abc.ABCMeta):
@@ -66,6 +67,17 @@ class ResidualsSpecialLoadStrategy(LoadStrategy):
 
     def load(self, config, configs_child):
         CPGLoadStrategy.load(self, config, configs_child)
+
+
+class EpimutationsLoadStrategy(LoadStrategy):
+
+    def load(self, config, configs_child):
+        load_epimutations(config)
+        config.base_list = config.cpg_list
+        config.base_dict = config.epimutations_dict
+        config.base_data = config.epimutations_data
+
+        self.inherit_childs(config, configs_child)
 
 
 class AttributesLoadStrategy(LoadStrategy):

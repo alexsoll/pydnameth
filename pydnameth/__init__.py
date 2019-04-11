@@ -17,6 +17,8 @@ from .config.data.data import Data
 from .config.data.types import DataPath, DataBase
 from .config.experiment.experiment import Experiment
 from .config.experiment.types import DataType, Task, Method
+from pydnameth.scripts.develop.epimutations.plot import \
+    epimutations_plot_scatter_dev
 from pydnameth.scripts.release import \
     cpg_proc_table_linreg, \
     cpg_proc_table_variance_linreg, \
@@ -25,7 +27,7 @@ from pydnameth.scripts.release import \
     cpg_proc_clock_linreg, \
     cpg_plot_methylation_scatter, \
     attributes_plot_observables_histogram
-from pydnameth.scripts.develop import \
+from pydnameth.scripts.develop.develop import \
     load_epimutations_dev, \
     cpg_proc_table_linreg_dev, \
     residuals_common_proc_table_linreg_dev, \
