@@ -3,6 +3,7 @@ from pydnameth.config.config import Config
 from pydnameth.config.experiment.types import DataType
 from pydnameth.config.experiment.experiment import Experiment
 from pydnameth.config.attributes.attributes import Attributes
+from pydnameth.config.annotations.annotations import Annotations
 from pydnameth.infrastucture.load.epimutations import load_epimutations
 
 

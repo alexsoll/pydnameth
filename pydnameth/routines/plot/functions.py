@@ -8,7 +8,7 @@ def get_layout(config):
 
     if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
-        if config.experiment.method  in [Method.scatter, Method.variance_histogram]:
+        if config.experiment.method in [Method.scatter, Method.variance_histogram]:
 
             item = config.experiment.params['item']
             if item in config.cpg_gene_dict:

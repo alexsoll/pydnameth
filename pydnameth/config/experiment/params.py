@@ -1,5 +1,6 @@
 from pydnameth.config.experiment.types import DataType, Method, Task
 
+
 def get_default_params(config):
     params = {}
 
@@ -24,7 +25,6 @@ def get_default_params(config):
                 }
 
         elif config.experiment.task == Task.plot:
-
 
             if config.experiment.method == Method.scatter:
                 params = {

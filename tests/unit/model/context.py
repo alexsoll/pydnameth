@@ -14,20 +14,16 @@ from pydnameth.model.strategy.get import BetasGetStrategy
 from pydnameth.model.strategy.get import ObservablesGetStrategy
 from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
-from pydnameth.model.strategy.setup import MethylationSetUpStrategy
-from pydnameth.model.strategy.setup import ObservablesSetUpStrategy
+from pydnameth.model.strategy.setup import PlotSetUpStrategy
 from pydnameth.model.strategy.run import TableRunStrategy
 from pydnameth.model.strategy.run import ClockRunStrategy
-from pydnameth.model.strategy.run import MethylationRunStrategy
-from pydnameth.model.strategy.run import ObservablesRunStrategy
+from pydnameth.model.strategy.run import PlotRunStrategy
 from pydnameth.model.strategy.release import TableReleaseStrategy
 from pydnameth.model.strategy.release import ClockReleaseStrategy
-from pydnameth.model.strategy.release import MethylationReleaseStrategy
-from pydnameth.model.strategy.release import ObservablesReleaseStrategy
+from pydnameth.model.strategy.release import PlotReleaseStrategy
 from pydnameth.model.strategy.save import TableSaveStrategy
 from pydnameth.model.strategy.save import ClockSaveStrategy
-from pydnameth.model.strategy.save import MethylationSaveStrategy
-from pydnameth.model.strategy.save import ObservablesSaveStrategy
+from pydnameth.model.strategy.save import PlotSaveStrategy
 from pydnameth.config.experiment.types import Task
 from pydnameth.config.experiment.types import DataType
 from tests.tear_down import clear_cache
@@ -109,14 +105,8 @@ class TestAnnotationsConditions(unittest.TestCase):
                                          ClockRunStrategy, ClockReleaseStrategy, ClockSaveStrategy])
         self.assertEqual(condition, True)
 
-    def test_strategy_creation_cpg_methylation(self):
-        condition = self.check_strategy(DataType.betas, Task.methylation,
-                                        [BetasLoadStrategy, BetasGetStrategy, MethylationSetUpStrategy,
-                                         MethylationRunStrategy, MethylationReleaseStrategy, MethylationSaveStrategy])
-        self.assertEqual(condition, True)
-
-    def test_strategy_creation_attr_observables(self):
-        condition = self.check_strategy(DataType.observables, Task.observables,
-                                        [ObservablesLoadStrategy, ObservablesGetStrategy, ObservablesSetUpStrategy,
-                                         ObservablesRunStrategy, ObservablesReleaseStrategy, ObservablesSaveStrategy])
+    def test_strategy_creation_plot(self):
+        condition = self.check_strategy(DataType.observables, Task.plot,
+                                        [ObservablesLoadStrategy, ObservablesGetStrategy, PlotSetUpStrategy,
+                                         PlotRunStrategy, PlotReleaseStrategy, PlotSaveStrategy])
         self.assertEqual(condition, True)

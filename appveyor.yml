@@ -35,5 +35,6 @@ install:
     - python.exe -m pip install -r requirements_dev.txt"
 
 test_script:
-    - python.exe -m flake8 pydnameth, tests
+    - python.exe -m flake8 pydnameth
+    - python.exe -m flake8 tests
     - python.exe setup.py test
