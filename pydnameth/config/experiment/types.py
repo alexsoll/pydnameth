@@ -22,6 +22,7 @@ class Method(Enum):
     variance_histogram = 'variance_histogram'
     aggregator = 'aggregator'
     mock = 'mock'
+    range = 'range'
 
     def __str__(self):
         return str(self.value)

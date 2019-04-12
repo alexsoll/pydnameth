@@ -23,7 +23,7 @@ def plot_scatter_dev(
             data=copy.deepcopy(data),
             experiment=Experiment(
                 type=data_type,
-                task=Task.methylation,
+                task=Task.plot,
                 method=Method.scatter,
                 params=copy.deepcopy(params)
             ),

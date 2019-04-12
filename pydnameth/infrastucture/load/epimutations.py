@@ -43,16 +43,14 @@ def load_epimutations(config):
 
         for cpg, row in tqdm(config.cpg_dict.items(), mininterval=100.0):
             betas = config.cpg_data[row, :]
+            quartiles = np.percentile(betas, [25, 75])
+            iqr = quartiles[1] - quartiles[0]
+            left = quartiles[0] - (3.0 * iqr)
+            right = quartiles[1] + (3.0 * iqr)
 
             curr_row = np.zeros(num_subjects, dtype=np.int)
-
             for subject_id in range(0, num_subjects):
                 curr_point = betas[subject_id]
-                curr_betas = np.delete(betas, subject_id)
-                quartiles = np.percentile(curr_betas, [25, 75])
-                iqr = quartiles[1] - quartiles[0]
-                left = quartiles[0] - (3.0 * iqr)
-                right = quartiles[1] + (3.0 * iqr)
                 if curr_point < left or curr_point > right:
                     curr_row[subject_id] = 1
 

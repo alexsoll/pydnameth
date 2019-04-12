@@ -14,12 +14,47 @@ def epimutations_plot_scatter_dev(
     observables_list,
     params=None
 ):
+    epimutations_plot(
+        data,
+        annotations,
+        attributes,
+        observables_list,
+        Method.scatter,
+        params
+    )
+
+
+def epimutations_plot_range_dev(
+    data,
+    annotations,
+    attributes,
+    observables_list,
+    params=None
+):
+    epimutations_plot(
+        data,
+        annotations,
+        attributes,
+        observables_list,
+        Method.range,
+        params
+    )
+
+
+def epimutations_plot(
+    data,
+    annotations,
+    attributes,
+    observables_list,
+    method,
+    params=None
+):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
             type=DataType.epimutations,
             task=Task.plot,
-            method=Method.scatter,
+            method=method,
             params=copy.deepcopy(params)
         ),
         annotations=copy.deepcopy(annotations),

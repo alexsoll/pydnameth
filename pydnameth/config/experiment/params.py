@@ -61,4 +61,12 @@ def get_default_params(config):
                     'y_type': 'linear'
                 }
 
+            if config.experiment.method == Method.range:
+                params = {
+                    'borders': [0, 20, 40, 60, 80, 100, 120],
+                    'x_range': 'auto',
+                    'y_range': 'auto',
+                    'y_type': 'linear'
+                }
+
     return params

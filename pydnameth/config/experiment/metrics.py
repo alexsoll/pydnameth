@@ -112,7 +112,7 @@ def get_metrics_keys(config):
                     'summary'
                 ]
 
-        return metrics
+    return metrics
 
 
 def get_main_metric(config):

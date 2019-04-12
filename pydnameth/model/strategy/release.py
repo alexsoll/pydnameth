@@ -103,6 +103,38 @@ class PlotReleaseStrategy(ReleaseStrategy):
 
                 config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
+            if config.experiment.method == Method.range:
+
+                layout = plot_routines.get_layout(config)
+
+                if config.experiment.params['x_range'] != 'auto':
+                    layout.xaxis.range = config.experiment.params['x_range']
+
+                borders = config.experiment.params['borders']
+
+                labels = []
+                tickvals = []
+                for seg_id in range(0, len(borders) - 1):
+                    x_center = (borders[seg_id + 1] + borders[seg_id]) * 0.5
+                    tickvals.append(x_center)
+                    labels.append(f'{borders[seg_id]} to {borders[seg_id + 1] - 1}')
+                layout.xaxis.tickvals = tickvals
+                layout.xaxis.ticktext = labels
+
+                if config.experiment.params['y_range'] != 'auto':
+                    layout.yaxis.range = config.experiment.params['y_range']
+
+                layout.yaxis.type = config.experiment.params['y_type']
+                if layout.yaxis.type == 'log':
+                    layout.yaxis.tickvals = [1, 2, 5,
+                                             10, 20, 50,
+                                             100, 200, 500,
+                                             1000, 2000, 5000,
+                                             10000, 20000, 50000,
+                                             100000, 200000, 500000]
+
+                config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
+
         elif config.experiment.type == DataType.observables:
 
             if config.experiment.method == Method.histogram:

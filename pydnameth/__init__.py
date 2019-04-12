@@ -22,8 +22,8 @@ from pydnameth.scripts.develop.betas.plot import betas_plot_scatter_dev, betas_p
     betas_plot_variance_histogram_dev
 from pydnameth.scripts.develop.betas.table import betas_table_aggregator_dev, betas_table_aggregator_var_dev, \
     betas_table_linreg_dev, betas_table_polygon_dev, betas_table_variance_linreg_dev, betas_table_z_test_linreg_dev
-from pydnameth.scripts.develop.epimutations.load import load_epimutations
-from pydnameth.scripts.develop.epimutations.plot import epimutations_plot_scatter_dev
+from pydnameth.scripts.develop.epimutations.load import epimutations_load_dev
+from pydnameth.scripts.develop.epimutations.plot import epimutations_plot_scatter_dev, epimutations_plot_range_dev
 from pydnameth.scripts.develop.observables.plot import observables_plot_histogram_dev
 from pydnameth.scripts.develop.residuals_common.plot import residuals_common_plot_scatter_dev
 from pydnameth.scripts.develop.residuals_common.table import residuals_common_table_aggregator_dev, \

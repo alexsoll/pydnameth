@@ -653,6 +653,8 @@ class PlotRunStrategy(RunStrategy):
 
                 plot_data = []
 
+                y_type = config.experiment.params['y_type']
+
                 for config_child in configs_child:
 
                     indexes = config_child.attributes_indexes
@@ -684,6 +686,83 @@ class PlotRunStrategy(RunStrategy):
                         ),
                     )
                     plot_data.append(scatter)
+
+                    # Adding regression line
+
+                    x_linreg = sm.add_constant(x)
+                    if y_type == 'log':
+                        y_linreg = np.log(y)
+                    else:
+                        y_linreg = y
+
+                    results = sm.OLS(y_linreg, x_linreg).fit()
+
+                    intercept = results.params[0]
+                    slope = results.params[1]
+
+                    x_min = np.min(x)
+                    x_max = np.max(x)
+                    if y_type == 'log':
+                        y_min = np.exp(slope * x_min + intercept)
+                        y_max = np.exp(slope * x_max + intercept)
+                    else:
+                        y_min = slope * x_min + intercept
+                        y_max = slope * x_max + intercept
+                    scatter = go.Scatter(
+                        x=[x_min, x_max],
+                        y=[y_min, y_max],
+                        mode='lines',
+                        marker=dict(
+                            color=color
+                        ),
+                        line=dict(
+                            width=6,
+                            color=color
+                        ),
+                        showlegend=False
+                    )
+
+                    plot_data.append(scatter)
+
+                config.experiment_data['data'] = plot_data
+
+            elif config.experiment.method == Method.range:
+
+                plot_data = []
+
+                borders = config.experiment.params['borders']
+
+                for config_child in configs_child:
+
+                    color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
+                    coordinates = color[4:-1].split(',')
+                    color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.5) + ')'
+
+                    indexes = config_child.attributes_indexes
+
+                    x = self.get_strategy.get_target(config_child)
+                    y = np.zeros(len(indexes), dtype=int)
+
+                    for subj_id in range(0, len(indexes)):
+                        subj_col = self.get_strategy.get_single_base(config_child, [subj_id])
+                        y[subj_id] = np.sum(subj_col)
+
+                    for seg_id in range(0, len(borders) - 1):
+                        x_center = (borders[seg_id + 1] + borders[seg_id]) * 0.5
+                        curr_box = []
+                        for subj_id in range(0, len(indexes)):
+                            if borders[seg_id] <= x[subj_id] < borders[seg_id + 1]:
+                                curr_box.append(y[subj_id])
+
+                        trace = go.Box(
+                            y=curr_box,
+                            x=[x_center] * len(curr_box),
+                            name=f'{borders[seg_id]} to {borders[seg_id + 1] - 1}',
+                            marker=dict(
+                                color=color_transparent
+                            )
+                        )
+                        plot_data.append(trace)
 
                 config.experiment_data['data'] = plot_data
 

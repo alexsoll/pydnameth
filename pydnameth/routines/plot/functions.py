@@ -89,6 +89,50 @@ def get_layout(config):
                 yaxis=get_axis(y_title),
             )
 
+        elif config.experiment.method == Method.range:
+
+            y_title = 'SEM number'
+
+            layout = go.Layout(
+                title=dict(
+                    font=dict(
+                        family='Arial',
+                        size=33,
+                    )
+                ),
+                autosize=True,
+                margin=go.layout.Margin(
+                    l=120,
+                    r=10,
+                    b=70,
+                    t=10,
+                    pad=0
+                ),
+                barmode='overlay',
+                showlegend=False,
+                xaxis=dict(
+                    title=config.attributes.target.capitalize(),
+                    showgrid=True,
+                    showline=True,
+                    mirror='ticks',
+                    titlefont=dict(
+                        family='Arial',
+                        size=33,
+                        color='black'
+                    ),
+                    showticklabels=True,
+                    tickangle=0,
+                    tickfont=dict(
+                        family='Arial',
+                        size=18,
+                        color='black'
+                    ),
+                    exponentformat='e',
+                    showexponent='all'
+                ),
+                yaxis=get_axis(y_title),
+            )
+
     elif config.experiment.type == DataType.observables:
 
         if config.experiment.method == Method.histogram:
