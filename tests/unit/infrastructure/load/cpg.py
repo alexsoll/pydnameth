@@ -8,7 +8,7 @@ from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
-from pydnameth.infrastucture.load.cpg import load_cpg
+from pydnameth.infrastucture.load.betas import load_betas
 from pydnameth.infrastucture.path import get_data_base_path
 from tests.tear_down import clear_cache
 
@@ -73,14 +73,14 @@ class TestLoadCpG(unittest.TestCase):
         fn_data = get_data_base_path(self.config) + '/' + 'betas'
         fn_npz = fn_data + '.npz'
 
-        load_cpg(self.config)
+        load_betas(self.config)
 
         self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_npz))
 
     def test_load_cpg_check_len_cpg_dict(self):
-        load_cpg(self.config)
+        load_betas(self.config)
         self.assertEqual(300, len(list(self.config.betas_dict)))
 
     def test_load_cpg_check_shape_cpg_data(self):
-        load_cpg(self.config)
+        load_betas(self.config)
         self.assertEqual((300, 729), self.config.betas_data.shape)

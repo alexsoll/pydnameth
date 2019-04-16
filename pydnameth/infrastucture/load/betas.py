@@ -12,7 +12,7 @@ def get_line_list(line):
     return line_list
 
 
-def load_cpg(config):
+def load_betas(config):
     fn_dict = get_data_base_path(config) + '/' + 'betas_dict.pkl'
 
     suffix = ''

@@ -15,6 +15,7 @@ def plot_scatter_dev(
     cpg_list,
     observables_list,
     child_method=Method.linreg,
+    data_params=None,
     method_params=None
 ):
     for cpg in cpg_list:
@@ -25,6 +26,7 @@ def plot_scatter_dev(
                 data=data_type,
                 task=Task.plot,
                 method=Method.scatter,
+                data_params=copy.deepcopy(data_params),
                 method_params=copy.deepcopy(method_params)
             ),
             annotations=copy.deepcopy(annotations),
@@ -62,7 +64,8 @@ def plot_scatter_dev(
                 experiment=Experiment(
                     data=data_type,
                     task=Task.table,
-                    method=copy.deepcopy(child_method)
+                    method=copy.deepcopy(child_method),
+                    data_params=copy.deepcopy(data_params),
                 ),
                 annotations=copy.deepcopy(annotations),
                 attributes=attributes_child,

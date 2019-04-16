@@ -1,4 +1,4 @@
-from pydnameth.infrastucture.load.cpg import load_cpg
+from pydnameth.infrastucture.load.betas import load_betas
 from pydnameth.infrastucture.path import get_data_base_path
 import numpy as np
 import pickle
@@ -28,7 +28,7 @@ def load_epimutations(config):
     else:
 
         config.experiment.data_params = {}
-        load_cpg(config)
+        load_betas(config)
 
         config.epimutations_dict = config.betas_dict
         f = open(fn_dict + '.pkl', 'wb')
@@ -65,5 +65,5 @@ def load_epimutations(config):
         np.savez_compressed(fn_data + '.npz', data=config.epimutations_data)
         np.savetxt(fn_data + '.txt', config.epimutations_data, delimiter='\t', fmt='%d')
 
-        # Clear cpg_data
+        # Clear data
         del config.betas_data

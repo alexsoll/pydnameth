@@ -69,4 +69,14 @@ def get_default_method_params(config):
                     'y_type': 'linear'
                 }
 
+    elif config.experiment.data == DataType.entropy:
+
+        if config.experiment.task == Task.plot:
+
+            if config.experiment.method == Method.scatter:
+                params = {
+                    'x_range': 'auto',
+                    'y_range': 'auto',
+                }
+
     return params

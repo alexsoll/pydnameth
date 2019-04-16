@@ -9,7 +9,8 @@ def residuals_common_plot_scatter_dev(
     cpg_list,
     observables_list,
     child_method=Method.linreg,
-    params=None
+    data_params=None,
+    method_params=None
 ):
     plot_scatter_dev(
         DataType.residuals_common,
@@ -19,5 +20,6 @@ def residuals_common_plot_scatter_dev(
         cpg_list,
         observables_list,
         child_method,
-        params
+        data_params,
+        method_params
     )

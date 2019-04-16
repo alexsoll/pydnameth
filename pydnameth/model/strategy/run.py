@@ -38,7 +38,7 @@ class TableRunStrategy(RunStrategy):
 
     def single(self, item, config, configs_child):
 
-        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.linreg:
 
@@ -391,7 +391,7 @@ class ClockRunStrategy(RunStrategy):
 
     def run(self, config, configs_child):
 
-        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.linreg:
 
@@ -481,7 +481,7 @@ class PlotRunStrategy(RunStrategy):
 
     def run(self, config, configs_child):
 
-        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.scatter:
 
@@ -768,6 +768,72 @@ class PlotRunStrategy(RunStrategy):
                             )
                         )
                         plot_data.append(trace)
+
+                config.experiment_data['data'] = plot_data
+
+        elif config.experiment.data == DataType.entropy:
+
+            if config.experiment.method == Method.scatter:
+
+                plot_data = []
+
+                for config_child in configs_child:
+
+                    indexes = config_child.attributes_indexes
+
+                    x = self.get_strategy.get_target(config_child)
+                    y = self.get_strategy.get_single_base(config_child, indexes)
+
+                    color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
+                    coordinates = color[4:-1].split(',')
+                    color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.7) + ')'
+                    color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.8) + ')'
+
+                    scatter = go.Scatter(
+                        x=x,
+                        y=y,
+                        name=get_names(config_child),
+                        mode='markers',
+                        marker=dict(
+                            size=4,
+                            color=color_transparent,
+                            line=dict(
+                                width=1,
+                                color=color_border,
+                            )
+                        ),
+                    )
+                    plot_data.append(scatter)
+
+                    # Adding regression line
+
+                    x_linreg = sm.add_constant(x)
+                    y_linreg = y
+
+                    results = sm.OLS(y_linreg, x_linreg).fit()
+
+                    intercept = results.params[0]
+                    slope = results.params[1]
+
+                    x_min = np.min(x)
+                    x_max = np.max(x)
+                    y_min = slope * x_min + intercept
+                    y_max = slope * x_max + intercept
+                    scatter = go.Scatter(
+                        x=[x_min, x_max],
+                        y=[y_min, y_max],
+                        mode='lines',
+                        marker=dict(
+                            color=color
+                        ),
+                        line=dict(
+                            width=6,
+                            color=color
+                        ),
+                        showlegend=False
+                    )
+
+                    plot_data.append(scatter)
 
                 config.experiment_data['data'] = plot_data
 

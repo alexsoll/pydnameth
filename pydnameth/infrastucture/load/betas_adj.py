@@ -9,9 +9,9 @@ import os.path
 from tqdm import tqdm
 
 
-def load_residuals_common(config):
+def load_betas_adj(config):
 
-    fn_dict = get_data_base_path(config) + '/' + 'residuals_common_dict.pkl'
+    fn_dict = get_data_base_path(config) + '/' + 'betas_adj_dict.pkl'
 
     suffix = ''
     if bool(config.experiment.data_params):
@@ -20,28 +20,26 @@ def load_residuals_common(config):
     else:
         raise ValueError(f'Exog for residuals is empty.')
 
-    fn_data = get_data_base_path(config) + '/' + 'residuals_common' + suffix + '.npz'
+    fn_data = get_data_base_path(config) + '/' + 'betas_adj' + suffix + '.npz'
 
     if os.path.isfile(fn_dict) and os.path.isfile(fn_data):
 
         f = open(fn_dict, 'rb')
-        config.residuals_dict = pickle.load(f)
+        config.betas_adj_dict = pickle.load(f)
         f.close()
 
         data = np.load(fn_data)
-        config.residuals_data = data['data']
+        config.betas_adj_data = data['data']
 
     else:
 
         config.experiment.data_params = {}
         load_betas(config)
 
-        config.residuals_dict = config.betas_dict
+        config.betas_adj_dict = config.betas_dict
         f = open(fn_dict, 'wb')
-        pickle.dump(config.residuals_dict, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(config.betas_adj_dict, f, pickle.HIGHEST_PROTOCOL)
         f.close()
-
-        config.residuals_dict = config.betas_dict
 
         exog_dict = {}
 
@@ -78,10 +76,12 @@ def load_residuals_common(config):
 
         num_cpgs = config.betas_data.shape[0]
         num_subjects = config.betas_data.shape[1]
-        config.residuals_data = np.zeros((num_cpgs, num_subjects), dtype=np.float32)
+        config.betas_adj_data = np.zeros((num_cpgs, num_subjects), dtype=np.float32)
 
-        for cpg, row in tqdm(config.betas_dict.items(), mininterval=60.0, desc='residuals_data creating'):
+        for cpg, row in tqdm(config.betas_dict.items(), mininterval=60.0, desc='betas_adj_data creating'):
             betas = config.betas_data[row, :]
+
+            mean = np.mean(betas)
 
             endog_dict = {cpg: betas}
             endog_df = pd.DataFrame(endog_dict)
@@ -89,9 +89,10 @@ def load_residuals_common(config):
             reg_res = sm.OLS(endog=endog_df, exog=exog_df).fit()
 
             residuals = list(map(np.float32, reg_res.resid))
-            config.residuals_data[row] = residuals
+            betas_adj = residuals + mean
+            config.betas_adj_data[row] = betas_adj
 
-        np.savez_compressed(fn_data, data=config.residuals_data)
+        np.savez_compressed(fn_data, data=config.betas_adj_data)
 
         # Clear data
         del config.betas_data

@@ -1,13 +1,17 @@
 from pydnameth.model.strategy.load import BetasLoadStrategy
+from pydnameth.model.strategy.load import BetasAdjLoadStrategy
 from pydnameth.model.strategy.load import ObservablesLoadStrategy
 from pydnameth.model.strategy.load import ResidualsCommonLoadStrategy
 from pydnameth.model.strategy.load import ResidualsSpecialLoadStrategy
 from pydnameth.model.strategy.load import EpimutationsLoadStrategy
+from pydnameth.model.strategy.load import EntropyLoadStrategy
 from pydnameth.model.strategy.get import BetasGetStrategy
+from pydnameth.model.strategy.get import BetasAdjGetStrategy
 from pydnameth.model.strategy.get import ObservablesGetStrategy
 from pydnameth.model.strategy.get import ResidualsCommonGetStrategy
 from pydnameth.model.strategy.get import ResidualsSpecialGetStrategy
 from pydnameth.model.strategy.get import EpimutationsGetStrategy
+from pydnameth.model.strategy.get import EntropyGetStrategy
 from pydnameth.model.strategy.setup import TableSetUpStrategy
 from pydnameth.model.strategy.setup import ClockSetUpStrategy
 from pydnameth.model.strategy.setup import PlotSetUpStrategy
@@ -30,6 +34,8 @@ class Context:
 
         if config.experiment.data == DataType.betas:
             self.load_strategy = BetasLoadStrategy()
+        elif config.experiment.data == DataType.betas_adj:
+            self.load_strategy = BetasAdjLoadStrategy()
         elif config.experiment.data == DataType.observables:
             self.load_strategy = ObservablesLoadStrategy()
         elif config.experiment.data == DataType.residuals_common:
@@ -38,9 +44,13 @@ class Context:
             self.load_strategy = ResidualsSpecialLoadStrategy()
         elif config.experiment.data == DataType.epimutations:
             self.load_strategy = EpimutationsLoadStrategy()
+        elif config.experiment.data == DataType.entropy:
+            self.load_strategy = EntropyLoadStrategy()
 
         if config.experiment.data == DataType.betas:
             self.get_strategy = BetasGetStrategy()
+        elif config.experiment.data == DataType.betas_adj:
+            self.get_strategy = BetasAdjGetStrategy()
         elif config.experiment.data == DataType.observables:
             self.get_strategy = ObservablesGetStrategy()
         elif config.experiment.data == DataType.residuals_common:
@@ -49,6 +59,8 @@ class Context:
             self.get_strategy = ResidualsSpecialGetStrategy()
         elif config.experiment.data == DataType.epimutations:
             self.get_strategy = EpimutationsGetStrategy()
+        elif config.experiment.data == DataType.entropy:
+            self.get_strategy = EntropyGetStrategy()
 
         if config.experiment.task == Task.table:
             self.setup_strategy = TableSetUpStrategy(self.get_strategy)

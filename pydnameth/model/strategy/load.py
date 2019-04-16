@@ -1,9 +1,10 @@
 import abc
 from pydnameth.config.experiment.types import Task
-from pydnameth.infrastucture.load.cpg import load_cpg
+from pydnameth.infrastucture.load.betas import load_betas
 from pydnameth.infrastucture.load.residuals_common import load_residuals_common
 from pydnameth.infrastucture.load.table import load_table_dict
 from pydnameth.infrastucture.load.epimutations import load_epimutations
+from pydnameth.infrastucture.load.entropy import load_entropy
 
 
 class LoadStrategy(metaclass=abc.ABCMeta):
@@ -34,10 +35,26 @@ class LoadStrategy(metaclass=abc.ABCMeta):
 class BetasLoadStrategy(LoadStrategy):
 
     def load(self, config, configs_child):
-        load_cpg(config)
+        load_betas(config)
         config.base_list = config.cpg_list
         config.base_dict = config.betas_dict
         config.base_data = config.betas_data
+
+        self.inherit_childs(config, configs_child)
+
+        if config.experiment.task == Task.table or config.experiment.task == Task.clock:
+
+            for config_child in configs_child:
+                self.load_child(config_child)
+
+
+class BetasAdjLoadStrategy(LoadStrategy):
+
+    def load(self, config, configs_child):
+        load_betas(config)
+        config.base_list = config.cpg_list
+        config.base_dict = config.betas_adj_dict
+        config.base_data = config.betas_adj_data
 
         self.inherit_childs(config, configs_child)
 
@@ -76,6 +93,17 @@ class EpimutationsLoadStrategy(LoadStrategy):
         config.base_list = config.cpg_list
         config.base_dict = config.epimutations_dict
         config.base_data = config.epimutations_data
+
+        self.inherit_childs(config, configs_child)
+
+
+class EntropyLoadStrategy(LoadStrategy):
+
+    def load(self, config, configs_child):
+        load_entropy(config)
+        config.base_list = None
+        config.base_dict = None
+        config.base_data = config.entropy_data
 
         self.inherit_childs(config, configs_child)
 

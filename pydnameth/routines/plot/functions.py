@@ -133,10 +133,43 @@ def get_layout(config):
                 yaxis=get_axis(y_title),
             )
 
+    elif config.experiment.data == DataType.entropy:
+
+        if config.experiment.method == Method.scatter:
+            y_title = 'entropy'
+
+            layout = go.Layout(
+                title=dict(
+                    font=dict(
+                        family='Arial',
+                        size=33,
+                    )
+                ),
+                autosize=True,
+                margin=go.layout.Margin(
+                    l=120,
+                    r=10,
+                    b=80,
+                    t=50,
+                    pad=0
+                ),
+                barmode='overlay',
+                legend=dict(
+                    font=dict(
+                        family='Arial',
+                        size=16,
+                    ),
+                    orientation="h",
+                    x=0.33,
+                    y=1.11,
+                ),
+                xaxis=get_axis(config.attributes.target.capitalize()),
+                yaxis=get_axis(y_title),
+            )
+
     elif config.experiment.data == DataType.observables:
 
         if config.experiment.method == Method.histogram:
-
             layout = go.Layout(
                 autosize=True,
                 margin=get_margin(),

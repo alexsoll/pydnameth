@@ -30,6 +30,7 @@ class Method(Enum):
 
 class DataType(Enum):
     betas = 'betas'
+    betas_adj = 'betas_adj'
     residuals_common = 'residuals_common'
     residuals_special = 'residuals_special'
     epimutations = 'epimutations'

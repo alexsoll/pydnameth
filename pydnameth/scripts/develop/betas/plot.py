@@ -18,14 +18,14 @@ def betas_plot_scatter_dev(
     method_params=None
 ):
     plot_scatter_dev(
-        DataType.betas,
-        data,
-        annotations,
-        attributes,
-        cpg_list,
-        observables_list,
-        child_method,
-        method_params
+        data_type=DataType.betas,
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        cpg_list=cpg_list,
+        observables_list=observables_list,
+        child_method=child_method,
+        method_params=method_params
     )
 
 
@@ -39,14 +39,14 @@ def betas_plot_scatter_var_dev(
     method_params=None
 ):
     plot_scatter_dev(
-        DataType.betas,
-        data,
-        annotations,
-        attributes,
-        cpg_list,
-        observables_list,
-        child_method,
-        method_params
+        data_type=DataType.betas,
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        cpg_list=cpg_list,
+        observables_list=observables_list,
+        child_method=child_method,
+        method_params=method_params
     )
 
 

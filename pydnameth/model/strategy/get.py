@@ -32,6 +32,15 @@ class BetasGetStrategy(GetStrategy):
         return aux
 
 
+class BetasAdjGetStrategy(GetStrategy):
+
+    def get_single_base(self, config, items):
+        return BetasGetStrategy.get_single_base(self, config, items)
+
+    def get_aux(self, config, item):
+        return BetasGetStrategy.get_aux(self, config, item)
+
+
 class ResidualsCommonGetStrategy(GetStrategy):
 
     def get_single_base(self, config, items):
@@ -73,6 +82,16 @@ class EpimutationsGetStrategy(GetStrategy):
     def get_single_base(self, config, items):
         rows = [config.base_dict[item] for item in config.base_list if item in config.base_dict]
         data = config.base_data[np.ix_(rows, items)]
+        return data
+
+    def get_aux(self, config, item):
+        pass
+
+
+class EntropyGetStrategy(GetStrategy):
+
+    def get_single_base(self, config, items):
+        data = config.base_data[items]
         return data
 
     def get_aux(self, config, item):
