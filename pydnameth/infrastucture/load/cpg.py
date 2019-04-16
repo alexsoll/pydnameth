@@ -2,6 +2,7 @@ from pydnameth.infrastucture.path import get_data_base_path
 import numpy as np
 import os.path
 import pickle
+from tqdm import tqdm
 
 
 def get_line_list(line):
@@ -12,36 +13,41 @@ def get_line_list(line):
 
 
 def load_cpg(config):
-    fn_dict = get_data_base_path(config) + '/' + 'cpg_dict.pkl'
-    fn_data = get_data_base_path(config) + '/' + config.data.name
+    fn_dict = get_data_base_path(config) + '/' + 'betas_dict.pkl'
+
+    suffix = ''
+    if bool(config.experiment.data_params):
+        suffix += '_' + str(config.experiment.get_data_params_str())
+
+    fn_data = get_data_base_path(config) + '/' + 'betas' + suffix
     fn_txt = fn_data + '.txt'
     fn_npz = fn_data + '.npz'
 
     if os.path.isfile(fn_dict) and os.path.isfile(fn_npz):
 
         f = open(fn_dict, 'rb')
-        config.cpg_dict = pickle.load(f)
+        config.betas_dict = pickle.load(f)
         f.close()
 
         data = np.load(fn_npz)
-        config.cpg_data = data['cpg_data']
+        config.betas_data = data['data']
 
     else:
 
-        config.cpg_dict = {}
+        config.betas_dict = {}
 
         f = open(fn_txt)
         f.readline()
         cpg_id = 0
-        for line in f:
+        for line in tqdm(f, mininterval=60.0, desc='betas_dict creating'):
             line_list = get_line_list(line)
             cpg = line_list[0]
-            config.cpg_dict[cpg] = cpg_id
+            config.betas_dict[cpg] = cpg_id
             cpg_id += 1
         f.close()
 
         f = open(fn_dict, 'wb')
-        pickle.dump(config.cpg_dict, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(config.betas_dict, f, pickle.HIGHEST_PROTOCOL)
         f.close()
 
         num_cpgs = cpg_id
@@ -52,14 +58,14 @@ def load_cpg(config):
         headers = [x.rstrip() for x in headers]
         subjects = headers[1:len(headers)]
 
-        config.cpg_data = np.zeros((num_cpgs, len(subjects)), dtype=np.float32)
+        config.betas_data = np.zeros((num_cpgs, len(subjects)), dtype=np.float32)
 
         cpg_id = 0
-        for line in f:
+        for line in tqdm(f, mininterval=60.0, desc='betas_data creating'):
             line_list = get_line_list(line)
             curr_data = list(map(np.float32, line_list[1::]))
-            config.cpg_data[cpg_id] = curr_data
+            config.betas_data[cpg_id] = curr_data
             cpg_id += 1
         f.close()
 
-        np.savez_compressed(fn_npz, cpg_data=config.cpg_data)
+        np.savez_compressed(fn_npz, data=config.betas_data)

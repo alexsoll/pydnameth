@@ -12,15 +12,19 @@ def table_linreg(
     data,
     annotations,
     attributes,
-    params=None
+    data_params=None,
+    task_params=None,
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=data_type,
+            data=data_type,
             task=Task.table,
             method=Method.linreg,
-            params=copy.deepcopy(params)
+            data_params=copy.deepcopy(data_params),
+            task_params=copy.deepcopy(task_params),
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -39,7 +43,9 @@ def table_aggregator(
     annotations,
     attributes,
     observables_list,
-    params=None
+    data_params=None,
+    task_params=None,
+    method_params=None
 ):
     child_methods_lvl_1 = [Method.polygon, Method.z_test_linreg]
     child_methods_lvl_2 = [Method.linreg]
@@ -47,10 +53,12 @@ def table_aggregator(
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=data_type,
+            data=data_type,
             task=Task.table,
             method=Method.aggregator,
-            params=copy.deepcopy(params)
+            data_params=copy.deepcopy(data_params),
+            task_params=copy.deepcopy(task_params),
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -63,10 +71,10 @@ def table_aggregator(
         config_lvl_1 = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=data_type,
+                data=data_type,
                 task=Task.table,
                 method=child_method_lvl_1,
-                params={}
+                data_params=copy.deepcopy(data_params),
             ),
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes),
@@ -96,10 +104,10 @@ def table_aggregator(
                 config_lvl_2 = Config(
                     data=copy.deepcopy(data),
                     experiment=Experiment(
-                        type=data_type,
+                        data=data_type,
                         task=Task.table,
                         method=copy.deepcopy(child_method_lvl_2),
-                        params={}
+                        data_params=copy.deepcopy(data_params),
                     ),
                     annotations=copy.deepcopy(annotations),
                     attributes=attributes_lvl_2,

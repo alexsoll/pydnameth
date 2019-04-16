@@ -55,5 +55,5 @@ def betas_clock_linreg(
         annotations=annotations,
         attributes=attributes,
         child_method=child_method,
-        params=params
+        method_params=params
     )

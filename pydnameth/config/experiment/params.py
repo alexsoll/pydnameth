@@ -1,10 +1,10 @@
 from pydnameth.config.experiment.types import DataType, Method, Task
 
 
-def get_default_params(config):
+def get_default_method_params(config):
     params = {}
 
-    if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+    if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
         if config.experiment.task == Task.table:
 
@@ -38,7 +38,7 @@ def get_default_params(config):
                     'item': 'cg01620164',
                 }
 
-    elif config.experiment.type == DataType.observables:
+    elif config.experiment.data == DataType.observables:
 
         if config.experiment.task == Task.plot:
 
@@ -50,7 +50,7 @@ def get_default_params(config):
                     'x_range': 'auto'
                 }
 
-    elif config.experiment.type == DataType.epimutations:
+    elif config.experiment.data == DataType.epimutations:
 
         if config.experiment.task == Task.plot:
 

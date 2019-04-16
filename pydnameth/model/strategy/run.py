@@ -1,6 +1,6 @@
 import abc
 from pydnameth.config.experiment.types import Method, DataType
-from pydnameth.config.experiment.metrics import get_metrics_keys
+from pydnameth.config.experiment.metrics import get_method_metrics_keys
 import statsmodels.api as sm
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -38,7 +38,7 @@ class TableRunStrategy(RunStrategy):
 
     def single(self, item, config, configs_child):
 
-        if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.linreg:
 
@@ -154,10 +154,10 @@ class TableRunStrategy(RunStrategy):
                 y = self.get_strategy.get_single_base(config, [item])[0]
                 y_normed = normalize_to_0_1(y)
 
-                min_samples = max(1, int(config.experiment.params['min_samples_percentage'] * len(x) / 100.0))
+                min_samples = max(1, int(config.experiment.method_params['min_samples_percentage'] * len(x) / 100.0))
 
                 X = np.array([x_normed, y_normed]).T
-                db = DBSCAN(eps=config.experiment.params['eps'], min_samples=min_samples).fit(X)
+                db = DBSCAN(eps=config.experiment.method_params['eps'], min_samples=min_samples).fit(X)
                 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
                 core_samples_mask[db.core_sample_indices_] = True
                 labels = db.labels_
@@ -184,15 +184,16 @@ class TableRunStrategy(RunStrategy):
                 if border_l > border_r:
                     raise ValueError('Polygons borders are not consistent')
 
+                metrics_keys = get_method_metrics_keys(config)
+
                 for config_child in configs_child:
 
                     target = self.get_strategy.get_target(config_child)
                     item_id = config_child.advanced_dict[item]
 
-                    metrics_keys = get_metrics_keys(config)
-
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
+                            metrics_keys.append(key)
                             advanced_data = config_child.advanced_data[key][item_id]
                             suffix = str(config_child.attributes.observables)
                             if suffix != '' and suffix not in key:
@@ -320,13 +321,15 @@ class TableRunStrategy(RunStrategy):
                 slopes_std = []
                 num_subs = []
 
+                metrics_keys = get_method_metrics_keys(config)
+
                 for config_child in configs_child:
 
                     item_id = config_child.advanced_dict[item]
-                    metrics_keys = get_metrics_keys(config)
 
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
+                            metrics_keys.append(key)
                             advanced_data = config_child.advanced_data[key][item_id]
                             suffix = str(config_child.attributes.observables)
                             if suffix != '' and suffix not in key:
@@ -350,13 +353,15 @@ class TableRunStrategy(RunStrategy):
 
             elif config.experiment.method == Method.aggregator:
 
+                metrics_keys = get_method_metrics_keys(config)
+
                 for config_child in configs_child:
 
                     item_id = config_child.advanced_dict[item]
-                    metrics_keys = get_metrics_keys(config)
 
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
+                            metrics_keys.append(key)
                             advanced_data = config_child.advanced_data[key][item_id]
                             suffix = str(config_child.attributes.observables)
                             if suffix != '' and suffix not in key:
@@ -368,7 +373,7 @@ class TableRunStrategy(RunStrategy):
                 config.metrics['aux'].append(aux)
 
     def iterate(self, config, configs_child):
-        for item in tqdm(config.base_list, mininterval=100.0):
+        for item in tqdm(config.base_list, mininterval=60.0, desc=f'{str(config.experiment)} running'):
             if item in config.base_dict:
                 self.single(item, config, configs_child)
 
@@ -386,7 +391,7 @@ class ClockRunStrategy(RunStrategy):
 
     def run(self, config, configs_child):
 
-        if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.linreg:
 
@@ -397,10 +402,10 @@ class ClockRunStrategy(RunStrategy):
 
                 target = self.get_strategy.get_target(config)
 
-                type = config.experiment.params['type']
-                runs = config.experiment.params['runs']
-                size = min(config.experiment.params['size'], train_size, len(items))
-                config.experiment.params['size'] = size
+                type = config.experiment.method_params['type']
+                runs = config.experiment.method_params['runs']
+                size = min(config.experiment.method_params['size'], train_size, len(items))
+                config.experiment.method_params['size'] = size
 
                 if type == ClockExogType.all.value:
 
@@ -476,12 +481,12 @@ class PlotRunStrategy(RunStrategy):
 
     def run(self, config, configs_child):
 
-        if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.scatter:
 
-                item = config.experiment.params['item']
-                details = config.experiment.params['details']
+                item = config.experiment.method_params['item']
+                details = config.experiment.method_params['details']
 
                 plot_data = []
 
@@ -621,7 +626,7 @@ class PlotRunStrategy(RunStrategy):
 
             elif config.experiment.method == Method.variance_histogram:
 
-                item = config.experiment.params['item']
+                item = config.experiment.method_params['item']
 
                 plot_data = {
                     'hist_data': [],
@@ -647,13 +652,13 @@ class PlotRunStrategy(RunStrategy):
 
                 config.experiment_data['data'] = plot_data
 
-        elif config.experiment.type == DataType.epimutations:
+        elif config.experiment.data == DataType.epimutations:
 
             if config.experiment.method == Method.scatter:
 
                 plot_data = []
 
-                y_type = config.experiment.params['y_type']
+                y_type = config.experiment.method_params['y_type']
 
                 for config_child in configs_child:
 
@@ -668,7 +673,7 @@ class PlotRunStrategy(RunStrategy):
 
                     color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
                     coordinates = color[4:-1].split(',')
-                    color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.5) + ')'
+                    color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.7) + ')'
                     color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.8) + ')'
 
                     scatter = go.Scatter(
@@ -677,7 +682,7 @@ class PlotRunStrategy(RunStrategy):
                         name=get_names(config_child),
                         mode='markers',
                         marker=dict(
-                            size=7,
+                            size=4,
                             color=color_transparent,
                             line=dict(
                                 width=1,
@@ -730,7 +735,7 @@ class PlotRunStrategy(RunStrategy):
 
                 plot_data = []
 
-                borders = config.experiment.params['borders']
+                borders = config.experiment.method_params['borders']
 
                 for config_child in configs_child:
 
@@ -766,7 +771,7 @@ class PlotRunStrategy(RunStrategy):
 
                 config.experiment_data['data'] = plot_data
 
-        elif config.experiment.type == DataType.observables:
+        elif config.experiment.data == DataType.observables:
 
             if config.experiment.method == Method.histogram:
 
@@ -780,7 +785,7 @@ class PlotRunStrategy(RunStrategy):
                     if False in is_number_list:
                         xbins = {}
                     else:
-                        bin_size = config.experiment.params['bin_size']
+                        bin_size = config.experiment.method_params['bin_size']
                         xbins = dict(
                             start=min(target) - 0.5 * bin_size,
                             end=max(target) + 0.5 * bin_size,
@@ -795,7 +800,7 @@ class PlotRunStrategy(RunStrategy):
                             name=get_names(config_child),
                             xbins=xbins,
                             marker=dict(
-                                opacity=config.experiment.params['opacity'],
+                                opacity=config.experiment.method_params['opacity'],
                                 color=color,
                                 line=dict(
                                     color='#444444',

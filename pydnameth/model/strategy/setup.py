@@ -1,6 +1,6 @@
 import abc
-from pydnameth.config.experiment.params import get_default_params
-from pydnameth.config.experiment.metrics import get_metrics_keys
+from pydnameth.config.experiment.params import get_default_method_params
+from pydnameth.config.experiment.metrics import get_method_metrics_keys
 import math
 
 
@@ -13,31 +13,34 @@ class SetupStrategy(metaclass=abc.ABCMeta):
     def setup(self, config, configs_child):
         pass
 
-    def setup_params(self, config):
-        default_params = get_default_params(config)
-        if not bool(config.experiment.params):
-            config.experiment.params = default_params
+    def setup_method_params(self, config):
+        default_params = get_default_method_params(config)
+        if not bool(config.experiment.method_params):
+            config.experiment.method_params = default_params
         else:
             for dp in default_params:
-                if dp not in config.experiment.params:
-                    config.experiment.params[dp] = default_params[dp]
+                if dp not in config.experiment.method_params:
+                    config.experiment.method_params[dp] = default_params[dp]
 
-    def setup_metrics(self, config):
+    def setup_method_metrics(self, config):
         config.metrics = {}
-        for key in get_metrics_keys(config):
+        for key in get_method_metrics_keys(config):
             config.metrics[key] = []
 
 
 class TableSetUpStrategy(SetupStrategy):
 
     def setup(self, config, configs_child):
-        self.setup_params(config)
-        self.setup_metrics(config)
+        self.setup_method_params(config)
+        self.setup_method_metrics(config)
+
+        metrics_keys = get_method_metrics_keys(config)
 
         for config_child in configs_child:
-            metrics_keys = get_metrics_keys(config)
+
             for key in config_child.advanced_data:
                 if key not in metrics_keys:
+                    metrics_keys.append(key)
                     suffix = str(config_child.attributes.observables)
                     if suffix != '' and suffix not in key:
                         key += '_' + suffix
@@ -47,11 +50,11 @@ class TableSetUpStrategy(SetupStrategy):
 class ClockSetUpStrategy(SetupStrategy):
 
     def setup(self, config, configs_child):
-        self.setup_params(config)
-        self.setup_metrics(config)
+        self.setup_method_params(config)
+        self.setup_method_metrics(config)
 
         max_size = len(config.attributes_dict[config.attributes.target])
-        test_size = math.floor(max_size * config.experiment.params['part'])
+        test_size = math.floor(max_size * config.experiment.method_params['part'])
         train_size = max_size - test_size
 
         # In clock task only first base config matters
@@ -70,8 +73,8 @@ class ClockSetUpStrategy(SetupStrategy):
 class PlotSetUpStrategy(SetupStrategy):
 
     def setup(self, config, configs_child):
-        self.setup_params(config)
-        self.setup_metrics(config)
+        self.setup_method_params(config)
+        self.setup_method_metrics(config)
 
         config.experiment_data = {
             'data': [],

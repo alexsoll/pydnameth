@@ -11,11 +11,9 @@ type can use only predefined enums
 class Data:
 
     def __init__(self,
-                 name='cpg_beta',
                  path='',
                  base=DataBase.GSE87571.value
                  ):
-        self.name = name
         self.path = path
         self.base = base
 

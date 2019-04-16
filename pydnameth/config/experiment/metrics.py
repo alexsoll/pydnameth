@@ -1,14 +1,15 @@
 from pydnameth import DataType, Task, Method
 
 
-def get_metrics_keys(config):
+def get_method_metrics_keys(config):
     metrics = []
 
-    if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+    if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
         if config.experiment.task == Task.table:
 
             if config.experiment.method == Method.linreg:
+
                 metrics = [
                     'item',
                     'aux',
@@ -38,7 +39,9 @@ def get_metrics_keys(config):
                     'normality_p_value_ks_with_params',
                     'normality_p_value_dagostino'
                 ]
+
             elif config.experiment.method == Method.variance_linreg:
+
                 metrics = [
                     'item',
                     'aux',
@@ -65,14 +68,18 @@ def get_metrics_keys(config):
                     'normality_p_value_ks_with_params_var',
                     'normality_p_value_dagostino_var'
                 ]
+
             elif config.experiment.method == Method.cluster:
+
                 metrics = [
                     'item',
                     'aux',
                     'number_of_clusters',
                     'number_of_noise_points',
                 ]
+
             elif config.experiment.method == Method.polygon:
+
                 metrics = [
                     'item',
                     'aux',
@@ -81,11 +88,15 @@ def get_metrics_keys(config):
                     'max_abs_slope',
                     'is_inside'
                 ]
+
             elif config.experiment.method == Method.special:
+
                 metrics = [
                     'item'
                 ]
+
             elif config.experiment.method == Method.z_test_linreg:
+
                 metrics = [
                     'item',
                     'aux',
@@ -93,7 +104,9 @@ def get_metrics_keys(config):
                     'p_value',
                     'abs_z_value'
                 ]
+
             elif config.experiment.method == Method.aggregator:
+
                 metrics = [
                     'item',
                     'aux'
@@ -113,26 +126,3 @@ def get_metrics_keys(config):
                 ]
 
     return metrics
-
-
-def get_main_metric(config):
-    metric = ()
-
-    if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
-
-        if config.experiment == Task.table:
-
-            if config.experiment.method == Method.linreg:
-                metric = ('R2', 'descending')
-            elif config.experiment.method == Method.variance_linreg:
-                metric = ('R2_var', 'descending')
-            elif config.experiment.method == Method.cluster:
-                metric = ('number_of_clusters', 'descending')
-            elif config.experiment.method == Method.polygon:
-                metric = ('area_intersection_rel', 'ascending')
-            elif config.experiment.method == Method.z_test_linreg:
-                metric = ('p_value', 'ascending')
-            elif config.experiment.method == Method.aggregator:
-                metric = ('item', 'ascending')
-
-    return metric

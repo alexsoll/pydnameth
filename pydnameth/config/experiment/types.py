@@ -33,6 +33,7 @@ class DataType(Enum):
     residuals_common = 'residuals_common'
     residuals_special = 'residuals_special'
     epimutations = 'epimutations'
+    entropy = 'entropy'
     observables = 'observables'
     suppl = 'suppl'
     cache = 'cache'

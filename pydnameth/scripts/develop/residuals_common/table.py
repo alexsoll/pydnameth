@@ -6,14 +6,14 @@ def residuals_common_table_linreg_dev(
     data,
     annotations,
     attributes,
-    params=None
+    data_params,
 ):
     table_linreg(
         DataType.residuals_common,
         data,
         annotations,
         attributes,
-        params
+        data_params=data_params
     )
 
 
@@ -22,13 +22,14 @@ def residuals_common_table_aggregator_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    data_params,
 ):
+
     table_aggregator(
         DataType.residuals_common,
         data,
         annotations,
         attributes,
         observables_list,
-        params
+        data_params=data_params,
     )

@@ -36,8 +36,8 @@ class BetasLoadStrategy(LoadStrategy):
     def load(self, config, configs_child):
         load_cpg(config)
         config.base_list = config.cpg_list
-        config.base_dict = config.cpg_dict
-        config.base_data = config.cpg_data
+        config.base_dict = config.betas_dict
+        config.base_data = config.betas_data
 
         self.inherit_childs(config, configs_child)
 

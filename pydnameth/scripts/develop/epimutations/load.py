@@ -12,10 +12,9 @@ def epimutations_load_dev(data):
     config = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.epimutations,
+            data=DataType.epimutations,
             task=None,
-            method=None,
-            params=None
+            method=None
         ),
         annotations=Annotations(
             name='annotations',

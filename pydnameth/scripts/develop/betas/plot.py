@@ -15,7 +15,7 @@ def betas_plot_scatter_dev(
     cpg_list,
     observables_list,
     child_method=Method.linreg,
-    params=None
+    method_params=None
 ):
     plot_scatter_dev(
         DataType.betas,
@@ -25,7 +25,7 @@ def betas_plot_scatter_dev(
         cpg_list,
         observables_list,
         child_method,
-        params
+        method_params
     )
 
 
@@ -36,7 +36,7 @@ def betas_plot_scatter_var_dev(
     cpg_list,
     observables_list,
     child_method=Method.variance_linreg,
-    params=None
+    method_params=None
 ):
     plot_scatter_dev(
         DataType.betas,
@@ -46,7 +46,7 @@ def betas_plot_scatter_var_dev(
         cpg_list,
         observables_list,
         child_method,
-        params
+        method_params
     )
 
 
@@ -57,17 +57,17 @@ def betas_plot_variance_histogram_dev(
     cpg_list,
     observables_list,
     child_method=Method.linreg,
-    params=None
+    method_params=None
 ):
     for cpg in cpg_list:
 
         config_root = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.betas,
+                data=DataType.betas,
                 task=Task.methylation,
                 method=Method.variance_histogram,
-                params=copy.deepcopy(params)
+                method_params=copy.deepcopy(method_params)
             ),
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes),
@@ -75,10 +75,10 @@ def betas_plot_variance_histogram_dev(
             is_root=True
         )
 
-        if config_root.experiment.params is None:
-            config_root.experiment.params = dict()
+        if config_root.experiment.method_params is None:
+            config_root.experiment.method_params = dict()
 
-        config_root.experiment.params['item'] = cpg
+        config_root.experiment.method_params['item'] = cpg
 
         root = Node(name=str(config_root), config=config_root)
 
@@ -102,10 +102,9 @@ def betas_plot_variance_histogram_dev(
             config_child = Config(
                 data=copy.deepcopy(data),
                 experiment=Experiment(
-                    type=DataType.betas,
+                    data=DataType.betas,
                     task=Task.table,
-                    method=copy.deepcopy(child_method),
-                    params={}
+                    method=copy.deepcopy(child_method)
                 ),
                 annotations=copy.deepcopy(annotations),
                 attributes=attributes_child,

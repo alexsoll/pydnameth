@@ -32,7 +32,6 @@ from tests.tear_down import clear_cache
 class TestAnnotationsConditions(unittest.TestCase):
     def setUp(self):
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
@@ -78,7 +77,11 @@ class TestAnnotationsConditions(unittest.TestCase):
         clear_cache(self.config)
 
     def check_strategy(self, data_type, task, needed_list):
-        experiment = Experiment(type=data_type, task=task, method=None, params=None)
+        experiment = Experiment(
+            data=data_type,
+            task=task,
+            method=None,
+        )
         self.config.experiment = experiment
         context = Context(self.config)
         condition = True

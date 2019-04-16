@@ -15,15 +15,15 @@ def betas_clock_linreg_dev(
     annotations,
     attributes,
     child_method=Method.linreg,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.clock,
             method=Method.linreg,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -35,10 +35,9 @@ def betas_clock_linreg_dev(
     config_child = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.table,
-            method=copy.deepcopy(child_method),
-            params={}
+            method=copy.deepcopy(child_method)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -57,7 +56,7 @@ def betas_special_clock_linreg_dev(
     annotations,
     attributes,
     file,
-    params=None,
+    method_params=None,
 ):
     if os.path.isfile(file):
 
@@ -68,10 +67,10 @@ def betas_special_clock_linreg_dev(
         config_root = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.betas,
+                data=DataType.betas,
                 task=Task.clock,
                 method=Method.linreg,
-                params=copy.deepcopy(params)
+                method_params=copy.deepcopy(method_params)
             ),
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes),
@@ -83,10 +82,10 @@ def betas_special_clock_linreg_dev(
         config_child = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.betas,
+                data=DataType.betas,
                 task=Task.table,
                 method=Method.special,
-                params={'file_name': fn}
+                method_params={'file_name': fn}
             ),
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes),

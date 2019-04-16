@@ -12,14 +12,14 @@ def betas_table_linreg_dev(
     data,
     annotations,
     attributes,
-    params=None
+    method_params=None
 ):
     table_linreg(
         DataType.betas,
         data,
         annotations,
         attributes,
-        params
+        method_params
     )
 
 
@@ -27,15 +27,15 @@ def betas_table_variance_linreg_dev(
     data,
     annotations,
     attributes,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.table,
             method=Method.variance_linreg,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -54,15 +54,15 @@ def betas_table_polygon_dev(
     attributes,
     observables_list,
     child_method=Method.linreg,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.table,
             method=Method.polygon,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -91,10 +91,9 @@ def betas_table_polygon_dev(
         config_child = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.betas,
+                data=DataType.betas,
                 task=Task.table,
-                method=copy.deepcopy(child_method),
-                params={}
+                method=copy.deepcopy(child_method)
             ),
             annotations=copy.deepcopy(annotations),
             attributes=attributes_child,
@@ -113,15 +112,15 @@ def betas_table_z_test_linreg_dev(
     attributes,
     observables_list,
     child_method=Method.linreg,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.table,
             method=Method.z_test_linreg,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -150,10 +149,9 @@ def betas_table_z_test_linreg_dev(
         config_child = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.betas,
+                data=DataType.betas,
                 task=Task.table,
-                method=copy.deepcopy(child_method),
-                params={}
+                method=copy.deepcopy(child_method)
             ),
             annotations=copy.deepcopy(annotations),
             attributes=attributes_child,
@@ -171,7 +169,7 @@ def betas_table_aggregator_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    method_params=None
 ):
     table_aggregator(
         DataType.betas,
@@ -179,7 +177,7 @@ def betas_table_aggregator_dev(
         annotations,
         attributes,
         observables_list,
-        params
+        method_params
     )
 
 
@@ -188,15 +186,15 @@ def betas_table_aggregator_var_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.table,
             method=Method.aggregator,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -225,10 +223,9 @@ def betas_table_aggregator_var_dev(
         config_child = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.betas,
+                data=DataType.betas,
                 task=Task.table,
-                method=copy.deepcopy(Method.variance_linreg),
-                params={}
+                method=copy.deepcopy(Method.variance_linreg)
             ),
             annotations=copy.deepcopy(annotations),
             attributes=attributes_child,
@@ -256,10 +253,9 @@ def betas_table_aggregator_var_dev(
     config_cluster = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.betas,
+            data=DataType.betas,
             task=Task.table,
-            method=copy.deepcopy(Method.cluster),
-            params={}
+            method=copy.deepcopy(Method.cluster)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=attributes_cluster,

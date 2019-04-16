@@ -42,7 +42,7 @@ def cpg_proc_table_linreg(
         data=data,
         annotations=annotations,
         attributes=attributes,
-        params=params
+        method_params=params
     )
 
 
@@ -105,7 +105,7 @@ def cpg_proc_table_polygon(
         attributes=attributes,
         observables_list=observables_list,
         child_method=child_method,
-        params=params
+        method_params=params
     )
 
 
@@ -132,7 +132,8 @@ def cpg_proc_table_z_test_linreg(
 
     For each subjects subset the next columns are added to the resulting table:
 
-    * R2_***: determination coefficient. A statistical measure of how well the regression line approximates the data points.
+    * R2_***: determination coefficient.
+    * A statistical measure of how well the regression line approximates the data points.
     * intercept_***: estimated value of the intercept of linear regression.
     * slope_***: estimated value of the slope of linear regression.
     * intercept_std_***: standard error of the estimate of the intercept of linear regression.
@@ -162,5 +163,5 @@ def cpg_proc_table_z_test_linreg(
         attributes=attributes,
         observables_list=observables_list,
         child_method=child_method,
-        params=params
+        method_params=params
     )

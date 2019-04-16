@@ -40,5 +40,5 @@ def cpg_plot_methylation_scatter(
         cpg_list=cpg_list,
         observables_list=observables_list,
         child_method=child_method,
-        params=params
+        method_params=params
     )

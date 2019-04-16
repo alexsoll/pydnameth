@@ -12,7 +12,7 @@ def epimutations_plot_scatter_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    method_params=None
 ):
     epimutations_plot(
         data,
@@ -20,7 +20,7 @@ def epimutations_plot_scatter_dev(
         attributes,
         observables_list,
         Method.scatter,
-        params
+        method_params
     )
 
 
@@ -29,7 +29,7 @@ def epimutations_plot_range_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    method_params=None
 ):
     epimutations_plot(
         data,
@@ -37,7 +37,7 @@ def epimutations_plot_range_dev(
         attributes,
         observables_list,
         Method.range,
-        params
+        method_params
     )
 
 
@@ -47,15 +47,15 @@ def epimutations_plot(
     attributes,
     observables_list,
     method,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.epimutations,
+            data=DataType.epimutations,
             task=Task.plot,
             method=method,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -85,10 +85,9 @@ def epimutations_plot(
         config_child = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
-                type=DataType.epimutations,
+                data=DataType.epimutations,
                 task=Task.table,
-                method=Method.mock,
-                params={}
+                method=Method.mock
             ),
             annotations=copy.deepcopy(annotations),
             attributes=attributes_child,

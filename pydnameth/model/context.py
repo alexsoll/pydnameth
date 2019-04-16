@@ -28,26 +28,26 @@ class Context:
 
     def __init__(self, config):
 
-        if config.experiment.type == DataType.betas:
+        if config.experiment.data == DataType.betas:
             self.load_strategy = BetasLoadStrategy()
-        elif config.experiment.type == DataType.observables:
+        elif config.experiment.data == DataType.observables:
             self.load_strategy = ObservablesLoadStrategy()
-        elif config.experiment.type == DataType.residuals_common:
+        elif config.experiment.data == DataType.residuals_common:
             self.load_strategy = ResidualsCommonLoadStrategy()
-        elif config.experiment.type == DataType.residuals_special:
+        elif config.experiment.data == DataType.residuals_special:
             self.load_strategy = ResidualsSpecialLoadStrategy()
-        elif config.experiment.type == DataType.epimutations:
+        elif config.experiment.data == DataType.epimutations:
             self.load_strategy = EpimutationsLoadStrategy()
 
-        if config.experiment.type == DataType.betas:
+        if config.experiment.data == DataType.betas:
             self.get_strategy = BetasGetStrategy()
-        elif config.experiment.type == DataType.observables:
+        elif config.experiment.data == DataType.observables:
             self.get_strategy = ObservablesGetStrategy()
-        elif config.experiment.type == DataType.residuals_common:
+        elif config.experiment.data == DataType.residuals_common:
             self.get_strategy = ResidualsCommonGetStrategy()
-        elif config.experiment.type == DataType.residuals_special:
+        elif config.experiment.data == DataType.residuals_special:
             self.get_strategy = ResidualsSpecialGetStrategy()
-        elif config.experiment.type == DataType.epimutations:
+        elif config.experiment.data == DataType.epimutations:
             self.get_strategy = EpimutationsGetStrategy()
 
         if config.experiment.task == Task.table:

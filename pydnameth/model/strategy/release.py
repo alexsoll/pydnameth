@@ -1,7 +1,5 @@
 import abc
-import numpy as np
 from pydnameth.config.experiment.types import DataType, Method
-from pydnameth.config.experiment.metrics import get_main_metric
 import plotly.graph_objs as go
 from statsmodels.stats.multitest import multipletests
 import plotly.figure_factory as ff
@@ -19,22 +17,13 @@ class TableReleaseStrategy(ReleaseStrategy):
 
     def release(self, config, configs_child):
 
-        if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.z_test_linreg:
                 reject, pvals_corr, alphacSidak, alphacBonf = multipletests(config.metrics['p_value'],
                                                                             0.05,
                                                                             method='fdr_bh')
                 config.metrics['p_value'] = pvals_corr
-
-            (key, direction) = get_main_metric(config)
-
-            order = list(np.argsort(config.metrics[key]))
-            if direction == 'descending':
-                order.reverse()
-
-            for key, value in config.metrics.items():
-                config.metrics[key] = list(np.array(value)[order])
 
 
 class ClockReleaseStrategy(ReleaseStrategy):
@@ -47,19 +36,19 @@ class PlotReleaseStrategy(ReleaseStrategy):
 
     def release(self, config, configs_child):
 
-        if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
             if config.experiment.method == Method.scatter:
 
                 layout = plot_routines.get_layout(config)
 
-                if 'x_range' in config.experiment.params:
-                    if config.experiment.params['x_range'] != 'auto':
-                        layout.xaxis.range = config.experiment.params['x_range']
+                if 'x_range' in config.experiment.method_params:
+                    if config.experiment.method_params['x_range'] != 'auto':
+                        layout.xaxis.range = config.experiment.method_params['x_range']
 
-                if 'y_range' in config.experiment.params:
-                    if config.experiment.params['y_range'] != 'auto':
-                        layout.yaxis.range = config.experiment.params['y_range']
+                if 'y_range' in config.experiment.method_params:
+                    if config.experiment.method_params['y_range'] != 'auto':
+                        layout.yaxis.range = config.experiment.method_params['y_range']
 
                 config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
@@ -80,19 +69,19 @@ class PlotReleaseStrategy(ReleaseStrategy):
 
                 config.experiment_data['fig'] = fig
 
-        elif config.experiment.type == DataType.epimutations:
+        elif config.experiment.data == DataType.epimutations:
 
             if config.experiment.method == Method.scatter:
 
                 layout = plot_routines.get_layout(config)
 
-                if config.experiment.params['x_range'] != 'auto':
-                    layout.xaxis.range = config.experiment.params['x_range']
+                if config.experiment.method_params['x_range'] != 'auto':
+                    layout.xaxis.range = config.experiment.method_params['x_range']
 
-                if config.experiment.params['y_range'] != 'auto':
-                    layout.yaxis.range = config.experiment.params['y_range']
+                if config.experiment.method_params['y_range'] != 'auto':
+                    layout.yaxis.range = config.experiment.method_params['y_range']
 
-                layout.yaxis.type = config.experiment.params['y_type']
+                layout.yaxis.type = config.experiment.method_params['y_type']
                 if layout.yaxis.type == 'log':
                     layout.yaxis.tickvals = [1, 2, 5,
                                              10, 20, 50,
@@ -107,10 +96,10 @@ class PlotReleaseStrategy(ReleaseStrategy):
 
                 layout = plot_routines.get_layout(config)
 
-                if config.experiment.params['x_range'] != 'auto':
-                    layout.xaxis.range = config.experiment.params['x_range']
+                if config.experiment.method_params['x_range'] != 'auto':
+                    layout.xaxis.range = config.experiment.method_params['x_range']
 
-                borders = config.experiment.params['borders']
+                borders = config.experiment.method_params['borders']
 
                 labels = []
                 tickvals = []
@@ -121,10 +110,10 @@ class PlotReleaseStrategy(ReleaseStrategy):
                 layout.xaxis.tickvals = tickvals
                 layout.xaxis.ticktext = labels
 
-                if config.experiment.params['y_range'] != 'auto':
-                    layout.yaxis.range = config.experiment.params['y_range']
+                if config.experiment.method_params['y_range'] != 'auto':
+                    layout.yaxis.range = config.experiment.method_params['y_range']
 
-                layout.yaxis.type = config.experiment.params['y_type']
+                layout.yaxis.type = config.experiment.method_params['y_type']
                 if layout.yaxis.type == 'log':
                     layout.yaxis.tickvals = [1, 2, 5,
                                              10, 20, 50,
@@ -135,14 +124,14 @@ class PlotReleaseStrategy(ReleaseStrategy):
 
                 config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
 
-        elif config.experiment.type == DataType.observables:
+        elif config.experiment.data == DataType.observables:
 
             if config.experiment.method == Method.histogram:
 
                 layout = plot_routines.get_layout(config)
 
-                if 'x_range' in config.experiment.params:
-                    if config.experiment.params['x_range'] != 'auto':
-                        layout.xaxis.range = config.experiment.params['x_range']
+                if 'x_range' in config.experiment.method_params:
+                    if config.experiment.method_params['x_range'] != 'auto':
+                        layout.xaxis.range = config.experiment.method_params['x_range']
 
                 config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)

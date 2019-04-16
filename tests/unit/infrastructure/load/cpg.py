@@ -18,16 +18,14 @@ class TestLoadCpG(unittest.TestCase):
     def setUp(self):
 
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
 
         experiment = Experiment(
-            type=None,
+            data=None,
             task=None,
             method=None,
-            params=None
         )
 
         annotations = Annotations(
@@ -71,8 +69,8 @@ class TestLoadCpG(unittest.TestCase):
         clear_cache(self.config)
 
     def test_load_cpg_check_files_creation(self):
-        fn_dict = get_data_base_path(self.config) + '/' + 'cpg_dict.pkl'
-        fn_data = get_data_base_path(self.config) + '/' + self.config.data.name
+        fn_dict = get_data_base_path(self.config) + '/' + 'betas_dict.pkl'
+        fn_data = get_data_base_path(self.config) + '/' + 'betas'
         fn_npz = fn_data + '.npz'
 
         load_cpg(self.config)
@@ -81,8 +79,8 @@ class TestLoadCpG(unittest.TestCase):
 
     def test_load_cpg_check_len_cpg_dict(self):
         load_cpg(self.config)
-        self.assertEqual(300, len(list(self.config.cpg_dict)))
+        self.assertEqual(300, len(list(self.config.betas_dict)))
 
     def test_load_cpg_check_shape_cpg_data(self):
         load_cpg(self.config)
-        self.assertEqual((300, 729), self.config.cpg_data.shape)
+        self.assertEqual((300, 729), self.config.betas_data.shape)

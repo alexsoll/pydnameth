@@ -6,11 +6,11 @@ from pydnameth.routines.common import get_axis, get_legend, get_margin
 def get_layout(config):
     layout = None
 
-    if config.experiment.type in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+    if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
 
         if config.experiment.method in [Method.scatter, Method.variance_histogram]:
 
-            item = config.experiment.params['item']
+            item = config.experiment.method_params['item']
             if item in config.cpg_gene_dict:
                 aux = config.cpg_gene_dict[item]
                 if isinstance(aux, list):
@@ -21,7 +21,7 @@ def get_layout(config):
                 aux_str = 'non-genic'
 
             y_title = 'Methylation level'
-            if config.experiment.type in [DataType.residuals_common, DataType.residuals_special]:
+            if config.experiment.data in [DataType.residuals_common, DataType.residuals_special]:
                 y_title = 'Residuals'
 
             layout = go.Layout(
@@ -54,7 +54,7 @@ def get_layout(config):
                 yaxis=get_axis(y_title),
             )
 
-    elif config.experiment.type == DataType.epimutations:
+    elif config.experiment.data == DataType.epimutations:
 
         if config.experiment.method == Method.scatter:
 
@@ -133,14 +133,14 @@ def get_layout(config):
                 yaxis=get_axis(y_title),
             )
 
-    elif config.experiment.type == DataType.observables:
+    elif config.experiment.data == DataType.observables:
 
         if config.experiment.method == Method.histogram:
 
             layout = go.Layout(
                 autosize=True,
                 margin=get_margin(),
-                barmode=config.experiment.params['barmode'],
+                barmode=config.experiment.method_params['barmode'],
                 legend=get_legend(),
                 xaxis=get_axis(config.attributes.target.capitalize()),
                 yaxis=get_axis('Count'),
