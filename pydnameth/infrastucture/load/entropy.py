@@ -48,7 +48,7 @@ def load_entropy(config):
 
         rows = [data_dict[item] for item in config.cpg_list if item in data_dict]
 
-        for subj_id in tqdm(range(0, num_subjects), mininterval=60.0, desc='residuals_data creating'):
+        for subj_id in tqdm(range(0, num_subjects), mininterval=60.0, desc='entropy_data creating'):
             values = np.squeeze(np.asarray(data[np.ix_(rows, [subj_id])]))
             entropy = 0.0
             outliers = 0
