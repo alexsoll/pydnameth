@@ -8,25 +8,23 @@ from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
-from pydnameth.infrastucture.load.attributes import load_attributes_dict
+from pydnameth.infrastucture.load.attributes import load_observables_dict
+from pydnameth.infrastucture.path import get_data_base_path
 from tests.tear_down import clear_cache
 
 
 class TestLoadAnnotations(unittest.TestCase):
 
     def setUp(self):
-
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
 
         experiment = Experiment(
-            type=None,
+            data=None,
             task=None,
-            method=None,
-            params=None
+            method=None
         )
 
         annotations = Annotations(
@@ -70,37 +68,36 @@ class TestLoadAnnotations(unittest.TestCase):
         clear_cache(self.config)
 
     def test_load_attributes_dict_num_elems(self):
-        attributes_dict = load_attributes_dict(self.config)
+        attributes_dict = load_observables_dict(self.config)
         self.assertEqual(len(attributes_dict['age']), 729)
 
     def test_load_attributes_dict_age_range(self):
-        attributes_dict = load_attributes_dict(self.config)
+        attributes_dict = load_observables_dict(self.config)
         self.assertEqual(max(attributes_dict['age']) - min(attributes_dict['age']), 80)
 
     def test_load_attributes_dict_check_pkl_file_creation(self):
-        load_attributes_dict(self.config)
+        load_observables_dict(self.config)
 
-        create = os.path.isfile(self.config.data.path + '/' + self.config.data.base + '/' +
-                                self.config.attributes.observables.name + '.pkl')
+        create = os.path.isfile(get_data_base_path(self.config) + '/' + self.config.attributes.observables.name + '.pkl')
 
         self.assertEqual(True, create)
 
     def test_load_attributes_dict_check_sum_smoke(self):
-        attributes_dict = load_attributes_dict(self.config)
+        attributes_dict = load_observables_dict(self.config)
 
         sum_smoke = sum(list(map(int, attributes_dict['smoke'])))
 
         self.assertEqual(188, sum_smoke)
 
     def test_load_attributes_dict_num_Male(self):
-        attributes_dict = load_attributes_dict(self.config)
+        attributes_dict = load_observables_dict(self.config)
 
         indexes = [ind for ind, val in enumerate(attributes_dict['gender']) if val == 'M']
 
         self.assertEqual(341, len(indexes))
 
     def test_load_attributes_dict_num_Female(self):
-        attributes_dict = load_attributes_dict(self.config)
+        attributes_dict = load_observables_dict(self.config)
 
         indexes = [ind for ind, val in enumerate(attributes_dict['gender']) if val == 'F']
 

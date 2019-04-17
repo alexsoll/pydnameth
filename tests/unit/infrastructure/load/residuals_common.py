@@ -18,16 +18,17 @@ class TestLoadResidualsCommon(unittest.TestCase):
     def setUp(self):
 
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
 
+        data_params = {'cells': ['B', 'CD4T', 'NK', 'CD8T', 'Gran']}
+
         experiment = Experiment(
-            type=None,
+            data=None,
             task=None,
             method=None,
-            params=None
+            data_params=data_params
         )
 
         annotations = Annotations(
@@ -68,9 +69,9 @@ class TestLoadResidualsCommon(unittest.TestCase):
         self.config.initialize()
 
     def test_load_residuals_check_files_creation(self):
-        suffix = 'cells(' + str(self.config.attributes.cells) + ')'
-        fn_dict = get_data_base_path(self.config) + '/' + 'residuals_dict_' + suffix + '.pkl'
-        fn_data = get_data_base_path(self.config) + '/' + 'residuals_' + suffix + '.npz'
+        suffix = '_' + self.config.experiment.get_data_params_str()
+        fn_dict = get_data_base_path(self.config) + '/' + 'residuals_common_dict.pkl'
+        fn_data = get_data_base_path(self.config) + '/' + 'residuals_common' + suffix + '.npz'
 
         load_residuals_common(self.config)
 

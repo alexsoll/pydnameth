@@ -9,6 +9,7 @@ from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
 from pydnameth.infrastucture.load.annotations import load_annotations_dict
+from pydnameth.infrastucture.path import get_data_base_path
 from pydnameth.config.annotations.types import AnnotationKey
 from tests.tear_down import clear_cache
 
@@ -17,16 +18,14 @@ class TestLoadAnnotations(unittest.TestCase):
 
     def setUp(self):
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
 
         experiment = Experiment(
-            type=None,
+            data=None,
             task=None,
             method=None,
-            params=None
         )
 
         annotations = Annotations(
@@ -97,8 +96,7 @@ class TestLoadAnnotations(unittest.TestCase):
     def test_load_annotations_check_pkl_file_creation(self):
         load_annotations_dict(self.config)
 
-        create = os.path.isfile(self.config.data.path + '/' + self.config.data.base + '/' +
-                                self.config.annotations.name + '.pkl')
+        create = os.path.isfile(get_data_base_path(self.config) + '/' + self.config.annotations.name + '.pkl')
 
         self.assertEqual(True, create)
 

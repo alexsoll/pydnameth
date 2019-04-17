@@ -18,16 +18,14 @@ class TestLoadCpG(unittest.TestCase):
     def setUp(self):
 
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
 
         experiment = Experiment(
-            type=None,
+            data=None,
             task=None,
             method=None,
-            params=None
         )
 
         annotations = Annotations(
