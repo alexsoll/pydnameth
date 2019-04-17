@@ -5,11 +5,11 @@ watchdog==0.9.0
 flake8==3.7.7
 tox==3.8.6
 coverage==4.5.3
-Sphinx==2.0.0
+Sphinx==2.0.1
 twine==1.13.0
 numpy==1.16.2
 pandas==0.24.2
-plotly==3.7.1
+plotly==3.8.0
 statsmodels==0.9.0
 sklearn==0.0
 scipy==1.2.1
@@ -24,4 +24,4 @@ psutil==5.6.1
 coverage==4.5.3
 codecov==2.0.15
 anytree==2.6.0
-tqdm==4.30.0
+tqdm==4.31.1
