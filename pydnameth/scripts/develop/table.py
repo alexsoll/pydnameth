@@ -7,11 +7,12 @@ from pydnameth.config.attributes.attributes import Observables, Cells, Attribute
 from pydnameth.model.tree import build_tree, calc_tree
 
 
-def table_linreg(
-    data_type,
+def table(
     data,
     annotations,
     attributes,
+    data_type,
+    method,
     data_params=None,
     task_params=None,
     method_params=None
@@ -21,7 +22,7 @@ def table_linreg(
         experiment=Experiment(
             data=data_type,
             task=Task.table,
-            method=Method.linreg,
+            method=method,
             data_params=copy.deepcopy(data_params),
             task_params=copy.deepcopy(task_params),
             method_params=copy.deepcopy(method_params)

@@ -136,7 +136,7 @@ def get_layout(config):
     elif config.experiment.data == DataType.entropy:
 
         if config.experiment.method == Method.scatter:
-            y_title = 'entropy'
+            y_title = 'Entropy'
 
             layout = go.Layout(
                 title=dict(

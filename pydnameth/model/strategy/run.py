@@ -2,6 +2,7 @@ import abc
 from pydnameth.config.experiment.types import Method, DataType
 from pydnameth.config.experiment.metrics import get_method_metrics_keys
 import statsmodels.api as sm
+import statsmodels.stats.diagnostic as sms
 import numpy as np
 from sklearn.cluster import DBSCAN
 from pydnameth.routines.clock.types import ClockExogType, Clock
@@ -371,6 +372,26 @@ class TableRunStrategy(RunStrategy):
                 config.metrics['item'].append(item)
                 aux = self.get_strategy.get_aux(config, item)
                 config.metrics['aux'].append(aux)
+
+        if config.experiment.data in [DataType.residuals_common, DataType.residuals_special]:
+
+            if config.experiment.method == Method.heteroscedasticity:
+
+                target = np.asarray(self.get_strategy.get_target(config)).reshape(-1, 1)
+                residuals = self.get_strategy.get_single_base(config, [item])[0]
+                residuals.reshape(-1, 1)
+
+                gq_test = sms.het_goldfeldquandt(residuals, target)
+
+                config.metrics['item'].append(item)
+                aux = self.get_strategy.get_aux(config, item)
+                config.metrics['aux'].append(aux)
+                config.metrics['bp_lms'].append(0)
+                config.metrics['bp_lms_p_value'].append(0)
+                config.metrics['bp_f_value'].append(0)
+                config.metrics['bp_f_p_value'].append(0)
+                config.metrics['gq_f_value'].append(gq_test[0])
+                config.metrics['gq_f_p_value'].append(gq_test[1])
 
     def iterate(self, config, configs_child):
         for item in tqdm(config.base_list, mininterval=60.0, desc=f'{str(config.experiment)} running'):

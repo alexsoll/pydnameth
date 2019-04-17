@@ -5,7 +5,7 @@ from pydnameth.config.experiment.types import Task, Method, DataType
 from pydnameth.config.experiment.experiment import Experiment
 from pydnameth.config.attributes.attributes import Observables, Cells, Attributes
 from pydnameth.model.tree import build_tree, calc_tree
-from pydnameth.scripts.develop.table import table_linreg, table_aggregator
+from pydnameth.scripts.develop.table import table, table_aggregator
 
 
 def betas_table_linreg_dev(
@@ -14,12 +14,29 @@ def betas_table_linreg_dev(
     attributes,
     method_params=None
 ):
-    table_linreg(
-        DataType.betas,
-        data,
-        annotations,
-        attributes,
-        method_params
+    table(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        data_type=DataType.betas,
+        method=Method.linreg,
+        method_params=method_params,
+    )
+
+
+def betas_table_cluster_dev(
+    data,
+    annotations,
+    attributes,
+    method_params=None
+):
+    table(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        data_type=DataType.betas,
+        method=Method.cluster,
+        method_params=method_params,
     )
 
 

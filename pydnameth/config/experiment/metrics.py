@@ -40,6 +40,15 @@ def get_method_metrics_keys(config):
                     'normality_p_value_dagostino'
                 ]
 
+            elif config.experiment.method == Method.heteroscedasticity:
+
+                metrics = [
+                    'item',
+                    'aux',
+                    'gq_f_value',
+                    'gq_f_p_value'
+                ]
+
             elif config.experiment.method == Method.variance_linreg:
 
                 metrics = [

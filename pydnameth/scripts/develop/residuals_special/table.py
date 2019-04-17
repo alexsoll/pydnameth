@@ -1,19 +1,20 @@
-from pydnameth.config.experiment.types import DataType
-from pydnameth.scripts.develop.table import table_linreg, table_aggregator
+from pydnameth.config.experiment.types import DataType, Method
+from pydnameth.scripts.develop.table import table, table_aggregator
 
 
 def residuals_special_table_linreg_dev(
     data,
     annotations,
     attributes,
-    params=None
+    data_params,
 ):
-    table_linreg(
-        DataType.residuals_special,
-        data,
-        annotations,
-        attributes,
-        params
+    table(
+        data=data,
+        annotations=annotations,
+        attributes=attributes,
+        data_type=DataType.residuals_special,
+        method=Method.linreg,
+        data_params=data_params,
     )
 
 
@@ -22,7 +23,7 @@ def residuals_special_table_aggregator_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    data_params,
 ):
     table_aggregator(
         DataType.residuals_special,
@@ -30,5 +31,5 @@ def residuals_special_table_aggregator_dev(
         annotations,
         attributes,
         observables_list,
-        params
+        data_params=data_params,
     )
