@@ -1,6 +1,6 @@
 from pydnameth.infrastucture.load.annotations import load_annotations_dict
 from pydnameth.infrastucture.load.excluded import load_excluded
-from pydnameth.infrastucture.load.attributes import load_attributes_dict
+from pydnameth.infrastucture.load.attributes import load_observables_dict
 from pydnameth.infrastucture.load.attributes import load_cells_dict
 from pydnameth.config.annotations.subset import subset_annotations
 from pydnameth.config.attributes.subset import subset_attributes
@@ -75,7 +75,7 @@ class Config:
                    + f'attributes({str(self.attributes)})'
         else:
             name = f'data({str(self.data)})_' \
-                   + f'experiment({self.experiment.get_experiment_str()})_params({self.experiment.get_params_str()})_' \
+                   + f'experiment({self.experiment.get_experiment_str()})_params({self.experiment.get_method_params_str()})_' \
                    + f'annotations({str(self.annotations)})_' \
                    + f'attributes({str(self.attributes)})'
         return name
@@ -93,7 +93,7 @@ class Config:
         self.annotations_dict = load_annotations_dict(self)
         subset_annotations(self)
 
-        self.attributes_dict = load_attributes_dict(self)
+        self.attributes_dict = load_observables_dict(self)
         self.attributes_indexes = get_indexes(self)
         subset_attributes(self)
         self.cells_dict = load_cells_dict(self)

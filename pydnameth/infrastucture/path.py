@@ -20,7 +20,7 @@ def get_cache_path(config):
 
 def get_experiment_path(config):
     path = config.data.path + '/' + config.data.base + '/' + \
-        config.experiment.type.value + '/' + \
+        config.experiment.data.value + '/' + \
         config.experiment.task.value + '/' + \
         config.experiment.method.value
 
