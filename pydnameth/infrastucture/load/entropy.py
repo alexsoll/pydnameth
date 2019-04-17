@@ -61,6 +61,3 @@ def load_entropy(config):
             config.entropy_data[subj_id] = entropy
 
         np.savez_compressed(fn_data, data=config.entropy_data)
-
-        # Clear data
-        del data

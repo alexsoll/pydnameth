@@ -36,5 +36,5 @@ def observables_plot_histogram(
         annotations=annotations,
         attributes=attributes,
         observables_list=observables_list,
-        params=params
+        method_params=params
     )

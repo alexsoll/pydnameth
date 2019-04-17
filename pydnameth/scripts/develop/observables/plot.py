@@ -12,15 +12,15 @@ def observables_plot_histogram_dev(
     annotations,
     attributes,
     observables_list,
-    params=None
+    method_params=None
 ):
     config_root = Config(
         data=copy.deepcopy(data),
         experiment=Experiment(
-            type=DataType.observables,
+            data=DataType.observables,
             task=Task.observables,
             method=Method.histogram,
-            params=copy.deepcopy(params)
+            method_params=copy.deepcopy(method_params)
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
