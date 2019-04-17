@@ -8,7 +8,7 @@ from pydnameth.config.attributes.attributes import Observables
 from pydnameth.config.attributes.attributes import Cells
 from pydnameth.config.attributes.attributes import Attributes
 from pydnameth.config.config import Config
-from pydnameth.infrastucture.load.cpg import load_cpg
+from pydnameth.infrastucture.load.betas import load_betas
 from pydnameth.infrastucture.path import get_data_base_path
 from tests.tear_down import clear_cache
 
@@ -18,16 +18,14 @@ class TestLoadCpG(unittest.TestCase):
     def setUp(self):
 
         data = Data(
-            name='cpg_beta',
             path=ROOT_DIR,
             base='fixtures'
         )
 
         experiment = Experiment(
-            type=None,
+            data=None,
             task=None,
             method=None,
-            params=None
         )
 
         annotations = Annotations(
@@ -71,18 +69,18 @@ class TestLoadCpG(unittest.TestCase):
         clear_cache(self.config)
 
     def test_load_cpg_check_files_creation(self):
-        fn_dict = get_data_base_path(self.config) + '/' + 'cpg_dict.pkl'
-        fn_data = get_data_base_path(self.config) + '/' + self.config.data.name
+        fn_dict = get_data_base_path(self.config) + '/' + 'betas_dict.pkl'
+        fn_data = get_data_base_path(self.config) + '/' + 'betas'
         fn_npz = fn_data + '.npz'
 
-        load_cpg(self.config)
+        load_betas(self.config)
 
         self.assertEqual(True, os.path.isfile(fn_dict) and os.path.isfile(fn_npz))
 
     def test_load_cpg_check_len_cpg_dict(self):
-        load_cpg(self.config)
-        self.assertEqual(300, len(list(self.config.cpg_dict)))
+        load_betas(self.config)
+        self.assertEqual(300, len(list(self.config.betas_dict)))
 
     def test_load_cpg_check_shape_cpg_data(self):
-        load_cpg(self.config)
-        self.assertEqual((300, 729), self.config.cpg_data.shape)
+        load_betas(self.config)
+        self.assertEqual((300, 729), self.config.betas_data.shape)

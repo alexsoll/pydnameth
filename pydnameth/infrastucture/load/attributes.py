@@ -4,7 +4,7 @@ import os.path
 import pickle
 
 
-def load_attributes_dict(config):
+def load_observables_dict(config):
     fn = get_data_base_path(config) + '/' + config.attributes.observables.name
     fn_txt = fn + '.txt'
     fn_pkl = fn + '.pkl'
