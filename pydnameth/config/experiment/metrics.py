@@ -45,8 +45,32 @@ def get_method_metrics_keys(config):
                 metrics = [
                     'item',
                     'aux',
+
                     'gq_f_value',
-                    'gq_f_p_value'
+                    'gq_f_p_value',
+
+                    'best_type',
+                    'best_R2',
+                    'best_R2_adj',
+                    'std_var_diff',
+
+                    'std_lin_R2',
+                    'std_lin_R2_adj',
+                    'std_lin_intercept',
+                    'std_lin_slope',
+                    'std_lin_intercept_std',
+                    'std_lin_slope_std',
+                    'std_lin_intercept_p_value',
+                    'std_lin_slope_p_value',
+
+                    'std_log_R2',
+                    'std_log_R2_adj',
+                    'std_log_intercept',
+                    'std_log_slope',
+                    'std_log_intercept_std',
+                    'std_log_slope_std',
+                    'std_log_intercept_p_value',
+                    'std_log_slope_p_value'
                 ]
 
             elif config.experiment.method == Method.variance_linreg:
@@ -131,6 +155,7 @@ def get_method_metrics_keys(config):
                     'r',
                     'evs',
                     'mae',
+                    'rms',
                     'summary'
                 ]
 

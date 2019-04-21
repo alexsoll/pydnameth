@@ -17,6 +17,7 @@ class Method(Enum):
     cluster = 'cluster'
     histogram = 'histogram'
     scatter = 'scatter'
+    curve = 'curve'
     polygon = 'polygon'
     special = 'special'
     z_test_linreg = 'z_test_linreg'

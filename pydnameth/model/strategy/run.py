@@ -2,7 +2,7 @@ import abc
 from pydnameth.config.experiment.types import Method, DataType
 from pydnameth.config.experiment.metrics import get_method_metrics_keys
 import statsmodels.api as sm
-import statsmodels.stats.diagnostic as sms
+import statsmodels.stats.diagnostic as ssd
 import numpy as np
 from sklearn.cluster import DBSCAN
 from pydnameth.routines.clock.types import ClockExogType, Clock
@@ -15,6 +15,7 @@ from pydnameth.routines.common import is_float, get_names, normalize_to_0_1
 from pydnameth.routines.polygon.types import PolygonRoutines
 from statsmodels.stats.stattools import jarque_bera, omni_normtest, durbin_watson
 from tqdm import tqdm
+from pydnameth.routines.residuals.variance import residuals_variance
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -43,8 +44,8 @@ class TableRunStrategy(RunStrategy):
 
             if config.experiment.method == Method.linreg:
 
-                target = self.get_strategy.get_target(config)
-                x = sm.add_constant(target)
+                targets = self.get_strategy.get_target(config)
+                x = sm.add_constant(targets)
                 y = self.get_strategy.get_single_base(config, [item])[0]
 
                 results = sm.OLS(y, x).fit()
@@ -93,8 +94,8 @@ class TableRunStrategy(RunStrategy):
 
             elif config.experiment.method == Method.variance_linreg:
 
-                target = self.get_strategy.get_target(config)
-                x = sm.add_constant(target)
+                targets = self.get_strategy.get_target(config)
+                x = sm.add_constant(targets)
                 y = self.get_strategy.get_single_base(config, [item])[0]
 
                 results = sm.OLS(y, x).fit()
@@ -189,17 +190,17 @@ class TableRunStrategy(RunStrategy):
 
                 for config_child in configs_child:
 
-                    target = self.get_strategy.get_target(config_child)
+                    targets = self.get_strategy.get_target(config_child)
                     item_id = config_child.advanced_dict[item]
 
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
-                            metrics_keys.append(key)
                             advanced_data = config_child.advanced_data[key][item_id]
                             suffix = str(config_child.attributes.observables)
                             if suffix != '' and suffix not in key:
                                 key += '_' + suffix
                             config.metrics[key].append(advanced_data)
+                            metrics_keys.append(key)
 
                     points_region = []
                     points_slope = []
@@ -213,7 +214,7 @@ class TableRunStrategy(RunStrategy):
                         slope_std = config_child.advanced_data['slope_std'][item_id]
 
                         pr = PolygonRoutines(
-                            x=target,
+                            x=targets,
                             y=[],
                             params={
                                 'intercept': intercept,
@@ -256,7 +257,7 @@ class TableRunStrategy(RunStrategy):
                         slope_var = config_child.advanced_data['slope_var'][item_id]
 
                         pr = PolygonRoutines(
-                            x=target,
+                            x=targets,
                             y=[],
                             params={
                                 'intercept': intercept,
@@ -330,12 +331,12 @@ class TableRunStrategy(RunStrategy):
 
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
-                            metrics_keys.append(key)
                             advanced_data = config_child.advanced_data[key][item_id]
                             suffix = str(config_child.attributes.observables)
                             if suffix != '' and suffix not in key:
                                 key += '_' + suffix
                             config.metrics[key].append(advanced_data)
+                            metrics_keys.append(key)
 
                     slopes.append(config_child.advanced_data['slope'][item_id])
                     slopes_std.append(config_child.advanced_data['slope_std'][item_id])
@@ -362,12 +363,12 @@ class TableRunStrategy(RunStrategy):
 
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
-                            metrics_keys.append(key)
                             advanced_data = config_child.advanced_data[key][item_id]
                             suffix = str(config_child.attributes.observables)
                             if suffix != '' and suffix not in key:
                                 key += '_' + suffix
                             config.metrics[key].append(advanced_data)
+                            metrics_keys.append(key)
 
                 config.metrics['item'].append(item)
                 aux = self.get_strategy.get_aux(config, item)
@@ -377,21 +378,73 @@ class TableRunStrategy(RunStrategy):
 
             if config.experiment.method == Method.heteroscedasticity:
 
-                target = np.asarray(self.get_strategy.get_target(config)).reshape(-1, 1)
-                residuals = self.get_strategy.get_single_base(config, [item])[0]
-                residuals.reshape(-1, 1)
+                targets = np.asarray(self.get_strategy.get_target(config)).reshape(-1, 1)
+                residuals = self.get_strategy.get_single_base(config, [item]).reshape(-1, 1)
 
-                gq_test = sms.het_goldfeldquandt(residuals, target)
+                gq_test = ssd.het_goldfeldquandt(residuals, targets)
+
+                targets = np.squeeze(np.asarray(targets))
+                residuals = np.squeeze(np.asarray(residuals))
+
+                exog = sm.add_constant(targets)
+                endog = residuals
+                results = sm.OLS(endog, exog).fit()
+                residuals_upd = results.resid
+
+                std_semi_window = config.experiment.method_params['std_semi_window']
+                std_exog, std_endog = residuals_variance(targets, residuals_upd, std_semi_window)
+
+                std_lin_exog = sm.add_constant(std_exog)
+                std_lin_endog = std_endog
+                std_lin_results = sm.OLS(std_lin_endog, std_lin_exog).fit()
+
+                std_log_exog = sm.add_constant(std_exog)
+                std_log_endog = np.log(std_endog)
+                std_log_results = sm.OLS(std_log_endog, std_log_exog).fit()
+
+                R2s = [std_lin_results.rsquared, std_log_results.rsquared]
+                best_R2_id = np.argmax(R2s)
+
+                R2s_adj = [std_lin_results.rsquared_adj, std_log_results.rsquared_adj]
+                best_R2_adj_id = np.argmax(R2s_adj)
+
+                if best_R2_id == 0:
+                    std_var_diff = std_lin_results.params[1] * (max(std_exog) - min(std_exog))
+                else:
+                    y2 = np.exp(std_lin_results.params[1] * max(std_exog) + std_lin_results.params[0])
+                    y1 = np.exp(std_lin_results.params[1] * min(std_exog) + std_lin_results.params[0])
+                    std_var_diff = y2 - y1
+                std_var_diff = abs(std_var_diff)
 
                 config.metrics['item'].append(item)
                 aux = self.get_strategy.get_aux(config, item)
                 config.metrics['aux'].append(aux)
-                config.metrics['bp_lms'].append(0)
-                config.metrics['bp_lms_p_value'].append(0)
-                config.metrics['bp_f_value'].append(0)
-                config.metrics['bp_f_p_value'].append(0)
+
                 config.metrics['gq_f_value'].append(gq_test[0])
                 config.metrics['gq_f_p_value'].append(gq_test[1])
+
+                config.metrics['best_type'].append(best_R2_id)
+                config.metrics['best_R2'].append(R2s[best_R2_id])
+                config.metrics['best_R2_adj'].append(R2s_adj[best_R2_adj_id])
+                config.metrics['std_var_diff'].append(std_var_diff)
+
+                config.metrics['std_lin_R2'].append(std_lin_results.rsquared)
+                config.metrics['std_lin_R2_adj'].append(std_lin_results.rsquared_adj)
+                config.metrics['std_lin_intercept'].append(std_lin_results.params[0])
+                config.metrics['std_lin_slope'].append(std_lin_results.params[1])
+                config.metrics['std_lin_intercept_std'].append(std_lin_results.bse[0])
+                config.metrics['std_lin_slope_std'].append(std_lin_results.bse[1])
+                config.metrics['std_lin_intercept_p_value'].append(std_lin_results.pvalues[0])
+                config.metrics['std_lin_slope_p_value'].append(std_lin_results.pvalues[1])
+
+                config.metrics['std_log_R2'].append(std_log_results.rsquared)
+                config.metrics['std_log_R2_adj'].append(std_log_results.rsquared_adj)
+                config.metrics['std_log_intercept'].append(std_log_results.params[0])
+                config.metrics['std_log_slope'].append(std_log_results.params[1])
+                config.metrics['std_log_intercept_std'].append(std_log_results.bse[0])
+                config.metrics['std_log_slope_std'].append(std_log_results.bse[1])
+                config.metrics['std_log_intercept_p_value'].append(std_log_results.pvalues[0])
+                config.metrics['std_log_slope_p_value'].append(std_log_results.pvalues[1])
 
     def iterate(self, config, configs_child):
         for item in tqdm(config.base_list, mininterval=60.0, desc=f'{str(config.experiment)} running'):
@@ -430,7 +483,7 @@ class ClockRunStrategy(RunStrategy):
 
                 if type == ClockExogType.all.value:
 
-                    for exog_id in range(0, size):
+                    for exog_id in tqdm(range(0, size), mininterval=60.0, desc=f'clock building'):
                         config.metrics['item'].append(items[exog_id])
                         aux = self.get_strategy.get_aux(config, items[exog_id])
                         config.metrics['aux'].append(aux)
@@ -452,7 +505,7 @@ class ClockRunStrategy(RunStrategy):
 
                 elif type == ClockExogType.deep.value:
 
-                    for exog_id in range(0, size):
+                    for exog_id in tqdm(range(0, size), mininterval=60.0, desc=f'clock building'):
                         config.metrics['item'].append(exog_id + 1)
                         config.metrics['aux'].append(exog_id + 1)
 
@@ -508,6 +561,7 @@ class PlotRunStrategy(RunStrategy):
 
                 item = config.experiment.method_params['item']
                 details = config.experiment.method_params['details']
+                std_semi_window = config.experiment.method_params['std_semi_window']
 
                 plot_data = []
 
@@ -515,7 +569,7 @@ class PlotRunStrategy(RunStrategy):
 
                     curr_plot_data = []
 
-                    target = self.get_strategy.get_target(config_child)
+                    targets = self.get_strategy.get_target(config_child)
                     methylation = self.get_strategy.get_single_base(config_child, [item])[0]
                     color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
                     coordinates = color[4:-1].split(',')
@@ -523,7 +577,7 @@ class PlotRunStrategy(RunStrategy):
                     color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.8) + ')'
 
                     scatter = go.Scatter(
-                        x=target,
+                        x=targets,
                         y=methylation,
                         name=get_names(config_child),
                         mode='markers',
@@ -540,7 +594,7 @@ class PlotRunStrategy(RunStrategy):
 
                     if config_child.experiment.method == Method.linreg:
 
-                        x = sm.add_constant(target)
+                        x = sm.add_constant(targets)
                         y = methylation
 
                         results = sm.OLS(y, x).fit()
@@ -550,10 +604,46 @@ class PlotRunStrategy(RunStrategy):
                         intercept_std = results.bse[0]
                         slope_std = results.bse[1]
 
+                        if std_semi_window != 'none':
+                            residuals = results.resid
+                            std_x, std_y = residuals_variance(targets, residuals, std_semi_window)
+
+                            std_y_t = np.zeros(len(std_y), dtype=float)
+                            std_y_b = np.zeros(len(std_y), dtype=float)
+                            for std_id in range(0, len(std_x)):
+                                std_y_t[std_id] = (slope * std_x[std_id] + intercept) + std_y[std_id]
+                                std_y_b[std_id] = (slope * std_x[std_id] + intercept) - std_y[std_id]
+
+                            scatter = go.Scatter(
+                                x=std_x,
+                                y=std_y_t,
+                                name=get_names(config_child),
+                                mode='lines',
+                                line=dict(
+                                    width=4,
+                                    color=color_border
+                                ),
+                                showlegend=False
+                            )
+                            curr_plot_data.append(scatter)
+
+                            scatter = go.Scatter(
+                                x=std_x,
+                                y=std_y_b,
+                                name=get_names(config_child),
+                                mode='lines',
+                                line=dict(
+                                    width=4,
+                                    color=color_border
+                                ),
+                                showlegend=False
+                            )
+                            curr_plot_data.append(scatter)
+
                         # Adding regression line
                         if details >= 1:
-                            x_min = np.min(target)
-                            x_max = np.max(target)
+                            x_min = np.min(targets)
+                            x_max = np.max(targets)
                             y_min = slope * x_min + intercept
                             y_max = slope * x_max + intercept
                             scatter = go.Scatter(
@@ -575,7 +665,7 @@ class PlotRunStrategy(RunStrategy):
                         # Adding polygon area
                         if details >= 2:
                             pr = PolygonRoutines(
-                                x=target,
+                                x=targets,
                                 y=[],
                                 params={
                                     'intercept': intercept,
@@ -590,7 +680,7 @@ class PlotRunStrategy(RunStrategy):
 
                     elif config_child.experiment.method == Method.variance_linreg:
 
-                        x = sm.add_constant(target)
+                        x = sm.add_constant(targets)
                         y = methylation
 
                         results = sm.OLS(y, x).fit()
@@ -606,8 +696,8 @@ class PlotRunStrategy(RunStrategy):
 
                         # Adding regression line
                         if details >= 1:
-                            x_min = np.min(target)
-                            x_max = np.max(target)
+                            x_min = np.min(targets)
+                            x_max = np.max(targets)
                             y_min = slope * x_min + intercept
                             y_max = slope * x_max + intercept
                             scatter = go.Scatter(
@@ -628,7 +718,7 @@ class PlotRunStrategy(RunStrategy):
                         # Adding polygon area
                         if details >= 1:
                             pr = PolygonRoutines(
-                                x=target,
+                                x=targets,
                                 y=[],
                                 params={
                                     'intercept': intercept,
@@ -660,16 +750,62 @@ class PlotRunStrategy(RunStrategy):
                     plot_data['group_labels'].append(str(config_child.attributes.observables))
                     plot_data['colors'].append(cl.scales['8']['qual']['Set1'][configs_child.index(config_child)])
 
-                    target = self.get_strategy.get_target(config_child)
+                    targets = self.get_strategy.get_target(config_child)
                     methylation = self.get_strategy.get_single_base(config_child, [item])[0]
 
                     if config_child.experiment.method == Method.linreg:
-                        x = sm.add_constant(target)
+                        x = sm.add_constant(targets)
                         y = methylation
 
                         results = sm.OLS(y, x).fit()
 
                         plot_data['hist_data'].append(results.resid)
+
+                config.experiment_data['data'] = plot_data
+
+            elif config.experiment.method == Method.curve:
+
+                x_target = config.experiment.method_params['x']
+                y_target = config.experiment.method_params['y']
+                number_of_points = int(config.experiment.method_params['number_of_points'])
+
+                plot_data = []
+
+                for config_child in configs_child:
+
+                    if x_target == 'count':
+                        xs = list(range(1, number_of_points + 1))
+                    else:
+                        if x_target in config_child.advanced_data:
+                            xs = config_child.advanced_data[x_target][0:number_of_points]
+                        else:
+                            raise ValueError(f'{x_target} not in {config_child}.')
+
+                    if y_target in config_child.advanced_data:
+                        ys = config_child.advanced_data[y_target][0:number_of_points]
+                    else:
+                        raise ValueError(f'{y_target} not in {config_child}.')
+
+                    color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
+                    coordinates = color[4:-1].split(',')
+                    color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.5) + ')'
+                    color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.9) + ')'
+
+                    scatter = go.Scatter(
+                        x=xs,
+                        y=ys,
+                        name=get_names(config_child),
+                        mode='lines+markers',
+                        marker=dict(
+                            size=10,
+                            color=color_transparent,
+                            line=dict(
+                                width=2,
+                                color=color_border,
+                            )
+                        ),
+                    )
+                    plot_data.append(scatter)
 
                 config.experiment_data['data'] = plot_data
 
@@ -867,15 +1003,15 @@ class PlotRunStrategy(RunStrategy):
 
                     curr_plot_data = []
 
-                    target = self.get_strategy.get_target(config_child)
-                    is_number_list = [is_float(t) for t in target]
+                    targets = self.get_strategy.get_target(config_child)
+                    is_number_list = [is_float(t) for t in targets]
                     if False in is_number_list:
                         xbins = {}
                     else:
                         bin_size = config.experiment.method_params['bin_size']
                         xbins = dict(
-                            start=min(target) - 0.5 * bin_size,
-                            end=max(target) + 0.5 * bin_size,
+                            start=min(targets) - 0.5 * bin_size,
+                            end=max(targets) + 0.5 * bin_size,
                             size=bin_size
                         )
 
@@ -883,7 +1019,7 @@ class PlotRunStrategy(RunStrategy):
 
                     if config_child.experiment.method == Method.histogram:
                         histogram = go.Histogram(
-                            x=target,
+                            x=targets,
                             name=get_names(config_child),
                             xbins=xbins,
                             marker=dict(

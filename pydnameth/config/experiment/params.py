@@ -14,6 +14,11 @@ def get_default_method_params(config):
                     'min_samples_percentage': 1
                 }
 
+            if config.experiment.method == Method.heteroscedasticity:
+                params = {
+                    'std_semi_window': 2
+                }
+
         elif config.experiment.task == Task.clock:
 
             if config.experiment.method == Method.linreg:
@@ -37,6 +42,12 @@ def get_default_method_params(config):
                 params = {
                     'item': 'cg01620164',
                 }
+            elif config.experiment.method == Method.curve:
+                params = {
+                    'x': 'x',
+                    'y': 'y',
+                    'number_of_points': 100
+                }
 
     elif config.experiment.data == DataType.observables:
 
@@ -58,7 +69,8 @@ def get_default_method_params(config):
                 params = {
                     'x_range': 'auto',
                     'y_range': 'auto',
-                    'y_type': 'linear'
+                    'y_type': 'linear',
+                    'std_semi_window': 'none'
                 }
 
             if config.experiment.method == Method.range:

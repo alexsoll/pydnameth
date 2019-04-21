@@ -31,6 +31,7 @@ def build_clock_linreg(clock):
     r_best = 0
     evs_best = 0
     mae_best = max(endog_data)
+    rms_best = 0
 
     for exog_ids in exog_ids_all:
 
@@ -53,6 +54,7 @@ def build_clock_linreg(clock):
         r_test = 0.0
         evs_test = 0.0
         mae_test = 0.0
+        rms_test = 0.0
 
         for train_index, test_index in rs.split(indexes):
 
@@ -83,20 +85,25 @@ def build_clock_linreg(clock):
             r_test += r_value
             evs = metrics.explained_variance_score(y_test, list(y_test_pred))
             mae = metrics.mean_absolute_error(y_test, list(y_test_pred))
+            rms = np.sqrt(metrics.mean_squared_error(y_test, y_test_pred))
             evs_test += evs
             mae_test += mae
+            rms_test += rms
 
         r_test /= float(num_bootstrap_runs)
         evs_test /= float(num_bootstrap_runs)
         mae_test /= float(num_bootstrap_runs)
+        rms_test /= float(num_bootstrap_runs)
 
         if mae_test < mae_best:
             R2_best = R2
             r_best = r_test
             evs_best = evs_test
             mae_best = mae_test
+            rms_best = rms_test
 
     metrics_dict['R2'].append(R2_best)
     metrics_dict['r'].append(r_best)
     metrics_dict['evs'].append(evs_best)
     metrics_dict['mae'].append(mae_best)
+    metrics_dict['rms'].append(rms_best)

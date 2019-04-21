@@ -31,6 +31,7 @@ from pydnameth.scripts.develop.betas.clock import \
     betas_special_clock_linreg_dev
 from pydnameth.scripts.develop.betas.plot import \
     betas_plot_scatter_dev,\
+    betas_clock_plot_curve_dev,\
     betas_plot_scatter_var_dev,\
     betas_plot_variance_histogram_dev
 
@@ -51,7 +52,8 @@ from pydnameth.scripts.develop.residuals_common.plot import \
 from pydnameth.scripts.develop.residuals_common.table import \
     residuals_common_table_aggregator_dev,\
     residuals_common_table_linreg_dev, \
-    residuals_common_table_heteroscedasticity_dev
+    residuals_common_table_heteroscedasticity_dev,\
+    residuals_common_table_aggregator_variance
 
 from pydnameth.scripts.develop.residuals_special.plot import \
     residuals_special_plot_scatter_dev
