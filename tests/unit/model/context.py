@@ -29,7 +29,7 @@ from pydnameth.config.experiment.types import DataType
 from tests.tear_down import clear_cache
 
 
-class TestAnnotationsConditions(unittest.TestCase):
+class TestContext(unittest.TestCase):
     def setUp(self):
         data = Data(
             path=ROOT_DIR,
