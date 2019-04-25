@@ -14,6 +14,7 @@ class Method(Enum):
     linreg = 'linreg'
     heteroscedasticity = 'heteroscedasticity'
     variance_linreg = 'variance_linreg'
+    variance = 'variance'
     cluster = 'cluster'
     histogram = 'histogram'
     scatter = 'scatter'

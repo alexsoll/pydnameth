@@ -2,7 +2,6 @@ import abc
 from pydnameth.config.experiment.types import Method, DataType
 from pydnameth.config.experiment.metrics import get_method_metrics_keys
 import statsmodels.api as sm
-import statsmodels.stats.diagnostic as ssd
 import numpy as np
 from sklearn.cluster import DBSCAN
 from pydnameth.routines.clock.types import ClockExogType, Clock
@@ -15,7 +14,7 @@ from pydnameth.routines.common import is_float, get_names, normalize_to_0_1
 from pydnameth.routines.polygon.types import PolygonRoutines
 from statsmodels.stats.stattools import jarque_bera, omni_normtest, durbin_watson
 from tqdm import tqdm
-from pydnameth.routines.residuals.variance import residuals_variance
+from pydnameth.routines.residuals.variance import residuals_std, residuals_box, variance_processing
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -50,18 +49,18 @@ class TableRunStrategy(RunStrategy):
 
                 results = sm.OLS(y, x).fit()
 
-                residuals = results.resid
+                y = results.resid
 
                 jb, jbpv, skew, kurtosis = jarque_bera(results.wresid)
                 omni, omnipv = omni_normtest(results.wresid)
 
-                res_mean = np.mean(residuals)
-                res_std = np.std(residuals)
+                res_mean = np.mean(y)
+                res_std = np.std(y)
 
-                _, normality_p_value_shapiro = shapiro(residuals)
-                _, normality_p_value_ks_wo_params = kstest(residuals, 'norm')
-                _, normality_p_value_ks_with_params = kstest(residuals, 'norm', (res_mean, res_std))
-                _, normality_p_value_dagostino = normaltest(residuals)
+                _, normality_p_value_shapiro = shapiro(y)
+                _, normality_p_value_ks_wo_params = kstest(y, 'norm')
+                _, normality_p_value_ks_with_params = kstest(y, 'norm', (res_mean, res_std))
+                _, normality_p_value_dagostino = normaltest(y)
 
                 config.metrics['item'].append(item)
                 aux = self.get_strategy.get_aux(config, item)
@@ -91,63 +90,6 @@ class TableRunStrategy(RunStrategy):
                 config.metrics['slope_std'].append(results.bse[1])
                 config.metrics['intercept_p_value'].append(results.pvalues[0])
                 config.metrics['slope_p_value'].append(results.pvalues[1])
-
-            elif config.experiment.method == Method.variance_linreg:
-
-                targets = self.get_strategy.get_target(config)
-                x = sm.add_constant(targets)
-                y = self.get_strategy.get_single_base(config, [item])[0]
-
-                results = sm.OLS(y, x).fit()
-                residuals = results.resid
-
-                res_mean = np.mean(residuals)
-                res_std = np.std(residuals)
-
-                _, normality_p_value_shapiro = shapiro(residuals)
-                _, normality_p_value_ks_wo_params = kstest(residuals, 'norm')
-                _, normality_p_value_ks_with_params = kstest(residuals, 'norm', (res_mean, res_std))
-                _, normality_p_value_dagostino = normaltest(residuals)
-
-                config.metrics['item'].append(item)
-                aux = self.get_strategy.get_aux(config, item)
-                config.metrics['aux'].append(aux)
-                config.metrics['R2'].append(results.rsquared)
-                config.metrics['intercept'].append(results.params[0])
-                config.metrics['slope'].append(results.params[1])
-                config.metrics['intercept_std'].append(results.bse[0])
-                config.metrics['slope_std'].append(results.bse[1])
-                config.metrics['intercept_p_value'].append(results.pvalues[0])
-                config.metrics['slope_p_value'].append(results.pvalues[1])
-                config.metrics['normality_p_value_shapiro'].append(normality_p_value_shapiro)
-                config.metrics['normality_p_value_ks_wo_params'].append(normality_p_value_ks_wo_params)
-                config.metrics['normality_p_value_ks_with_params'].append(normality_p_value_ks_with_params)
-                config.metrics['normality_p_value_dagostino'].append(normality_p_value_dagostino)
-
-                diffs = np.abs(residuals)
-
-                results_var = sm.OLS(diffs, x).fit()
-                residuals_var = results_var.resid
-
-                res_mean_var = np.mean(residuals_var)
-                res_std_var = np.std(residuals_var)
-
-                _, normality_p_value_shapiro_var = shapiro(residuals_var)
-                _, normality_p_value_ks_wo_params_var = kstest(residuals_var, 'norm')
-                _, normality_p_value_ks_with_params_var = kstest(residuals_var, 'norm', (res_mean_var, res_std_var))
-                _, normality_p_value_dagostino_var = normaltest(residuals_var)
-
-                config.metrics['R2_var'].append(results_var.rsquared)
-                config.metrics['intercept_var'].append(results_var.params[0])
-                config.metrics['slope_var'].append(results_var.params[1])
-                config.metrics['intercept_std_var'].append(results_var.bse[0])
-                config.metrics['slope_std_var'].append(results_var.bse[1])
-                config.metrics['intercept_p_value_var'].append(results_var.pvalues[0])
-                config.metrics['slope_p_value_var'].append(results_var.pvalues[1])
-                config.metrics['normality_p_value_shapiro_var'].append(normality_p_value_shapiro_var)
-                config.metrics['normality_p_value_ks_wo_params_var'].append(normality_p_value_ks_wo_params_var)
-                config.metrics['normality_p_value_ks_with_params_var'].append(normality_p_value_ks_with_params_var)
-                config.metrics['normality_p_value_dagostino_var'].append(normality_p_value_dagostino_var)
 
             elif config.experiment.method == Method.cluster:
 
@@ -374,77 +316,39 @@ class TableRunStrategy(RunStrategy):
                 aux = self.get_strategy.get_aux(config, item)
                 config.metrics['aux'].append(aux)
 
-        if config.experiment.data in [DataType.residuals_common, DataType.residuals_special]:
+            elif config.experiment.method == Method.variance:
 
-            if config.experiment.method == Method.heteroscedasticity:
-
-                targets = np.asarray(self.get_strategy.get_target(config)).reshape(-1, 1)
-                residuals = self.get_strategy.get_single_base(config, [item]).reshape(-1, 1)
-
-                gq_test = ssd.het_goldfeldquandt(residuals, targets)
-
+                targets = self.get_strategy.get_target(config)
+                data = self.get_strategy.get_single_base(config, [item])
                 targets = np.squeeze(np.asarray(targets))
-                residuals = np.squeeze(np.asarray(residuals))
+                data = np.squeeze(np.asarray(data))
 
                 exog = sm.add_constant(targets)
-                endog = residuals
+                endog = data
                 results = sm.OLS(endog, exog).fit()
-                residuals_upd = results.resid
+                residuals = results.resid
 
-                std_semi_window = config.experiment.method_params['std_semi_window']
-                std_exog, std_endog = residuals_variance(targets, residuals_upd, std_semi_window)
+                semi_window = config.experiment.method_params['semi_window']
 
-                std_lin_exog = sm.add_constant(std_exog)
-                std_lin_endog = std_endog
-                std_lin_results = sm.OLS(std_lin_endog, std_lin_exog).fit()
+                exog, endog = residuals_std(targets, residuals, semi_window)
+                variance_processing(exog, endog, config.metrics, 'std')
 
-                std_log_exog = sm.add_constant(std_exog)
-                std_log_endog = np.log(std_endog)
-                std_log_results = sm.OLS(std_log_endog, std_log_exog).fit()
+                xs, bs, ms, ts = residuals_box(targets, residuals, semi_window)
+                variance_processing(xs, bs, config.metrics, 'box_b')
+                variance_processing(xs, ms, config.metrics, 'box_m')
+                variance_processing(xs, ts, config.metrics, 'box_t')
 
-                R2s = [std_lin_results.rsquared, std_log_results.rsquared]
-                best_R2_id = np.argmax(R2s)
+                R2s = [
+                    config.metrics['std_best_R2'][-1],
+                    np.min([config.metrics['box_b_best_R2'][-1], config.metrics['box_t_best_R2'][-1]])
+                ]
 
-                R2s_adj = [std_lin_results.rsquared_adj, std_log_results.rsquared_adj]
-                best_R2_adj_id = np.argmax(R2s_adj)
-
-                if best_R2_id == 0:
-                    std_var_diff = std_lin_results.params[1] * (max(std_exog) - min(std_exog))
-                else:
-                    y2 = np.exp(std_lin_results.params[1] * max(std_exog) + std_lin_results.params[0])
-                    y1 = np.exp(std_lin_results.params[1] * min(std_exog) + std_lin_results.params[0])
-                    std_var_diff = y2 - y1
-                std_var_diff = abs(std_var_diff)
+                config.metrics['best_type'].append(np.argmax(R2s))
+                config.metrics['best_R2'].append(np.max(R2s))
 
                 config.metrics['item'].append(item)
                 aux = self.get_strategy.get_aux(config, item)
                 config.metrics['aux'].append(aux)
-
-                config.metrics['gq_f_value'].append(gq_test[0])
-                config.metrics['gq_f_p_value'].append(gq_test[1])
-
-                config.metrics['best_type'].append(best_R2_id)
-                config.metrics['best_R2'].append(R2s[best_R2_id])
-                config.metrics['best_R2_adj'].append(R2s_adj[best_R2_adj_id])
-                config.metrics['std_var_diff'].append(std_var_diff)
-
-                config.metrics['std_lin_R2'].append(std_lin_results.rsquared)
-                config.metrics['std_lin_R2_adj'].append(std_lin_results.rsquared_adj)
-                config.metrics['std_lin_intercept'].append(std_lin_results.params[0])
-                config.metrics['std_lin_slope'].append(std_lin_results.params[1])
-                config.metrics['std_lin_intercept_std'].append(std_lin_results.bse[0])
-                config.metrics['std_lin_slope_std'].append(std_lin_results.bse[1])
-                config.metrics['std_lin_intercept_p_value'].append(std_lin_results.pvalues[0])
-                config.metrics['std_lin_slope_p_value'].append(std_lin_results.pvalues[1])
-
-                config.metrics['std_log_R2'].append(std_log_results.rsquared)
-                config.metrics['std_log_R2_adj'].append(std_log_results.rsquared_adj)
-                config.metrics['std_log_intercept'].append(std_log_results.params[0])
-                config.metrics['std_log_slope'].append(std_log_results.params[1])
-                config.metrics['std_log_intercept_std'].append(std_log_results.bse[0])
-                config.metrics['std_log_slope_std'].append(std_log_results.bse[1])
-                config.metrics['std_log_intercept_p_value'].append(std_log_results.pvalues[0])
-                config.metrics['std_log_slope_p_value'].append(std_log_results.pvalues[1])
 
     def iterate(self, config, configs_child):
         for item in tqdm(config.base_list, mininterval=60.0, desc=f'{str(config.experiment)} running'):
@@ -560,25 +464,28 @@ class PlotRunStrategy(RunStrategy):
             if config.experiment.method == Method.scatter:
 
                 item = config.experiment.method_params['item']
-                details = config.experiment.method_params['details']
-                std_semi_window = config.experiment.method_params['std_semi_window']
+                line = config.experiment.method_params['line']
+                add = config.experiment.method_params['add']
+                semi_window = config.experiment.method_params['semi_window']
 
                 plot_data = []
 
                 for config_child in configs_child:
 
-                    curr_plot_data = []
-
+                    # Plot data
                     targets = self.get_strategy.get_target(config_child)
-                    methylation = self.get_strategy.get_single_base(config_child, [item])[0]
+                    data = self.get_strategy.get_single_base(config_child, [item])[0]
+
+                    # Colors setup
                     color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
                     coordinates = color[4:-1].split(',')
                     color_transparent = 'rgba(' + ','.join(coordinates) + ',' + str(0.1) + ')'
                     color_border = 'rgba(' + ','.join(coordinates) + ',' + str(0.8) + ')'
 
+                    # Adding scatter
                     scatter = go.Scatter(
                         x=targets,
-                        y=methylation,
+                        y=data,
                         name=get_names(config_child),
                         mode='markers',
                         marker=dict(
@@ -590,148 +497,137 @@ class PlotRunStrategy(RunStrategy):
                             )
                         ),
                     )
-                    curr_plot_data.append(scatter)
+                    plot_data.append(scatter)
 
-                    if config_child.experiment.method == Method.linreg:
+                    # Linear regression
+                    x = sm.add_constant(targets)
+                    y = data
+                    results = sm.OLS(y, x).fit()
+                    intercept = results.params[0]
+                    slope = results.params[1]
+                    intercept_std = results.bse[0]
+                    slope_std = results.bse[1]
 
-                        x = sm.add_constant(targets)
-                        y = methylation
+                    # Adding regression line
+                    if line == 'yes':
+                        x_min = np.min(targets)
+                        x_max = np.max(targets)
+                        y_min = slope * x_min + intercept
+                        y_max = slope * x_max + intercept
+                        scatter = go.Scatter(
+                            x=[x_min, x_max],
+                            y=[y_min, y_max],
+                            mode='lines',
+                            marker=dict(
+                                color=color
+                            ),
+                            line=dict(
+                                width=6,
+                                color=color
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
 
-                        results = sm.OLS(y, x).fit()
+                    # Adding polygon area
+                    if add == 'polygon':
+                        pr = PolygonRoutines(
+                            x=targets,
+                            y=[],
+                            params={
+                                'intercept': intercept,
+                                'slope': slope,
+                                'intercept_std': intercept_std,
+                                'slope_std': slope_std
+                            },
+                            method=config_child.experiment.method
+                        )
+                        scatter = pr.get_scatter(color_transparent)
+                        plot_data.append(scatter)
 
-                        intercept = results.params[0]
-                        slope = results.params[1]
-                        intercept_std = results.bse[0]
-                        slope_std = results.bse[1]
-
-                        if std_semi_window != 'none':
-                            residuals = results.resid
-                            std_x, std_y = residuals_variance(targets, residuals, std_semi_window)
-
-                            std_y_t = np.zeros(len(std_y), dtype=float)
-                            std_y_b = np.zeros(len(std_y), dtype=float)
-                            for std_id in range(0, len(std_x)):
-                                std_y_t[std_id] = (slope * std_x[std_id] + intercept) + std_y[std_id]
-                                std_y_b[std_id] = (slope * std_x[std_id] + intercept) - std_y[std_id]
-
-                            scatter = go.Scatter(
-                                x=std_x,
-                                y=std_y_t,
-                                name=get_names(config_child),
-                                mode='lines',
-                                line=dict(
-                                    width=4,
-                                    color=color_border
-                                ),
-                                showlegend=False
-                            )
-                            curr_plot_data.append(scatter)
-
-                            scatter = go.Scatter(
-                                x=std_x,
-                                y=std_y_b,
-                                name=get_names(config_child),
-                                mode='lines',
-                                line=dict(
-                                    width=4,
-                                    color=color_border
-                                ),
-                                showlegend=False
-                            )
-                            curr_plot_data.append(scatter)
-
-                        # Adding regression line
-                        if details >= 1:
-                            x_min = np.min(targets)
-                            x_max = np.max(targets)
-                            y_min = slope * x_min + intercept
-                            y_max = slope * x_max + intercept
-                            scatter = go.Scatter(
-                                x=[x_min, x_max],
-                                y=[y_min, y_max],
-                                mode='lines',
-                                marker=dict(
-                                    color=color
-                                ),
-                                line=dict(
-                                    width=6,
-                                    color=color
-                                ),
-                                showlegend=False
-                            )
-
-                            curr_plot_data.append(scatter)
-
-                        # Adding polygon area
-                        if details >= 2:
-                            pr = PolygonRoutines(
-                                x=targets,
-                                y=[],
-                                params={
-                                    'intercept': intercept,
-                                    'slope': slope,
-                                    'intercept_std': intercept_std,
-                                    'slope_std': slope_std
-                                },
-                                method=config_child.experiment.method
-                            )
-                            scatter = pr.get_scatter(color_transparent)
-                            curr_plot_data.append(scatter)
-
-                    elif config_child.experiment.method == Method.variance_linreg:
-
-                        x = sm.add_constant(targets)
-                        y = methylation
-
-                        results = sm.OLS(y, x).fit()
-                        intercept = results.params[0]
-                        slope = results.params[1]
+                    # Adding std curve
+                    if add == 'std' and semi_window != 'none':
 
                         residuals = results.resid
-                        diffs = np.abs(residuals)
-                        results_var = sm.OLS(diffs, x).fit()
 
-                        intercept_var = results_var.params[0]
-                        slope_var = results_var.params[1]
+                        xs, ys = residuals_std(targets, residuals, semi_window)
+                        ys_t = np.zeros(len(ys), dtype=float)
+                        ys_b = np.zeros(len(ys), dtype=float)
+                        for std_id in range(0, len(xs)):
+                            ys_t[std_id] = (slope * xs[std_id] + intercept) + ys[std_id]
+                            ys_b[std_id] = (slope * xs[std_id] + intercept) - ys[std_id]
 
-                        # Adding regression line
-                        if details >= 1:
-                            x_min = np.min(targets)
-                            x_max = np.max(targets)
-                            y_min = slope * x_min + intercept
-                            y_max = slope * x_max + intercept
-                            scatter = go.Scatter(
-                                x=[x_min, x_max],
-                                y=[y_min, y_max],
-                                mode='lines',
-                                marker=dict(
-                                    color=color,
-                                ),
-                                line=dict(
-                                    width=6,
-                                    color=color
-                                ),
-                                showlegend=False
-                            )
-                            curr_plot_data.append(scatter)
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=ys_t,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=4,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
 
-                        # Adding polygon area
-                        if details >= 1:
-                            pr = PolygonRoutines(
-                                x=targets,
-                                y=[],
-                                params={
-                                    'intercept': intercept,
-                                    'slope': slope,
-                                    'intercept_var': intercept_var,
-                                    'slope_var': slope_var,
-                                },
-                                method=config_child.experiment.method
-                            )
-                            scatter = pr.get_scatter(color)
-                            curr_plot_data.append(scatter)
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=ys_b,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=4,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
 
-                    plot_data += curr_plot_data
+                    # Adding box curve
+                    if add == 'box' and semi_window != 'none':
+
+                        residuals = results.resid
+
+                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window)
+
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=bs,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=4,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
+
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=ms,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=6,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
+
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=ts,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=4,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
 
                 config.experiment_data['data'] = plot_data
 
@@ -751,11 +647,11 @@ class PlotRunStrategy(RunStrategy):
                     plot_data['colors'].append(cl.scales['8']['qual']['Set1'][configs_child.index(config_child)])
 
                     targets = self.get_strategy.get_target(config_child)
-                    methylation = self.get_strategy.get_single_base(config_child, [item])[0]
+                    data = self.get_strategy.get_single_base(config_child, [item])[0]
 
                     if config_child.experiment.method == Method.linreg:
                         x = sm.add_constant(targets)
-                        y = methylation
+                        y = data
 
                         results = sm.OLS(y, x).fit()
 
@@ -825,7 +721,8 @@ class PlotRunStrategy(RunStrategy):
                     y = np.zeros(len(indexes), dtype=int)
 
                     for subj_id in range(0, len(indexes)):
-                        subj_col = self.get_strategy.get_single_base(config_child, [subj_id])
+                        col_id = indexes[subj_id]
+                        subj_col = self.get_strategy.get_single_base(config_child, [col_id])
                         y[subj_id] = np.sum(subj_col)
 
                     color = cl.scales['8']['qual']['Set1'][configs_child.index(config_child)]
@@ -906,7 +803,8 @@ class PlotRunStrategy(RunStrategy):
                     y = np.zeros(len(indexes), dtype=int)
 
                     for subj_id in range(0, len(indexes)):
-                        subj_col = self.get_strategy.get_single_base(config_child, [subj_id])
+                        col_id = indexes[subj_id]
+                        subj_col = self.get_strategy.get_single_base(config_child, [col_id])
                         y[subj_id] = np.sum(subj_col)
 
                     for seg_id in range(0, len(borders) - 1):

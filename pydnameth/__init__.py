@@ -20,7 +20,7 @@ from .config.experiment.types import DataType, Task, Method
 
 from pydnameth.scripts.develop.betas.table import \
     betas_table_aggregator_dev,\
-    betas_table_aggregator_var_dev,\
+    betas_table_aggregator_variance_dev,\
     betas_table_linreg_dev,\
     betas_table_cluster_dev,\
     betas_table_polygon_dev,\
