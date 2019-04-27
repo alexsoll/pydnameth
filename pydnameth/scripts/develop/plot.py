@@ -7,7 +7,7 @@ from pydnameth.config.attributes.attributes import Observables, Cells, Attribute
 from pydnameth.model.tree import build_tree, calc_tree
 
 
-def plot_scatter_dev(
+def plot_scatter(
     data_type,
     data,
     annotations,

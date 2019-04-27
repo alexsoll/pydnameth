@@ -10,11 +10,10 @@ from pydnameth.infrastucture.path import get_save_path
 from pydnameth.model.tree import build_tree, calc_tree
 
 
-def betas_clock_linreg_dev(
+def betas_clock_linreg(
     data,
     annotations,
     attributes,
-    child_method=Method.linreg,
     method_params=None
 ):
     config_root = Config(
@@ -37,7 +36,7 @@ def betas_clock_linreg_dev(
         experiment=Experiment(
             data=DataType.betas,
             task=Task.table,
-            method=copy.deepcopy(child_method)
+            method=Method.linreg
         ),
         annotations=copy.deepcopy(annotations),
         attributes=copy.deepcopy(attributes),
@@ -51,13 +50,48 @@ def betas_clock_linreg_dev(
     calc_tree(root)
 
 
-def betas_special_clock_linreg_dev(
+def betas_clock_special(
     data,
     annotations,
     attributes,
     file,
     method_params=None,
 ):
+    """
+        Producing epigentic clock, using best CpGs which are provided in input file.
+
+        Epigentic clock represents as table:
+        Each row corresponds to clocks, which are built on all CpGs from the previous rows including the current row.
+        Columns:
+
+        * item: CpG id.
+        * aux: gene, on which CpG is mapped.
+        * R2: determination coefficient of linear regression between real and predicted target observable.
+          A statistical measure of how well the regression line approximates the data points.
+        * r: correlation coefficient of linear regression between real and predicted target observable.
+        * evs: explained variance regression score.
+        * mae: mean absolute error regression loss.
+        * rmse: root mean square error
+
+        Possible parameters of experiment:
+
+        * ``'type'``: type of clocks. \n
+          Possible options: \n
+          ``'all'``: iterative building of clocks starting from one element in the model,
+          ending with ``'size'`` elements in the model. \n
+          ``'single '``: building of clocks only with ``'size'`` elements in the model. \n
+          ``'deep'``: iterative building of clocks starting from one element in the model,
+          ending with ``'size'`` elements in the model, but choosing all possible combinations from ``'size'`` elements.
+        * ``'part'``: the proportion of considered number of subject in the test set. From ``0.0`` to ``1.0``.
+        * ``'size'``: maximum number of exogenous variables in a model.
+        * ``'runs'`` number of bootstrap runs in model
+
+        :param data: pdm.Data instance, which specifies information about dataset.
+        :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
+        :param attributes: pdm.Attributes instance, which specifies information about subjects.
+        :param method_params: parameters of experiment.
+     """
+
     if os.path.isfile(file):
 
         head, tail = os.path.split(file)

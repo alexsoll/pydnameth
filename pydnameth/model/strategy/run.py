@@ -115,26 +115,9 @@ class TableRunStrategy(RunStrategy):
 
             elif config.experiment.method == Method.polygon:
 
-                polygons_region = []
-                polygons_slope = []
-                polygons_region_min = []
-                max_abs_slope = 0.0
-                is_inside = False
-
-                mins = [min(self.get_strategy.get_target(config_child)) for config_child in configs_child]
-                maxs = [max(self.get_strategy.get_target(config_child)) for config_child in configs_child]
-                border_l = max(mins)
-                border_r = min(maxs)
-                if border_l > border_r:
-                    raise ValueError('Polygons borders are not consistent')
-
                 metrics_keys = get_method_metrics_keys(config)
-
                 for config_child in configs_child:
-
-                    targets = self.get_strategy.get_target(config_child)
                     item_id = config_child.advanced_dict[item]
-
                     for key in config_child.advanced_data:
                         if key not in metrics_keys:
                             advanced_data = config_child.advanced_data[key][item_id]
@@ -144,11 +127,25 @@ class TableRunStrategy(RunStrategy):
                             config.metrics[key].append(advanced_data)
                             metrics_keys.append(key)
 
-                    points_region = []
-                    points_slope = []
-                    points_region_min = []
+                if config.experiment.method_params['method'] == Method.linreg:
 
-                    if config_child.experiment.method == Method.linreg:
+                    polygons_region = []
+                    polygons_slope = []
+                    polygons_region_min = []
+                    max_abs_slope = 0.0
+                    is_inside = False
+
+                    mins = [min(self.get_strategy.get_target(config_child)) for config_child in configs_child]
+                    maxs = [max(self.get_strategy.get_target(config_child)) for config_child in configs_child]
+                    border_l = max(mins)
+                    border_r = min(maxs)
+                    if border_l > border_r:
+                        raise ValueError('Polygons borders are not consistent')
+
+                    for config_child in configs_child:
+
+                        targets = self.get_strategy.get_target(config_child)
+                        item_id = config_child.advanced_dict[item]
 
                         intercept = config_child.advanced_data['intercept'][item_id]
                         slope = config_child.advanced_data['slope'][item_id]
@@ -190,74 +187,112 @@ class TableRunStrategy(RunStrategy):
                         )
                         points_region_min = pr_min.get_border_points()
 
-                    elif config_child.experiment.method == Method.linreg.variance_linreg:
+                        polygon = geometry.Polygon([[point.x, point.y] for point in points_region])
+                        polygons_region.append(polygon)
 
-                        intercept = config_child.advanced_data['intercept'][item_id]
-                        slope = config_child.advanced_data['slope'][item_id]
-                        slope_std = config_child.advanced_data['slope_std'][item_id]
-                        intercept_var = config_child.advanced_data['intercept_var'][item_id]
-                        slope_var = config_child.advanced_data['slope_var'][item_id]
+                        polygon = geometry.Polygon([[point.x, point.y] for point in points_slope])
+                        polygons_slope.append(polygon)
 
-                        pr = PolygonRoutines(
-                            x=targets,
-                            y=[],
-                            params={
-                                'intercept': intercept,
-                                'slope': slope,
-                                'intercept_var': intercept_var,
-                                'slope_var': slope_var,
-                            },
-                            method=config_child.experiment.method
-                        )
+                        polygon = geometry.Polygon([[point.x, point.y] for point in points_region_min])
+                        polygons_region_min.append(polygon)
 
-                        points_region = pr.get_border_points()
+                    intersection = polygons_region[0]
+                    union = polygons_region[0]
+                    for polygon in polygons_region[1::]:
+                        intersection = intersection.intersection(polygon)
+                        union = union.union(polygon)
+                    area_intersection_rel = intersection.area / union.area
 
-                        points_slope = [
-                            geometry.Point(slope - 3.0 * slope_std, 0.0),
-                            geometry.Point(slope + 3.0 * slope_std, 0.0),
-                            geometry.Point(slope + 3.0 * slope_std, 1.0),
-                            geometry.Point(slope - 3.0 * slope_std, 1.0),
-                        ]
+                    union = polygons_region_min[0]
+                    for polygon in polygons_region_min[1::]:
+                        union = union.union(polygon)
+                    for polygon in polygons_region_min:
+                        if union.area == polygon.area:
+                            is_inside = True
 
-                        max_abs_slope = max(max_abs_slope, abs(slope))
+                    intersection = polygons_slope[0]
+                    union = polygons_slope[0]
+                    for polygon in polygons_slope[1::]:
+                        intersection = intersection.intersection(polygon)
+                        union = union.union(polygon)
+                    slope_intersection_rel = intersection.area / union.area
 
-                    polygon = geometry.Polygon([[point.x, point.y] for point in points_region])
-                    polygons_region.append(polygon)
+                    config.metrics['item'].append(item)
+                    aux = self.get_strategy.get_aux(config, item)
+                    config.metrics['aux'].append(aux)
+                    config.metrics['area_intersection_rel'].append(area_intersection_rel)
+                    config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
+                    config.metrics['max_abs_slope'].append(max_abs_slope)
+                    config.metrics['is_inside'].append(is_inside)
 
-                    polygon = geometry.Polygon([[point.x, point.y] for point in points_slope])
-                    polygons_slope.append(polygon)
+                elif config.experiment.method_params['method'] == Method.variance:
 
-                    polygon = geometry.Polygon([[point.x, point.y] for point in points_region_min])
-                    polygons_region_min.append(polygon)
+                    polygons_region_std = []
+                    polygons_region_box = []
 
-                intersection = polygons_region[0]
-                union = polygons_region[0]
-                for polygon in polygons_region[1::]:
-                    intersection = intersection.intersection(polygon)
-                    union = union.union(polygon)
-                area_intersection_rel = intersection.area / union.area
+                    for config_child in configs_child:
 
-                union = polygons_region_min[0]
-                for polygon in polygons_region_min[1::]:
-                    union = union.union(polygon)
-                for polygon in polygons_region_min:
-                    if union.area == polygon.area:
-                        is_inside = True
+                        targets = self.get_strategy.get_target(config_child)
+                        data = self.get_strategy.get_single_base(config_child, [item])
+                        targets = np.squeeze(np.asarray(targets))
+                        data = np.squeeze(np.asarray(data))
 
-                intersection = polygons_slope[0]
-                union = polygons_slope[0]
-                for polygon in polygons_slope[1::]:
-                    intersection = intersection.intersection(polygon)
-                    union = union.union(polygon)
-                slope_intersection_rel = intersection.area / union.area
+                        exog = sm.add_constant(targets)
+                        endog = data
+                        results = sm.OLS(endog, exog).fit()
+                        residuals = results.resid
 
-                config.metrics['item'].append(item)
-                aux = self.get_strategy.get_aux(config, item)
-                config.metrics['aux'].append(aux)
-                config.metrics['area_intersection_rel'].append(area_intersection_rel)
-                config.metrics['slope_intersection_rel'].append(slope_intersection_rel)
-                config.metrics['max_abs_slope'].append(max_abs_slope)
-                config.metrics['is_inside'].append(is_inside)
+                        semi_window = config_child.experiment.method_params['semi_window']
+
+                        std_xs, std_ys = residuals_std(targets, residuals, semi_window)
+                        points_std = []
+                        for p_id in range(0, len(std_xs)):
+                            points_std.append(geometry.Point(
+                                std_xs[p_id],
+                                std_ys[p_id]
+                            ))
+                        for p_id in range(len(std_xs) - 1, -1, -1):
+                            points_std.append(geometry.Point(
+                                std_xs[p_id],
+                                -std_ys[p_id]
+                            ))
+                        polygon = geometry.Polygon([[point.x, point.y] for point in points_std])
+                        polygons_region_std.append(polygon)
+
+                        box_xs, box_bs, box_ms, box_ts = residuals_box(targets, residuals, semi_window)
+                        points_box = []
+                        for p_id in range(0, len(box_xs)):
+                            points_box.append(geometry.Point(
+                                box_xs[p_id],
+                                box_ts[p_id]
+                            ))
+                        for p_id in range(len(box_xs) - 1, -1, -1):
+                            points_box.append(geometry.Point(
+                                box_xs[p_id],
+                                box_bs[p_id]
+                            ))
+                        polygon = geometry.Polygon([[point.x, point.y] for point in points_box])
+                        polygons_region_box.append(polygon)
+
+                    intersection_std = polygons_region_std[0]
+                    union_std = polygons_region_std[0]
+                    for polygon in polygons_region_std[1::]:
+                        intersection_std = intersection_std.intersection(polygon)
+                        union_std = union_std.union(polygon)
+                    area_intersection_rel_std = intersection_std.area / union_std.area
+
+                    intersection_box = polygons_region_box[0]
+                    union_box = polygons_region_box[0]
+                    for polygon in polygons_region_box[1::]:
+                        intersection_box = intersection_box.intersection(polygon)
+                        union_box = union_box.union(polygon)
+                    area_intersection_rel_box = intersection_box.area / union_box.area
+
+                    config.metrics['item'].append(item)
+                    aux = self.get_strategy.get_aux(config, item)
+                    config.metrics['aux'].append(aux)
+                    config.metrics['area_intersection_rel_std'].append(area_intersection_rel_std)
+                    config.metrics['area_intersection_rel_box'].append(area_intersection_rel_box)
 
             elif config.experiment.method == Method.z_test_linreg:
 

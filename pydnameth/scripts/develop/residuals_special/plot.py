@@ -1,8 +1,8 @@
 from pydnameth.config.experiment.types import Method, DataType
-from pydnameth.scripts.develop.plot import plot_scatter_dev
+from pydnameth.scripts.develop.plot import plot_scatter
 
 
-def residuals_special_plot_scatter_dev(
+def residuals_special_plot_scatter(
     data,
     annotations,
     attributes,
@@ -11,7 +11,7 @@ def residuals_special_plot_scatter_dev(
     child_method=Method.linreg,
     params=None
 ):
-    plot_scatter_dev(
+    plot_scatter(
         DataType.residuals_special,
         data,
         annotations,

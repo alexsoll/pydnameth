@@ -19,6 +19,11 @@ def get_default_method_params(config):
                     'semi_window': 2
                 }
 
+            elif config.experiment.method == Method.polygon:
+                params = {
+                    'method': Method.linreg
+                }
+
         elif config.experiment.task == Task.clock:
 
             if config.experiment.method == Method.linreg:

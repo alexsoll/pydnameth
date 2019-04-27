@@ -1,19 +1,42 @@
-import copy
-from anytree import Node
-from pydnameth.config.config import Config
-from pydnameth.config.experiment.types import Task, Method, DataType
-from pydnameth.config.experiment.experiment import Experiment
-from pydnameth.config.attributes.attributes import Observables, Cells, Attributes
-from pydnameth.model.tree import build_tree, calc_tree
-from pydnameth.scripts.develop.table import table, table_aggregator, table_aggregator_variance
+from pydnameth.config.experiment.types import Method, DataType
+from pydnameth.scripts.develop.table import table, table_aggregator_linreg, table_aggregator_variance
 
 
-def betas_table_linreg_dev(
+def betas_table_linreg(
     data,
     annotations,
     attributes,
     method_params=None
 ):
+    """
+       Producing table with information for linear regression between beta values
+       and methylation level for each CpG.
+
+       Each row corresponds to specific CpG.
+
+       Columns:
+
+       * item: CpG id.
+       * aux: gene, on which CpG is mapped.
+       * R2: determination coefficient. A statistical measure of how well the regression line approximates the data points.
+       * intercept: estimated value of the intercept of linear regression.
+       * slope: estimated value of the slope of linear regression.
+       * intercept_std: standard error of the estimate of the intercept of linear regression.
+       * slope_std: standard error of the estimate of the slope of linear regression.
+       * intercept_p_value: p-value for the intercept of linear regression.
+       * slope_p_pvalue: p-value for the slope of linear regression.
+       * ...
+
+       Possible parameters of experiment:
+
+       * None
+
+       :param data: pdm.Data instance, which specifies information about dataset.
+       :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
+       :param attributes: pdm.Attributes instance, which specifies information about subjects.
+       :param method_params: parameters of experiment.
+   """
+
     table(
         data=data,
         annotations=annotations,
@@ -24,7 +47,7 @@ def betas_table_linreg_dev(
     )
 
 
-def betas_table_cluster_dev(
+def betas_table_cluster(
     data,
     annotations,
     attributes,
@@ -40,155 +63,59 @@ def betas_table_cluster_dev(
     )
 
 
-def betas_table_variance_linreg_dev(
-    data,
-    annotations,
-    attributes,
-    method_params=None
-):
-    config_root = Config(
-        data=copy.deepcopy(data),
-        experiment=Experiment(
-            data=DataType.betas,
-            task=Task.table,
-            method=Method.variance_linreg,
-            method_params=copy.deepcopy(method_params)
-        ),
-        annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes),
-        is_run=True,
-        is_root=True
-    )
-
-    root = Node(name=str(config_root), config=config_root)
-    build_tree(root)
-    calc_tree(root)
-
-
-def betas_table_polygon_dev(
-    data,
-    annotations,
-    attributes,
-    observables_list,
-    child_method=Method.linreg,
-    method_params=None
-):
-    config_root = Config(
-        data=copy.deepcopy(data),
-        experiment=Experiment(
-            data=DataType.betas,
-            task=Task.table,
-            method=Method.polygon,
-            method_params=copy.deepcopy(method_params)
-        ),
-        annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes),
-        is_run=True,
-        is_root=True
-    )
-    root = Node(name=str(config_root), config=config_root)
-
-    for d in observables_list:
-        observables_child = Observables(
-            name=copy.deepcopy(attributes.observables.name),
-            types=d
-        )
-
-        cells_child = Cells(
-            name=copy.deepcopy(attributes.cells.name),
-            types=copy.deepcopy(attributes.cells.types)
-        )
-
-        attributes_child = Attributes(
-            target=copy.deepcopy(attributes.target),
-            observables=observables_child,
-            cells=cells_child,
-        )
-
-        config_child = Config(
-            data=copy.deepcopy(data),
-            experiment=Experiment(
-                data=DataType.betas,
-                task=Task.table,
-                method=copy.deepcopy(child_method)
-            ),
-            annotations=copy.deepcopy(annotations),
-            attributes=attributes_child,
-            is_run=True,
-            is_root=False
-        )
-        Node(name=str(config_child), config=config_child, parent=root)
-
-    build_tree(root)
-    calc_tree(root)
-
-
-def betas_table_z_test_linreg_dev(
-    data,
-    annotations,
-    attributes,
-    observables_list,
-    child_method=Method.linreg,
-    method_params=None
-):
-    config_root = Config(
-        data=copy.deepcopy(data),
-        experiment=Experiment(
-            data=DataType.betas,
-            task=Task.table,
-            method=Method.z_test_linreg,
-            method_params=copy.deepcopy(method_params)
-        ),
-        annotations=copy.deepcopy(annotations),
-        attributes=copy.deepcopy(attributes),
-        is_run=True,
-        is_root=True
-    )
-    root = Node(name=str(config_root), config=config_root)
-
-    for d in observables_list:
-        observables_child = Observables(
-            name=copy.deepcopy(attributes.observables.name),
-            types=d
-        )
-
-        cells_child = Cells(
-            name=copy.deepcopy(attributes.cells.name),
-            types=copy.deepcopy(attributes.cells.types)
-        )
-
-        attributes_child = Attributes(
-            target=copy.deepcopy(attributes.target),
-            observables=observables_child,
-            cells=cells_child,
-        )
-
-        config_child = Config(
-            data=copy.deepcopy(data),
-            experiment=Experiment(
-                data=DataType.betas,
-                task=Task.table,
-                method=copy.deepcopy(child_method)
-            ),
-            annotations=copy.deepcopy(annotations),
-            attributes=attributes_child,
-            is_run=True,
-            is_root=False
-        )
-        Node(name=str(config_child), config=config_child, parent=root)
-
-    build_tree(root)
-    calc_tree(root)
-
-
-def betas_table_aggregator_dev(
+def betas_table_aggregator_linreg(
     data,
     annotations,
     attributes,
     observables_list,
     method_params=None
 ):
-    table_aggregator(
+    """
+        Producing table with information about observable-specificity of target data type
+        and target observable for each CpG.
+
+        Columns:
+
+        * item: CpG id.
+        * aux: gene, on which CpG is mapped.
+        * area_intersection_rel: relative intersection area of polygons
+          which is equals area of polygon(s) intersection to area of polygons union ratio.
+        * slope_intersection_rel: relative intersection area of allowed regions for slopes of linear regression.
+        * max_abs_slope: maximal absolute slope between all provided subjects subsets
+        * ...
+        * z_value: number of standard deviations by which data point is above the mean value.
+        * The considered data point is the difference between two linear regressions slopes.
+        * abs_z_value: absolute z_value
+        * p_value: probability of rejecting the null hypothesis that the difference in slopes is zero.
+        * ...
+
+        For each subjects subset the next columns are added to the resulting table:
+
+        * R2_***: determination coefficient.
+          A statistical measure of how well the regression line approximates the data points.
+        * intercept_***: estimated value of the intercept of linear regression.
+        * slope_***: estimated value of the slope of linear regression.
+        * intercept_std_***: standard error of the estimate of the intercept of linear regression.
+        * slope_std_***: standard error of the estimate of the slope of linear regression.
+        * intercept_p_value_***: p-value for the intercept of linear regression.
+        * slope_p_pvalue_***: p-value for the slope of linear regression.
+        * ...
+
+        Where *** is the name of subjects subset.
+
+        Possible parameters of experiment:
+
+        * None
+
+        :param data: pdm.Data instance, which specifies information about dataset.
+        :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
+        :param attributes: pdm.Attributes instance, which specifies information about subjects.
+        :param observables_list: list of subjects subsets. Each element in list is dict,
+         where ``key`` is observable name and ``value`` is possible values for this observable.
+        :param method_params: parameters of experiment.
+    """
+
+    table_aggregator_linreg(
         DataType.betas,
         data,
         annotations,
@@ -198,7 +125,7 @@ def betas_table_aggregator_dev(
     )
 
 
-def betas_table_aggregator_variance_dev(
+def betas_table_aggregator_variance(
     data,
     annotations,
     attributes,

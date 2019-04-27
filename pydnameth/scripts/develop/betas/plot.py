@@ -5,10 +5,10 @@ from pydnameth.config.experiment.types import Task, Method, DataType
 from pydnameth.config.experiment.experiment import Experiment
 from pydnameth.config.attributes.attributes import Observables, Cells, Attributes
 from pydnameth.model.tree import build_tree, calc_tree
-from pydnameth.scripts.develop.plot import plot_scatter_dev
+from pydnameth.scripts.develop.plot import plot_scatter
 
 
-def betas_plot_scatter_dev(
+def betas_plot_scatter(
     data,
     annotations,
     attributes,
@@ -17,7 +17,24 @@ def betas_plot_scatter_dev(
     child_method=Method.linreg,
     method_params=None
 ):
-    plot_scatter_dev(
+    """
+    Plotting methylation level from observables as scatter for provided subjects subsets and provided CpG list.
+
+    Possible parameters of experiment:
+
+     * ``'x_range'``: can be ``'auto'`` or list with two elements, which are borders of target axis.
+     * ...
+
+    :param data: pdm.Data instance, which specifies information about dataset.
+    :param annotations: pdm.Annotations instance, which specifies subset of CpGs.
+    :param attributes: pdm.Attributes instance, which specifies information about subjects.
+    :param cpg_list: List of CpGs for plotting
+    :param observables_list: list of subjects subsets. Each element in list is dict,
+     where ``key`` is observable name and ``value`` is possible values for this observable.
+    :param method_params: parameters of experiment.
+    """
+
+    plot_scatter(
         data_type=DataType.betas,
         data=data,
         annotations=annotations,
@@ -29,28 +46,7 @@ def betas_plot_scatter_dev(
     )
 
 
-def betas_plot_scatter_var_dev(
-    data,
-    annotations,
-    attributes,
-    cpg_list,
-    observables_list,
-    child_method=Method.linreg,
-    method_params=None
-):
-    plot_scatter_dev(
-        data_type=DataType.betas,
-        data=data,
-        annotations=annotations,
-        attributes=attributes,
-        cpg_list=cpg_list,
-        observables_list=observables_list,
-        child_method=child_method,
-        method_params=method_params
-    )
-
-
-def betas_clock_plot_curve_dev(
+def betas_plot_curve_clock(
     data,
     annotations,
     attributes,

@@ -69,49 +69,66 @@ def residuals_box(targets, residuals, semi_window=2):
 
 
 def variance_processing(exog, endog, characteristics_dict, key_prefix):
-    lin_exog = sm.add_constant(exog)
-    lin_endog = endog
-    lin_results = sm.OLS(lin_endog, lin_exog).fit()
-
-    characteristics_dict[key_prefix + '_lin_R2'].append(lin_results.rsquared)
-    characteristics_dict[key_prefix + '_lin_intercept'].append(lin_results.params[0])
-    characteristics_dict[key_prefix + '_lin_slope'].append(lin_results.params[1])
-    characteristics_dict[key_prefix + '_lin_intercept_std'].append(lin_results.bse[0])
-    characteristics_dict[key_prefix + '_lin_slope_std'].append(lin_results.bse[1])
-    characteristics_dict[key_prefix + '_lin_intercept_p_value'].append(lin_results.pvalues[0])
-    characteristics_dict[key_prefix + '_lin_slope_p_value'].append(lin_results.pvalues[1])
+    lin_lin_exog = sm.add_constant(exog)
+    lin_lin_endog = endog
+    lin_lin_results = sm.OLS(lin_lin_endog, lin_lin_exog).fit()
+    characteristics_dict[key_prefix + '_lin_lin_R2'].append(lin_lin_results.rsquared)
+    characteristics_dict[key_prefix + '_lin_lin_intercept'].append(lin_lin_results.params[0])
+    characteristics_dict[key_prefix + '_lin_lin_slope'].append(lin_lin_results.params[1])
+    characteristics_dict[key_prefix + '_lin_lin_intercept_std'].append(lin_lin_results.bse[0])
+    characteristics_dict[key_prefix + '_lin_lin_slope_std'].append(lin_lin_results.bse[1])
+    characteristics_dict[key_prefix + '_lin_lin_intercept_p_value'].append(lin_lin_results.pvalues[0])
+    characteristics_dict[key_prefix + '_lin_lin_slope_p_value'].append(lin_lin_results.pvalues[1])
+    R2s = [lin_lin_results.rsquared]
 
     if min(endog) > 0:
-        log_exog = sm.add_constant(exog)
-        log_endog = np.log(endog)
-        log_results = sm.OLS(log_endog, log_exog).fit()
+        lin_log_exog = sm.add_constant(exog)
+        lin_log_endog = np.log(endog)
+        lin_log_results = sm.OLS(lin_log_endog, lin_log_exog).fit()
+        characteristics_dict[key_prefix + '_lin_log_R2'].append(lin_log_results.rsquared)
+        characteristics_dict[key_prefix + '_lin_log_intercept'].append(lin_log_results.params[0])
+        characteristics_dict[key_prefix + '_lin_log_slope'].append(lin_log_results.params[1])
+        characteristics_dict[key_prefix + '_lin_log_intercept_std'].append(lin_log_results.bse[0])
+        characteristics_dict[key_prefix + '_lin_log_slope_std'].append(lin_log_results.bse[1])
+        characteristics_dict[key_prefix + '_lin_log_intercept_p_value'].append(lin_log_results.pvalues[0])
+        characteristics_dict[key_prefix + '_lin_log_slope_p_value'].append(lin_log_results.pvalues[1])
+        R2s.append(lin_log_results.rsquared)
 
-        characteristics_dict[key_prefix + '_log_R2'].append(log_results.rsquared)
-        characteristics_dict[key_prefix + '_log_intercept'].append(log_results.params[0])
-        characteristics_dict[key_prefix + '_log_slope'].append(log_results.params[1])
-        characteristics_dict[key_prefix + '_log_intercept_std'].append(log_results.bse[0])
-        characteristics_dict[key_prefix + '_log_slope_std'].append(log_results.bse[1])
-        characteristics_dict[key_prefix + '_log_intercept_p_value'].append(log_results.pvalues[0])
-        characteristics_dict[key_prefix + '_log_slope_p_value'].append(log_results.pvalues[1])
-
-        R2s = [lin_results.rsquared, log_results.rsquared]
-        best_R2_id = np.argmax(R2s)
-        best_R2 = R2s[best_R2_id]
     else:
-        characteristics_dict[key_prefix + '_log_R2'].append('NA')
-        characteristics_dict[key_prefix + '_log_intercept'].append('NA')
-        characteristics_dict[key_prefix + '_log_slope'].append('NA')
-        characteristics_dict[key_prefix + '_log_intercept_std'].append('NA')
-        characteristics_dict[key_prefix + '_log_slope_std'].append('NA')
-        characteristics_dict[key_prefix + '_log_intercept_p_value'].append('NA')
-        characteristics_dict[key_prefix + '_log_slope_p_value'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_R2'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_intercept'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_slope'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_intercept_std'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_slope_std'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_intercept_p_value'].append('NA')
+        characteristics_dict[key_prefix + '_lin_log_slope_p_value'].append('NA')
+        R2s.append(-1)
 
-        best_R2_id = 0
-        best_R2 = lin_results.rsquared
+    if min(endog) > 0 and min(exog) > 0:
+        log_log_exog = sm.add_constant(np.log(exog))
+        log_log_endog = np.log(endog)
+        log_log_results = sm.OLS(log_log_endog, log_log_exog).fit()
+        characteristics_dict[key_prefix + '_log_log_R2'].append(log_log_results.rsquared)
+        characteristics_dict[key_prefix + '_log_log_intercept'].append(log_log_results.params[0])
+        characteristics_dict[key_prefix + '_log_log_slope'].append(log_log_results.params[1])
+        characteristics_dict[key_prefix + '_log_log_intercept_std'].append(log_log_results.bse[0])
+        characteristics_dict[key_prefix + '_log_log_slope_std'].append(log_log_results.bse[1])
+        characteristics_dict[key_prefix + '_log_log_intercept_p_value'].append(log_log_results.pvalues[0])
+        characteristics_dict[key_prefix + '_log_log_slope_p_value'].append(log_log_results.pvalues[1])
+        R2s.append(log_log_results.rsquared)
+
+    else:
+        characteristics_dict[key_prefix + '_log_log_R2'].append('NA')
+        characteristics_dict[key_prefix + '_log_log_intercept'].append('NA')
+        characteristics_dict[key_prefix + '_log_log_slope'].append('NA')
+        characteristics_dict[key_prefix + '_log_log_intercept_std'].append('NA')
+        characteristics_dict[key_prefix + '_log_log_slope_std'].append('NA')
+        characteristics_dict[key_prefix + '_log_log_intercept_p_value'].append('NA')
+        characteristics_dict[key_prefix + '_log_log_slope_p_value'].append('NA')
+        R2s.append(-1)
+
+    best_R2_id = np.argmax(R2s)
+    best_R2 = R2s[best_R2_id]
 
     characteristics_dict[key_prefix + '_best_type'].append(best_R2_id)
     characteristics_dict[key_prefix + '_best_R2'].append(best_R2)
-
-
-
-

@@ -38,7 +38,7 @@ def table(
     calc_tree(root)
 
 
-def table_aggregator(
+def table_aggregator_linreg(
     data_type,
     data,
     annotations,
@@ -69,6 +69,12 @@ def table_aggregator(
     root = Node(name=str(config_root), config=config_root)
 
     for child_method_lvl_1 in child_methods_lvl_1:
+
+        if child_method_lvl_1 == Method.polygon:
+            method_params = {'method': Method.linreg}
+        else:
+            method_params = {}
+
         config_lvl_1 = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
@@ -76,6 +82,7 @@ def table_aggregator(
                 task=Task.table,
                 method=child_method_lvl_1,
                 data_params=copy.deepcopy(data_params),
+                method_params=method_params
             ),
             annotations=copy.deepcopy(annotations),
             attributes=copy.deepcopy(attributes),
@@ -144,24 +151,40 @@ def table_aggregator_variance(
     )
     root = Node(name=str(config_root), config=config_root)
 
+    config_lvl_1 = Config(
+        data=copy.deepcopy(data),
+        experiment=Experiment(
+            data=data_type,
+            task=Task.table,
+            method=Method.polygon,
+            data_params=copy.deepcopy(data_params),
+            method_params={'method': Method.variance}
+        ),
+        annotations=copy.deepcopy(annotations),
+        attributes=copy.deepcopy(attributes),
+        is_run=True,
+        is_root=False
+    )
+    node_lvl_1 = Node(name=str(config_lvl_1), config=config_lvl_1, parent=root)
+
     for d in observables_list:
-        observables_lvl_1 = Observables(
+        observables_lvl_2 = Observables(
             name=copy.deepcopy(attributes.observables.name),
             types=d
         )
 
-        cells_lvl_1 = Cells(
+        cells_lvl_2 = Cells(
             name=copy.deepcopy(attributes.cells.name),
             types=copy.deepcopy(attributes.cells.types)
         )
 
-        attributes_lvl_1 = Attributes(
+        attributes_lvl_2 = Attributes(
             target=copy.deepcopy(attributes.target),
-            observables=observables_lvl_1,
-            cells=cells_lvl_1,
+            observables=observables_lvl_2,
+            cells=cells_lvl_2,
         )
 
-        config_lvl_1 = Config(
+        config_lvl_2 = Config(
             data=copy.deepcopy(data),
             experiment=Experiment(
                 data=data_type,
@@ -173,11 +196,11 @@ def table_aggregator_variance(
                 }
             ),
             annotations=copy.deepcopy(annotations),
-            attributes=attributes_lvl_1,
+            attributes=attributes_lvl_2,
             is_run=True,
             is_root=False
         )
-        Node(name=str(config_lvl_1), config=config_lvl_1, parent=root)
+        Node(name=str(config_lvl_2), config=config_lvl_2, parent=node_lvl_1)
 
     observables_cluster = Observables(
         name=copy.deepcopy(attributes.observables.name),

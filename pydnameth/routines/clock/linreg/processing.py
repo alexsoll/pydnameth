@@ -45,8 +45,6 @@ def build_clock_linreg(clock):
 
         reg_res = sm.OLS(endog=endog_df[endog_name], exog=exog_df[exog_arg_list]).fit()
 
-        metrics_dict['summary'].append(reg_res.summary())
-
         rs = ShuffleSplit(num_bootstrap_runs, test_size, train_size)
         indexes = np.linspace(0, len(endog_data) - 1, len(endog_data), dtype=int).tolist()
 
@@ -106,4 +104,4 @@ def build_clock_linreg(clock):
     metrics_dict['r'].append(r_best)
     metrics_dict['evs'].append(evs_best)
     metrics_dict['mae'].append(mae_best)
-    metrics_dict['rms'].append(rms_best)
+    metrics_dict['rmse'].append(rms_best)
