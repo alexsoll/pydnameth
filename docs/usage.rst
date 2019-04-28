@@ -331,7 +331,10 @@ The name of the functions provided by the ``pydnameth`` package are follow the n
 
 Currently released functions:
 
-.. automodule:: pydnameth.scripts.develop
+.. automodule:: pydnameth.scripts.develop.betas
+    :members:
+
+.. automodule:: pydnameth.scripts.develop.observables
     :members:
 
 --------------
