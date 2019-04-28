@@ -7,7 +7,7 @@ from pydnameth.config.attributes.attributes import Observables, Cells, Attribute
 from pydnameth.model.tree import build_tree, calc_tree
 
 
-def entropy_plot_scatter_dev(
+def entropy_plot_scatter(
     data,
     annotations,
     attributes,

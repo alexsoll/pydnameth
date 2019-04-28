@@ -7,7 +7,7 @@ from pydnameth.config.attributes.attributes import Observables, Cells, Attribute
 from pydnameth.model.tree import build_tree, calc_tree
 
 
-def epimutations_plot_scatter_dev(
+def epimutations_plot_scatter(
     data,
     annotations,
     attributes,
@@ -24,7 +24,7 @@ def epimutations_plot_scatter_dev(
     )
 
 
-def epimutations_plot_range_dev(
+def epimutations_plot_range(
     data,
     annotations,
     attributes,

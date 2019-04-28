@@ -20,6 +20,7 @@ def save_table_dict(fn, table_dict):
     fn_xls = fn + '.xlsx'
     df = pd.DataFrame(table_dict)
     writer = pd.ExcelWriter(fn_xls, engine='xlsxwriter')
+    writer.book.use_zip64()
     df.to_excel(writer, index=False)
     writer.save()
 

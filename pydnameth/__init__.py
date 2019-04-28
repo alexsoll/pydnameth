@@ -19,55 +19,38 @@ from .config.experiment.experiment import Experiment
 from .config.experiment.types import DataType, Task, Method
 
 from pydnameth.scripts.develop.betas.table import \
-    betas_table_aggregator_dev,\
-    betas_table_aggregator_var_dev,\
-    betas_table_linreg_dev,\
-    betas_table_cluster_dev,\
-    betas_table_polygon_dev,\
-    betas_table_variance_linreg_dev,\
-    betas_table_z_test_linreg_dev
+    betas_table_aggregator_linreg,\
+    betas_table_aggregator_variance,\
+    betas_table_linreg,\
+    betas_table_cluster
 from pydnameth.scripts.develop.betas.clock import \
-    betas_clock_linreg_dev,\
-    betas_special_clock_linreg_dev
+    betas_clock_linreg,\
+    betas_clock_special
 from pydnameth.scripts.develop.betas.plot import \
-    betas_plot_scatter_dev,\
-    betas_plot_scatter_var_dev,\
+    betas_plot_scatter,\
+    betas_plot_curve_clock,\
     betas_plot_variance_histogram_dev
 
 from pydnameth.scripts.develop.epimutations.load import \
-    epimutations_load_dev
+    epimutations_load
 from pydnameth.scripts.develop.epimutations.plot import \
-    epimutations_plot_scatter_dev,\
-    epimutations_plot_range_dev
+    epimutations_plot_scatter,\
+    epimutations_plot_range
 
 from pydnameth.scripts.develop.entropy.plot import \
-    entropy_plot_scatter_dev
+    entropy_plot_scatter
 
 from pydnameth.scripts.develop.observables.plot import \
-    observables_plot_histogram_dev
+    observables_plot_histogram
 
 from pydnameth.scripts.develop.residuals_common.plot import \
-    residuals_common_plot_scatter_dev
+    residuals_common_plot_scatter
 from pydnameth.scripts.develop.residuals_common.table import \
-    residuals_common_table_aggregator_dev,\
-    residuals_common_table_linreg_dev, \
-    residuals_common_table_heteroscedasticity_dev
+    residuals_common_table_aggregator_linreg,\
+    residuals_common_table_aggregator_variance
 
 from pydnameth.scripts.develop.residuals_special.plot import \
-    residuals_special_plot_scatter_dev
+    residuals_special_plot_scatter
 from pydnameth.scripts.develop.residuals_special.table import \
-    residuals_special_table_aggregator_dev,\
-    residuals_special_table_linreg_dev
-
-from pydnameth.scripts.release.betas.clock import \
-    betas_clock_linreg
-from pydnameth.scripts.release.betas.plot import \
-    cpg_plot_methylation_scatter
-from pydnameth.scripts.release.betas.table import \
-    cpg_proc_table_linreg,\
-    cpg_proc_table_polygon,\
-    cpg_proc_table_z_test_linreg
-
-from pydnameth.scripts.release.observables.plot import \
-    observables_plot_histogram
+    residuals_special_table_aggregator
 

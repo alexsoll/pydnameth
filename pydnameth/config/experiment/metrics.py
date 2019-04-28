@@ -40,42 +40,110 @@ def get_method_metrics_keys(config):
                     'normality_p_value_dagostino'
                 ]
 
-            elif config.experiment.method == Method.heteroscedasticity:
+            elif config.experiment.method == Method.variance:
 
                 metrics = [
                     'item',
                     'aux',
-                    'gq_f_value',
-                    'gq_f_p_value'
-                ]
 
-            elif config.experiment.method == Method.variance_linreg:
+                    'best_type',
+                    'best_R2',
 
-                metrics = [
-                    'item',
-                    'aux',
-                    'R2',
-                    'intercept',
-                    'slope',
-                    'intercept_std',
-                    'slope_std',
-                    'intercept_p_value',
-                    'slope_p_value',
-                    'normality_p_value_shapiro',
-                    'normality_p_value_ks_wo_params',
-                    'normality_p_value_ks_with_params',
-                    'normality_p_value_dagostino',
-                    'R2_var',
-                    'intercept_var',
-                    'slope_var',
-                    'intercept_std_var',
-                    'slope_std_var',
-                    'intercept_p_value_var',
-                    'slope_p_value_var',
-                    'normality_p_value_shapiro_var',
-                    'normality_p_value_ks_wo_params_var',
-                    'normality_p_value_ks_with_params_var',
-                    'normality_p_value_dagostino_var'
+                    'std_best_type',
+                    'std_best_R2',
+                    'std_lin_lin_R2',
+                    'std_lin_lin_intercept',
+                    'std_lin_lin_slope',
+                    'std_lin_lin_intercept_std',
+                    'std_lin_lin_slope_std',
+                    'std_lin_lin_intercept_p_value',
+                    'std_lin_lin_slope_p_value',
+                    'std_lin_log_R2',
+                    'std_lin_log_intercept',
+                    'std_lin_log_slope',
+                    'std_lin_log_intercept_std',
+                    'std_lin_log_slope_std',
+                    'std_lin_log_intercept_p_value',
+                    'std_lin_log_slope_p_value',
+                    'std_log_log_R2',
+                    'std_log_log_intercept',
+                    'std_log_log_slope',
+                    'std_log_log_intercept_std',
+                    'std_log_log_slope_std',
+                    'std_log_log_intercept_p_value',
+                    'std_log_log_slope_p_value',
+
+                    'box_b_best_type',
+                    'box_b_best_R2',
+                    'box_b_lin_lin_R2',
+                    'box_b_lin_lin_intercept',
+                    'box_b_lin_lin_slope',
+                    'box_b_lin_lin_intercept_std',
+                    'box_b_lin_lin_slope_std',
+                    'box_b_lin_lin_intercept_p_value',
+                    'box_b_lin_lin_slope_p_value',
+                    'box_b_lin_log_R2',
+                    'box_b_lin_log_intercept',
+                    'box_b_lin_log_slope',
+                    'box_b_lin_log_intercept_std',
+                    'box_b_lin_log_slope_std',
+                    'box_b_lin_log_intercept_p_value',
+                    'box_b_lin_log_slope_p_value',
+                    'box_b_log_log_R2',
+                    'box_b_log_log_intercept',
+                    'box_b_log_log_slope',
+                    'box_b_log_log_intercept_std',
+                    'box_b_log_log_slope_std',
+                    'box_b_log_log_intercept_p_value',
+                    'box_b_log_log_slope_p_value',
+
+                    'box_m_best_type',
+                    'box_m_best_R2',
+                    'box_m_lin_lin_R2',
+                    'box_m_lin_lin_intercept',
+                    'box_m_lin_lin_slope',
+                    'box_m_lin_lin_intercept_std',
+                    'box_m_lin_lin_slope_std',
+                    'box_m_lin_lin_intercept_p_value',
+                    'box_m_lin_lin_slope_p_value',
+                    'box_m_lin_log_R2',
+                    'box_m_lin_log_intercept',
+                    'box_m_lin_log_slope',
+                    'box_m_lin_log_intercept_std',
+                    'box_m_lin_log_slope_std',
+                    'box_m_lin_log_intercept_p_value',
+                    'box_m_lin_log_slope_p_value',
+                    'box_m_log_log_R2',
+                    'box_m_log_log_intercept',
+                    'box_m_log_log_slope',
+                    'box_m_log_log_intercept_std',
+                    'box_m_log_log_slope_std',
+                    'box_m_log_log_intercept_p_value',
+                    'box_m_log_log_slope_p_value',
+
+                    'box_t_best_type',
+                    'box_t_best_R2',
+                    'box_t_lin_lin_R2',
+                    'box_t_lin_lin_intercept',
+                    'box_t_lin_lin_slope',
+                    'box_t_lin_lin_intercept_std',
+                    'box_t_lin_lin_slope_std',
+                    'box_t_lin_lin_intercept_p_value',
+                    'box_t_lin_lin_slope_p_value',
+                    'box_t_lin_log_R2',
+                    'box_t_lin_log_intercept',
+                    'box_t_lin_log_slope',
+                    'box_t_lin_log_intercept_std',
+                    'box_t_lin_log_slope_std',
+                    'box_t_lin_log_intercept_p_value',
+                    'box_t_lin_log_slope_p_value',
+                    'box_t_log_log_R2',
+                    'box_t_log_log_intercept',
+                    'box_t_log_log_slope',
+                    'box_t_log_log_intercept_std',
+                    'box_t_log_log_slope_std',
+                    'box_t_log_log_intercept_p_value',
+                    'box_t_log_log_slope_p_value',
                 ]
 
             elif config.experiment.method == Method.cluster:
@@ -89,14 +157,25 @@ def get_method_metrics_keys(config):
 
             elif config.experiment.method == Method.polygon:
 
-                metrics = [
-                    'item',
-                    'aux',
-                    'area_intersection_rel',
-                    'slope_intersection_rel',
-                    'max_abs_slope',
-                    'is_inside'
-                ]
+                if config.experiment.method_params['method'] == Method.linreg:
+
+                    metrics = [
+                        'item',
+                        'aux',
+                        'area_intersection_rel',
+                        'slope_intersection_rel',
+                        'max_abs_slope',
+                        'is_inside'
+                    ]
+
+                elif config.experiment.method_params['method'] == Method.variance:
+
+                    metrics = [
+                        'item',
+                        'aux',
+                        'area_intersection_rel_std',
+                        'area_intersection_rel_box'
+                    ]
 
             elif config.experiment.method == Method.special:
 
@@ -131,7 +210,7 @@ def get_method_metrics_keys(config):
                     'r',
                     'evs',
                     'mae',
-                    'summary'
+                    'rmse',
                 ]
 
     return metrics

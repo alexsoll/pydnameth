@@ -4,7 +4,7 @@ from pydnameth.config.experiment.types import DataType, Method, Task
 def get_default_method_params(config):
     params = {}
 
-    if config.experiment.data in [DataType.betas, DataType.residuals_common, DataType.residuals_special]:
+    if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
 
         if config.experiment.task == Task.table:
 
@@ -12,6 +12,16 @@ def get_default_method_params(config):
                 params = {
                     'eps': 0.1,
                     'min_samples_percentage': 1
+                }
+
+            elif config.experiment.method == Method.variance:
+                params = {
+                    'semi_window': 2
+                }
+
+            elif config.experiment.method == Method.polygon:
+                params = {
+                    'method': Method.linreg
                 }
 
         elif config.experiment.task == Task.clock:
@@ -31,11 +41,19 @@ def get_default_method_params(config):
                     'item': 'cg01620164',
                     'x_range': 'auto',
                     'y_range': 'auto',
-                    'details': 2
+                    'line': 'yes',
+                    'add': 'none',
+                    'semi_window': 'none'
                 }
             elif config.experiment.method == Method.variance_histogram:
                 params = {
                     'item': 'cg01620164',
+                }
+            elif config.experiment.method == Method.curve:
+                params = {
+                    'x': 'x',
+                    'y': 'y',
+                    'number_of_points': 100
                 }
 
     elif config.experiment.data == DataType.observables:
@@ -58,7 +76,7 @@ def get_default_method_params(config):
                 params = {
                     'x_range': 'auto',
                     'y_range': 'auto',
-                    'y_type': 'linear'
+                    'y_type': 'linear',
                 }
 
             if config.experiment.method == Method.range:

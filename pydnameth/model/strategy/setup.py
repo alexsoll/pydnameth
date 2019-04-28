@@ -40,11 +40,11 @@ class TableSetUpStrategy(SetupStrategy):
 
             for key in config_child.advanced_data:
                 if key not in metrics_keys:
-                    metrics_keys.append(key)
                     suffix = str(config_child.attributes.observables)
                     if suffix != '' and suffix not in key:
                         key += '_' + suffix
                     config.metrics[key] = []
+                    metrics_keys.append(key)
 
 
 class ClockSetUpStrategy(SetupStrategy):
