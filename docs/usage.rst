@@ -16,7 +16,7 @@ Info
 ----
 As a rule, 4 files are provided in each methylation dataset:
 
-* ``cpg_beta.txt`` - contains methylation data itself.
+* ``betas.txt`` - contains methylation data itself.
   Rows correspond to individual CpGs, and columns correspond to subjects.
 * ``annotations.txt`` - contains information about CpGs.
   Rows correspond to individual CpGs, and columns correspond to CpG's characteristics (gene, bop, coordinate, etc.).
@@ -58,7 +58,7 @@ which contains methylation data.
 
 Example::
 
-    name = 'cpg_beta'
+    name = 'betas'
 
 ++++++++
 ``path``
@@ -72,7 +72,7 @@ Example::
 ++++++++
 ``base``
 ++++++++
-Name of the directory in which the necessary files are located and in which the files with the results will be saved.
+Name of the directory, where the necessary files are located and where the files with the results will be saved.
 
 Example::
 
@@ -86,7 +86,7 @@ Example of creating ``pdm.Data`` instance:
 .. code-block:: python
 
      data = pdm.Data(
-        name='cpg_beta',
+        name='betas',
         path='C:/Data',
         base='GSE40279'
     )
@@ -211,7 +211,7 @@ Currently supported options (``string``):
 * ``'B'`` - class B CpGs are considered.
 * ``'C'`` - class C CpGs are considered.
 * ``'D'`` - class D CpGs are considered.
-* ``'A_B'`` - class A or B CpGs are considered.
+* ``'A_B'`` - class A and B CpGs are considered.
 * ``'any'`` - all CpGs are considered.
 
 Example::
@@ -322,12 +322,12 @@ Released Experiments
 --------------------
 The name of the functions provided by the ``pydnameth`` package are follow the next logic:
 
-* First part is data type for the experiment. For example ``cpg`` or ``attributes``.
-* Second part answers the question ``WHAT WE WANT TO DO?``.
-  For example ``proc_table`` - table with data and characteristics processing,
-  ``plot_methylation`` - methylation data plotting.
-* Third part answers the question ``HOW WE WANT TO DO?``. Specifies the method for the experiment.
-  For example ``linreg`` - linear regression method.
+* First part is data type for the experiment. For example, ``betas``, ``residuals`` or ``attributes``.
+* Second part answers the question: ``WHAT WE WANT TO DO?``.
+  For example, ``table`` - table with data and characteristics processing,
+  ``plot`` - data plotting.
+* Third part answers the question: ``HOW WE WANT TO DO?``. Specifies the method for the experiment.
+  For example, ``linreg`` - linear regression method.
 
 Currently released functions:
 
