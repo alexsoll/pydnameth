@@ -7,7 +7,7 @@ from pydnameth.config.annotations.annotations import Annotations
 from pydnameth.infrastucture.load.epimutations import load_epimutations
 
 
-def epimutations_load_dev(data):
+def epimutations_load(data):
 
     config = Config(
         data=copy.deepcopy(data),

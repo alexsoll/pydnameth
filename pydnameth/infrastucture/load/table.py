@@ -15,4 +15,4 @@ def load_table_dict(config):
             table_dict[key] = list(curr_dict.values())
         return table_dict
     else:
-        raise IOError('No such file')
+        raise IOError(f'No such file: {fn}')
