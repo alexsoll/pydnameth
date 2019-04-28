@@ -21,7 +21,7 @@ class LoadStrategy(metaclass=abc.ABCMeta):
 
     def load_child(self, config_child):
 
-        if config_child.experiment.task == Task.table:
+        if config_child.experiment.task in [Task.table, Task.clock]:
 
             config_child.advanced_data = load_table_dict(config_child)
             config_child.advanced_list = config_child.base_list
@@ -42,7 +42,7 @@ class BetasLoadStrategy(LoadStrategy):
 
         self.inherit_childs(config, configs_child)
 
-        if config.experiment.task == Task.table or config.experiment.task == Task.clock:
+        if config.is_load_child:
 
             for config_child in configs_child:
                 self.load_child(config_child)
@@ -58,7 +58,7 @@ class BetasAdjLoadStrategy(LoadStrategy):
 
         self.inherit_childs(config, configs_child)
 
-        if config.experiment.task == Task.table or config.experiment.task == Task.clock:
+        if config.is_load_child:
 
             for config_child in configs_child:
                 self.load_child(config_child)
@@ -74,7 +74,7 @@ class ResidualsCommonLoadStrategy(LoadStrategy):
 
         self.inherit_childs(config, configs_child)
 
-        if config.experiment.task == Task.table or config.experiment.task == Task.clock:
+        if config.is_load_child:
 
             for config_child in configs_child:
                 self.load_child(config_child)

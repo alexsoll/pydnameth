@@ -54,6 +54,54 @@ def get_layout(config):
                 yaxis=get_axis(y_title),
             )
 
+        elif config.experiment.method in [Method.curve]:
+
+            x_title = config.experiment.method_params['x']
+            y_title = config.experiment.method_params['y']
+
+            layout = go.Layout(
+                autosize=True,
+                margin=go.layout.Margin(
+                    l=95,
+                    r=10,
+                    b=80,
+                    t=10,
+                    pad=0
+                ),
+                barmode='overlay',
+                legend=dict(
+                    font=dict(
+                        family='Arial',
+                        size=16,
+                    ),
+                    orientation="h",
+                    x=0.33,
+                    y=1.11,
+                ),
+                xaxis=dict(
+                    title=x_title,
+                    zeroline=False,
+                    showgrid=True,
+                    showline=True,
+                    mirror='ticks',
+                    titlefont=dict(
+                        family='Arial',
+                        size=33,
+                        color='black'
+                    ),
+                    showticklabels=True,
+                    tickangle=0,
+                    tickfont=dict(
+                        family='Arial',
+                        size=30,
+                        color='black'
+                    ),
+                    exponentformat='e',
+                    showexponent='all'
+                ),
+                yaxis=get_axis(y_title),
+            )
+
     elif config.experiment.data == DataType.epimutations:
 
         if config.experiment.method == Method.scatter:

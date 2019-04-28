@@ -73,6 +73,12 @@ class PlotReleaseStrategy(ReleaseStrategy):
 
                 config.experiment_data['fig'] = fig
 
+            elif config.experiment.method == Method.curve:
+
+                layout = plot_routines.get_layout(config)
+
+                config.experiment_data['fig'] = go.Figure(data=config.experiment_data['data'], layout=layout)
+
         elif config.experiment.data == DataType.epimutations:
 
             if config.experiment.method == Method.scatter:

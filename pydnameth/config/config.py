@@ -26,6 +26,7 @@ class Config:
                  attributes,
                  is_run=True,
                  is_root=True,
+                 is_load_child=True
                  ):
 
         self.data = data
@@ -34,6 +35,7 @@ class Config:
         self.attributes = attributes
         self.is_run = is_run
         self.is_root = is_root
+        self.is_load_child = is_load_child
 
         self.cpg_gene_dict = {}
         self.cpg_bop_dict = {}
