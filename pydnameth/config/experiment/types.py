@@ -41,6 +41,7 @@ class DataType(Enum):
     observables = 'observables'
     suppl = 'suppl'
     cache = 'cache'
+    genes = 'genes'
 
     def __str__(self):
         return str(self.value)
