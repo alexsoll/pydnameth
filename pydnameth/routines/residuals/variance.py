@@ -67,14 +67,14 @@ def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'
         elif box_b == 'Q1':
             bs[x_id] = q1
         else:
-            ValueError('Unknown box_b type')
+            raise ValueError('Unknown box_b type')
 
         if box_t == 'right':
             ts[x_id] = q3 + 1.5 * iqr
         elif box_t == 'Q3':
             ts[x_id] = q3
         else:
-            ValueError('Unknown box_t type')
+            raise ValueError('Unknown box_t type')
 
     return xs, bs, ms, ts
 
