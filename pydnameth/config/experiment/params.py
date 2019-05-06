@@ -16,7 +16,9 @@ def get_default_method_params(config):
 
             elif config.experiment.method == Method.variance:
                 params = {
-                    'semi_window': 2
+                    'semi_window': 2,
+                    'box_b': 'left',
+                    'box_t': 'right'
                 }
 
             elif config.experiment.method == Method.polygon:
