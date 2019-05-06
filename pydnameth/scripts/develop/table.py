@@ -192,7 +192,9 @@ def table_aggregator_variance(
                 method=Method.variance,
                 data_params=copy.deepcopy(data_params),
                 method_params={
-                    'semi_window': 8
+                    'semi_window': 8,
+                    'box_b': 'Q1',
+                    'box_t': 'Q3',
                 }
             ),
             annotations=copy.deepcopy(annotations),

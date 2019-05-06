@@ -14,7 +14,8 @@ from pydnameth.routines.common import is_float, get_names, normalize_to_0_1
 from pydnameth.routines.polygon.types import PolygonRoutines
 from statsmodels.stats.stattools import jarque_bera, omni_normtest, durbin_watson
 from tqdm import tqdm
-from pydnameth.routines.residuals.variance import residuals_std, residuals_box, variance_processing
+from pydnameth.routines.residuals.variance import residuals_std, residuals_box, \
+    variance_processing, init_variance_characteristics_dict
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -39,7 +40,8 @@ class TableRunStrategy(RunStrategy):
 
     def single(self, item, config, configs_child):
 
-        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common,
+                                      DataType.residuals_special]:
 
             if config.experiment.method == Method.linreg:
 
@@ -143,7 +145,6 @@ class TableRunStrategy(RunStrategy):
                         raise ValueError('Polygons borders are not consistent')
 
                     for config_child in configs_child:
-
                         targets = self.get_strategy.get_target(config_child)
                         item_id = config_child.advanced_dict[item]
 
@@ -368,7 +369,10 @@ class TableRunStrategy(RunStrategy):
                 exog, endog = residuals_std(targets, residuals, semi_window)
                 variance_processing(exog, endog, config.metrics, 'std')
 
-                xs, bs, ms, ts = residuals_box(targets, residuals, semi_window)
+                box_b = config.experiment.method_params['box_b']
+                box_t = config.experiment.method_params['box_t']
+
+                xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
                 variance_processing(xs, bs, config.metrics, 'box_b')
                 variance_processing(xs, ms, config.metrics, 'box_m')
                 variance_processing(xs, ts, config.metrics, 'box_t')
@@ -404,7 +408,8 @@ class ClockRunStrategy(RunStrategy):
 
     def run(self, config, configs_child):
 
-        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common,
+                                      DataType.residuals_special]:
 
             if config.experiment.method == Method.linreg:
 
@@ -494,7 +499,8 @@ class PlotRunStrategy(RunStrategy):
 
     def run(self, config, configs_child):
 
-        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common, DataType.residuals_special]:
+        if config.experiment.data in [DataType.betas, DataType.betas_adj, DataType.residuals_common,
+                                      DataType.residuals_special]:
 
             if config.experiment.method == Method.scatter:
 
@@ -502,6 +508,8 @@ class PlotRunStrategy(RunStrategy):
                 line = config.experiment.method_params['line']
                 add = config.experiment.method_params['add']
                 semi_window = config.experiment.method_params['semi_window']
+                box_b = config.experiment.method_params['box_b']
+                box_t = config.experiment.method_params['box_t']
 
                 plot_data = []
 
@@ -620,10 +628,9 @@ class PlotRunStrategy(RunStrategy):
 
                     # Adding box curve
                     if add == 'box' and semi_window != 'none':
-
                         residuals = results.resid
 
-                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window)
+                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
 
                         scatter = go.Scatter(
                             x=xs,
@@ -654,6 +661,181 @@ class PlotRunStrategy(RunStrategy):
                         scatter = go.Scatter(
                             x=xs,
                             y=ts,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=4,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
+
+                    # Adding best curve
+                    if add == 'best' and semi_window != 'none':
+
+                        residuals = results.resid
+
+                        characteristics_dict = {}
+                        init_variance_characteristics_dict(characteristics_dict, 'std')
+                        init_variance_characteristics_dict(characteristics_dict, 'box_b')
+                        init_variance_characteristics_dict(characteristics_dict, 'box_m')
+                        init_variance_characteristics_dict(characteristics_dict, 'box_t')
+
+                        xs_std, ys_std = residuals_std(targets, residuals, semi_window)
+                        variance_processing(xs_std, ys_std, characteristics_dict, 'std')
+
+                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                        variance_processing(xs, bs, characteristics_dict, 'box_b')
+                        variance_processing(xs, ms, characteristics_dict, 'box_m')
+                        variance_processing(xs, ts, characteristics_dict, 'box_t')
+
+                        R2s = [
+                            characteristics_dict['std_best_R2'][-1],
+                            np.min([characteristics_dict['box_b_best_R2'][-1],
+                                    characteristics_dict['box_t_best_R2'][-1]])
+                        ]
+
+                        characteristics_dict['best_type'].append(np.argmax(R2s))
+                        characteristics_dict['best_R2'].append(np.max(R2s))
+
+                        if np.argmax(R2s) == 0:  # std is the best fit
+
+                            if characteristics_dict['std_best_type'] == [0]:  # lin-lin axes
+
+                                ys_t = np.zeros(2, dtype=float)
+                                ys_b = np.zeros(2, dtype=float)
+
+                                intercept_std = characteristics_dict['std_lin_lin_intercept'][0]
+                                slope_std = characteristics_dict['std_lin_lin_slope'][0]
+
+                                ys_t[0] = (slope * xs_std[0] + intercept) + (slope_std * xs_std[0] + intercept_std)
+                                ys_b[0] = (slope * xs_std[0] + intercept) - (slope_std * xs_std[0] + intercept_std)
+
+                                ys_t[1] = (slope * xs_std[-1] + intercept) + (slope_std * xs_std[-1] + intercept_std)
+                                ys_b[1] = (slope * xs_std[-1] + intercept) - (slope_std * xs_std[-1] + intercept_std)
+
+                                xs = [xs_std[0], xs_std[-1]]
+
+                            elif characteristics_dict['std_best_type'] == [1]:  # lin-log axes
+
+                                ys_t = np.zeros(len(ys_std), dtype=float)
+                                ys_b = np.zeros(len(ys_std), dtype=float)
+
+                                intercept_std = characteristics_dict['std_lin_log_intercept'][0]
+                                slope_std = characteristics_dict['std_lin_log_slope'][0]
+
+                                for std_id in range(0, len(xs_std)):
+                                    basic_linreg = slope * xs_std[std_id] + intercept
+                                    ys_t[std_id] = basic_linreg + np.exp(slope_std * xs_std[std_id] + intercept_std)
+                                    ys_b[std_id] = basic_linreg - np.exp(slope_std * xs_std[std_id] + intercept_std)
+
+                            elif characteristics_dict['std_best_type'] == [2]:  # log-log axes
+
+                                ys_t = np.zeros(len(ys_std), dtype=float)
+                                ys_b = np.zeros(len(ys_std), dtype=float)
+
+                                intercept_std = characteristics_dict['std_log_log_intercept'][0]
+                                slope_std = characteristics_dict['std_log_log_slope'][0]
+
+                                for std_id in range(0, len(xs_std)):
+                                    basic_linreg = slope * xs_std[std_id] + intercept
+                                    ys_t[std_id] = basic_linreg + np.exp(
+                                        slope_std * np.log(xs_std[std_id]) + intercept_std)
+                                    ys_b[std_id] = basic_linreg - np.exp(
+                                        slope_std * np.log(xs_std[std_id]) + intercept_std)
+
+                        elif np.argmax(R2s) == 1:  # box is the best fit
+
+                            if characteristics_dict['box_t_best_type'] == [0]:  # lin-lin axes
+
+                                ys_t = np.zeros(2, dtype=float)
+                                ys_b = np.zeros(2, dtype=float)
+
+                                intercept_box_t = characteristics_dict['box_t_lin_lin_intercept'][0]
+                                slope_box_t = characteristics_dict['box_t_lin_lin_slope'][0]
+
+                                intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
+                                slope_box_b = characteristics_dict['box_b_lin_lin_slope'][0]
+
+                                ys_t[0] = (slope * xs[0] + intercept) + (slope_box_t * xs[0] + intercept_box_t)
+                                ys_b[0] = (slope * xs[0] + intercept) - (slope_box_b * xs[0] + intercept_box_b)
+
+                                ys_t[1] = (slope * xs[-1] + intercept) + (slope_box_t * xs[-1] + intercept_box_t)
+                                ys_b[1] = (slope * xs[-1] + intercept) - (slope_box_b * xs[-1] + intercept_box_b)
+
+                                xs = [xs[0], xs[-1]]
+
+                            elif characteristics_dict['box_t_best_type'] == [1]:  # lin-log axes
+
+                                ys_t = np.zeros(len(ys_std), dtype=float)
+                                ys_b = np.zeros(len(ys_std), dtype=float)
+
+                                intercept_box_t = characteristics_dict['box_t_lin_log_intercept'][0]
+                                slope_box_t = characteristics_dict['box_t_lin_log_slope'][0]
+
+                                if characteristics_dict['box_b_lin_log_intercept'][0] != 'NA' and \
+                                        characteristics_dict['box_b_lin_log_slope'][0] != 'NA':
+                                    intercept_box_b = characteristics_dict['box_b_lin_log_intercept'][0]
+                                    slope_box_b = characteristics_dict['box_b_lin_log_slope'][0]
+                                    is_lin_log = True
+                                else:
+                                    intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
+                                    slope_box_b = abs(characteristics_dict['box_b_lin_lin_slope'][0])
+                                    is_lin_log = False
+
+                                for std_id in range(0, len(xs)):
+                                    basic_linreg = slope * xs[std_id] + intercept
+                                    ys_t[std_id] = basic_linreg + np.exp(slope_box_t * xs[std_id] + intercept_box_t)
+                                    if is_lin_log:
+                                        ys_b[std_id] = basic_linreg - np.exp(slope_box_b * xs[std_id] + intercept_box_b)
+                                    else:
+                                        ys_b[std_id] = basic_linreg - (slope_box_b * xs[std_id] + intercept_box_b)
+
+                            elif characteristics_dict['box_t_best_type'] == [2]:  # log-log axes
+
+                                ys_t = np.zeros(len(ys_std), dtype=float)
+                                ys_b = np.zeros(len(ys_std), dtype=float)
+
+                                intercept_box_t = characteristics_dict['box_t_log_log_intercept'][0]
+                                slope_box_t = characteristics_dict['box_t_log_log_slope'][0]
+
+                                if characteristics_dict['box_b_log_log_intercept'][0] != 'NA' and \
+                                        characteristics_dict['box_b_log_log_slope'][0] != 'NA':
+                                    intercept_box_b = characteristics_dict['box_b_log_log_intercept'][0]
+                                    slope_box_b = characteristics_dict['box_b_log_log_slope'][0]
+                                    is_log_log = True
+                                else:
+                                    intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
+                                    slope_box_b = abs(characteristics_dict['box_b_lin_lin_slope'][0])
+                                    is_log_log = False
+
+                                for std_id in range(0, len(xs)):
+                                    basic_linreg = slope * xs[std_id] + intercept
+                                    ys_t[std_id] = basic_linreg + np.exp(
+                                        slope_box_t * np.log(xs[std_id]) + intercept_box_t)
+                                    if is_log_log:
+                                        ys_b[std_id] = basic_linreg - np.exp(
+                                            slope_box_b * np.log(xs[std_id]) + intercept_box_b)
+                                    else:
+                                        ys_b[std_id] = basic_linreg - (slope_box_b * xs[std_id] + intercept_box_b)
+
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=ys_t,
+                            name=get_names(config_child),
+                            mode='lines',
+                            line=dict(
+                                width=4,
+                                color=color_border
+                            ),
+                            showlegend=False
+                        )
+                        plot_data.append(scatter)
+
+                        scatter = go.Scatter(
+                            x=xs,
+                            y=ys_b,
                             name=get_names(config_child),
                             mode='lines',
                             line=dict(
@@ -868,7 +1050,6 @@ class PlotRunStrategy(RunStrategy):
                 plot_data = []
 
                 for config_child in configs_child:
-
                     indexes = config_child.attributes_indexes
 
                     x = self.get_strategy.get_target(config_child)
