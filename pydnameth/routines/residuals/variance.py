@@ -32,7 +32,7 @@ def residuals_std(targets, residuals, semi_window=2):
     return xs, ys
 
 
-def residuals_box(targets, residuals, semi_window=2):
+def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'):
     targets = np.squeeze(np.asarray(targets))
     residuals = np.squeeze(np.asarray(residuals))
 
@@ -61,9 +61,20 @@ def residuals_box(targets, residuals, semi_window=2):
         curr_residuals = window_residuals[xs[x_id]]
         q1, median, q3 = np.percentile(np.asarray(curr_residuals), [25, 50, 75])
         iqr = q3 - q1
-        bs[x_id] = q1 - 1.5 * iqr
         ms[x_id] = median
-        ts[x_id] = q3 + 1.5 * iqr
+        if box_b == 'left':
+            bs[x_id] = q1 - 1.5 * iqr
+        elif box_b == 'Q1':
+            bs[x_id] = q1
+        else:
+            raise ValueError('Unknown box_b type')
+
+        if box_t == 'right':
+            ts[x_id] = q3 + 1.5 * iqr
+        elif box_t == 'Q3':
+            ts[x_id] = q3
+        else:
+            raise ValueError('Unknown box_t type')
 
     return xs, bs, ms, ts
 
@@ -132,3 +143,31 @@ def variance_processing(exog, endog, characteristics_dict, key_prefix):
 
     characteristics_dict[key_prefix + '_best_type'].append(best_R2_id)
     characteristics_dict[key_prefix + '_best_R2'].append(best_R2)
+
+
+def init_variance_characteristics_dict(characteristics_dict, key_prefix):
+    characteristics_dict[key_prefix + '_lin_lin_R2'] = []
+    characteristics_dict[key_prefix + '_lin_lin_intercept'] = []
+    characteristics_dict[key_prefix + '_lin_lin_slope'] = []
+    characteristics_dict[key_prefix + '_lin_lin_intercept_std'] = []
+    characteristics_dict[key_prefix + '_lin_lin_slope_std'] = []
+    characteristics_dict[key_prefix + '_lin_lin_intercept_p_value'] = []
+    characteristics_dict[key_prefix + '_lin_lin_slope_p_value'] = []
+    characteristics_dict[key_prefix + '_lin_log_R2'] = []
+    characteristics_dict[key_prefix + '_lin_log_intercept'] = []
+    characteristics_dict[key_prefix + '_lin_log_slope'] = []
+    characteristics_dict[key_prefix + '_lin_log_intercept_std'] = []
+    characteristics_dict[key_prefix + '_lin_log_slope_std'] = []
+    characteristics_dict[key_prefix + '_lin_log_intercept_p_value'] = []
+    characteristics_dict[key_prefix + '_lin_log_slope_p_value'] = []
+    characteristics_dict[key_prefix + '_log_log_R2'] = []
+    characteristics_dict[key_prefix + '_log_log_intercept'] = []
+    characteristics_dict[key_prefix + '_log_log_slope'] = []
+    characteristics_dict[key_prefix + '_log_log_intercept_std'] = []
+    characteristics_dict[key_prefix + '_log_log_slope_std'] = []
+    characteristics_dict[key_prefix + '_log_log_intercept_p_value'] = []
+    characteristics_dict[key_prefix + '_log_log_slope_p_value'] = []
+    characteristics_dict[key_prefix + '_best_type'] = []
+    characteristics_dict[key_prefix + '_best_R2'] = []
+    characteristics_dict['best_type'] = []
+    characteristics_dict['best_R2'] = []
