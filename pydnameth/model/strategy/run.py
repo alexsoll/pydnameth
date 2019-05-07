@@ -359,20 +359,15 @@ class TableRunStrategy(RunStrategy):
                 targets = np.squeeze(np.asarray(targets))
                 data = np.squeeze(np.asarray(data))
 
-                exog = sm.add_constant(targets)
-                endog = data
-                results = sm.OLS(endog, exog).fit()
-                residuals = results.resid
-
                 semi_window = config.experiment.method_params['semi_window']
 
-                exog, endog = residuals_std(targets, residuals, semi_window)
+                exog, endog = residuals_std(targets, data, semi_window)
                 variance_processing(exog, endog, config.metrics, 'std')
 
                 box_b = config.experiment.method_params['box_b']
                 box_t = config.experiment.method_params['box_t']
 
-                xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                xs, bs, ms, ts = residuals_box(targets, data, semi_window, box_b, box_t)
                 variance_processing(xs, bs, config.metrics, 'box_b')
                 variance_processing(xs, ms, config.metrics, 'box_m')
                 variance_processing(xs, ts, config.metrics, 'box_t')
@@ -591,9 +586,7 @@ class PlotRunStrategy(RunStrategy):
                     # Adding std curve
                     if add == 'std' and semi_window != 'none':
 
-                        residuals = results.resid
-
-                        xs, ys = residuals_std(targets, residuals, semi_window)
+                        xs, ys = residuals_std(targets, data, semi_window)
                         ys_t = np.zeros(len(ys), dtype=float)
                         ys_b = np.zeros(len(ys), dtype=float)
                         for std_id in range(0, len(xs)):
@@ -628,9 +621,8 @@ class PlotRunStrategy(RunStrategy):
 
                     # Adding box curve
                     if add == 'box' and semi_window != 'none':
-                        residuals = results.resid
 
-                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                        xs, bs, ms, ts = residuals_box(targets, data, semi_window, box_b, box_t)
 
                         scatter = go.Scatter(
                             x=xs,
@@ -674,7 +666,7 @@ class PlotRunStrategy(RunStrategy):
                     # Adding best curve
                     if add == 'best' and semi_window != 'none':
 
-                        residuals = results.resid
+                        residuals = data
 
                         characteristics_dict = {}
                         init_variance_characteristics_dict(characteristics_dict, 'std')
@@ -781,7 +773,7 @@ class PlotRunStrategy(RunStrategy):
                                     is_lin_log = True
                                 else:
                                     intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
-                                    slope_box_b = abs(characteristics_dict['box_b_lin_lin_slope'][0])
+                                    slope_box_b = characteristics_dict['box_b_lin_lin_slope'][0]
                                     is_lin_log = False
 
                                 for std_id in range(0, len(xs)):
@@ -807,13 +799,13 @@ class PlotRunStrategy(RunStrategy):
                                     is_log_log = True
                                 else:
                                     intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
-                                    slope_box_b = abs(characteristics_dict['box_b_lin_lin_slope'][0])
+                                    slope_box_b = characteristics_dict['box_b_lin_lin_slope'][0]
                                     is_log_log = False
 
                                 for std_id in range(0, len(xs)):
                                     basic_linreg = slope * xs[std_id] + intercept
-                                    ys_t[std_id] = basic_linreg + np.exp(
-                                        slope_box_t * np.log(xs[std_id]) + intercept_box_t)
+                                    ys_t[std_id] = basic_linreg + np.power(
+                                        xs[std_id], slope_box_t) * np.exp(intercept_box_t)
                                     if is_log_log:
                                         ys_b[std_id] = basic_linreg - np.exp(
                                             slope_box_b * np.log(xs[std_id]) + intercept_box_b)
