@@ -24,12 +24,20 @@ def residuals_std(targets, residuals, semi_window=2):
                 window_targets[window_id].append(curr_target)
 
     xs = list(window_targets.keys())
-    ys = np.zeros(len(xs), dtype=float)
+    bs = np.zeros(len(xs), dtype=float)
+    ms = np.zeros(len(xs), dtype=float)
+    ts = np.zeros(len(xs), dtype=float)
     for x_id in range(0, len(xs)):
         curr_residuals = window_residuals[xs[x_id]]
-        ys[x_id] = np.std(curr_residuals)
 
-    return xs, ys
+        curr_mean = np.mean(curr_residuals)
+        curr_std = np.std(curr_residuals)
+
+        bs[x_id] = curr_mean - curr_std
+        ms[x_id] = curr_mean
+        ts[x_id] = curr_mean + curr_std
+
+    return xs, bs, ms, ts
 
 
 def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'):
@@ -169,5 +177,8 @@ def init_variance_characteristics_dict(characteristics_dict, key_prefix):
     characteristics_dict[key_prefix + '_log_log_slope_p_value'] = []
     characteristics_dict[key_prefix + '_best_type'] = []
     characteristics_dict[key_prefix + '_best_R2'] = []
-    characteristics_dict['best_type'] = []
-    characteristics_dict['best_R2'] = []
+
+    if 'best_type' not in characteristics_dict:
+        characteristics_dict['best_type'] = []
+    if 'best_R2' not in characteristics_dict:
+        characteristics_dict['best_R2'] = []
