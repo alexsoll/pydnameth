@@ -46,32 +46,7 @@ def get_method_metrics_keys(config):
                     'item',
                     'aux',
 
-                    'best_type',
                     'best_R2',
-
-                    'std_best_type',
-                    'std_best_R2',
-                    'std_lin_lin_R2',
-                    'std_lin_lin_intercept',
-                    'std_lin_lin_slope',
-                    'std_lin_lin_intercept_std',
-                    'std_lin_lin_slope_std',
-                    'std_lin_lin_intercept_p_value',
-                    'std_lin_lin_slope_p_value',
-                    'std_lin_log_R2',
-                    'std_lin_log_intercept',
-                    'std_lin_log_slope',
-                    'std_lin_log_intercept_std',
-                    'std_lin_log_slope_std',
-                    'std_lin_log_intercept_p_value',
-                    'std_lin_log_slope_p_value',
-                    'std_log_log_R2',
-                    'std_log_log_intercept',
-                    'std_log_log_slope',
-                    'std_log_log_intercept_std',
-                    'std_log_log_slope_std',
-                    'std_log_log_intercept_p_value',
-                    'std_log_log_slope_p_value',
 
                     'box_b_best_type',
                     'box_b_best_R2',
@@ -173,7 +148,6 @@ def get_method_metrics_keys(config):
                     metrics = [
                         'item',
                         'aux',
-                        'area_intersection_rel_std',
                         'area_intersection_rel_box'
                     ]
 
