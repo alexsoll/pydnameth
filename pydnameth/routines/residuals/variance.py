@@ -2,44 +2,6 @@ import numpy as np
 import statsmodels.api as sm
 
 
-def residuals_std(targets, residuals, semi_window=2):
-    targets = np.squeeze(np.asarray(targets))
-    residuals = np.squeeze(np.asarray(residuals))
-
-    min_target = int(np.floor(min(targets)))
-    max_target = int(np.ceil(max(targets)))
-    window_residuals = {}
-    window_targets = {}
-    for center in range(min_target, max_target + 1):
-        window_residuals[center] = []
-        window_targets[center] = []
-
-    for point_id in range(0, len(targets)):
-        curr_target = targets[point_id]
-        curr_target_round = int(round(curr_target))
-        curr_residuals = residuals[point_id]
-        for window_id in range(curr_target_round - semi_window, curr_target_round + semi_window + 1):
-            if window_id in window_residuals:
-                window_residuals[window_id].append(curr_residuals)
-                window_targets[window_id].append(curr_target)
-
-    xs = list(window_targets.keys())
-    bs = np.zeros(len(xs), dtype=float)
-    ms = np.zeros(len(xs), dtype=float)
-    ts = np.zeros(len(xs), dtype=float)
-    for x_id in range(0, len(xs)):
-        curr_residuals = window_residuals[xs[x_id]]
-
-        curr_mean = np.mean(curr_residuals)
-        curr_std = np.std(curr_residuals)
-
-        bs[x_id] = curr_mean - curr_std
-        ms[x_id] = curr_mean
-        ts[x_id] = curr_mean + curr_std
-
-    return xs, bs, ms, ts
-
-
 def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'):
     targets = np.squeeze(np.asarray(targets))
     residuals = np.squeeze(np.asarray(residuals))
@@ -67,13 +29,15 @@ def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'
     ts = np.zeros(len(xs), dtype=float)
     for x_id in range(0, len(xs)):
         curr_residuals = window_residuals[xs[x_id]]
-        q1, median, q3 = np.percentile(np.asarray(curr_residuals), [25, 50, 75])
+        q5, q1, median, q3, q95 = np.percentile(np.asarray(curr_residuals), [5, 25, 50, 75, 95])
         iqr = q3 - q1
         ms[x_id] = median
         if box_b == 'left':
             bs[x_id] = q1 - 1.5 * iqr
         elif box_b == 'Q1':
             bs[x_id] = q1
+        elif box_b == 'Q5':
+            bs[x_id] = q5
         else:
             raise ValueError('Unknown box_b type')
 
@@ -81,6 +45,8 @@ def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'
             ts[x_id] = q3 + 1.5 * iqr
         elif box_t == 'Q3':
             ts[x_id] = q3
+        elif box_t == 'Q95':
+            ts[x_id] = q95
         else:
             raise ValueError('Unknown box_t type')
 
