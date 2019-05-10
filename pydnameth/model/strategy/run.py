@@ -14,7 +14,7 @@ from pydnameth.routines.common import is_float, get_names, normalize_to_0_1
 from pydnameth.routines.polygon.types import PolygonRoutines
 from statsmodels.stats.stattools import jarque_bera, omni_normtest, durbin_watson
 from tqdm import tqdm
-from pydnameth.routines.residuals.variance import residuals_box, variance_processing, init_variance_characteristics_dict
+from pydnameth.routines.residuals.variance import process_box, variance_processing, init_variance_characteristics_dict
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -245,7 +245,7 @@ class TableRunStrategy(RunStrategy):
                         box_b = config_child.experiment.method_params['box_b']
                         box_t = config_child.experiment.method_params['box_t']
 
-                        box_xs, box_bs, box_ms, box_ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                        box_xs, box_bs, box_ms, box_ts = process_box(targets, residuals, semi_window, box_b, box_t)
                         points_box = []
                         for p_id in range(0, len(box_xs)):
                             points_box.append(geometry.Point(
@@ -340,7 +340,7 @@ class TableRunStrategy(RunStrategy):
                 box_b = config.experiment.method_params['box_b']
                 box_t = config.experiment.method_params['box_t']
 
-                xs, bs, ms, ts = residuals_box(targets, data, semi_window, box_b, box_t)
+                xs, bs, ms, ts = process_box(targets, data, semi_window, box_b, box_t)
                 variance_processing(xs, bs, config.metrics, 'box_b')
                 variance_processing(xs, ms, config.metrics, 'box_m')
                 variance_processing(xs, ts, config.metrics, 'box_t')
@@ -354,9 +354,13 @@ class TableRunStrategy(RunStrategy):
                 config.metrics['aux'].append(aux)
 
     def iterate(self, config, configs_child):
+        item_id = 0
         for item in tqdm(config.base_list, mininterval=60.0, desc=f'{str(config.experiment)} running'):
+            if item_id == 1102:
+                olol = 0
             if item in config.base_dict:
                 self.single(item, config, configs_child)
+            item_id += 1
 
     def run(self, config, configs_child):
         self.iterate(config, configs_child)
@@ -555,7 +559,7 @@ class PlotRunStrategy(RunStrategy):
 
                     # Adding box curve
                     if fit == 'no' and semi_window != 'none':
-                        xs, bs, ms, ts = residuals_box(targets, data, semi_window, box_b, box_t)
+                        xs, bs, ms, ts = process_box(targets, data, semi_window, box_b, box_t)
 
                         scatter = go.Scatter(
                             x=xs,
@@ -607,7 +611,7 @@ class PlotRunStrategy(RunStrategy):
                         init_variance_characteristics_dict(characteristics_dict, 'box_m')
                         init_variance_characteristics_dict(characteristics_dict, 'box_t')
 
-                        xs_box, bs_box, ms_box, ts_box = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                        xs_box, bs_box, ms_box, ts_box = process_box(targets, residuals, semi_window, box_b, box_t)
                         variance_processing(xs_box, bs_box, characteristics_dict, 'box_b')
                         variance_processing(xs_box, ms_box, characteristics_dict, 'box_m')
                         variance_processing(xs_box, ts_box, characteristics_dict, 'box_t')
