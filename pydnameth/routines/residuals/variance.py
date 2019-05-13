@@ -2,9 +2,9 @@ import numpy as np
 import statsmodels.api as sm
 
 
-def residuals_std(targets, residuals, semi_window=2):
+def process_box(targets, values, semi_window=2, box_b='left', box_t='right'):
     targets = np.squeeze(np.asarray(targets))
-    residuals = np.squeeze(np.asarray(residuals))
+    values = np.squeeze(np.asarray(values))
 
     min_target = int(np.floor(min(targets)))
     max_target = int(np.ceil(max(targets)))
@@ -17,37 +17,7 @@ def residuals_std(targets, residuals, semi_window=2):
     for point_id in range(0, len(targets)):
         curr_target = targets[point_id]
         curr_target_round = int(round(curr_target))
-        curr_residuals = residuals[point_id]
-        for window_id in range(curr_target_round - semi_window, curr_target_round + semi_window + 1):
-            if window_id in window_residuals:
-                window_residuals[window_id].append(curr_residuals)
-                window_targets[window_id].append(curr_target)
-
-    xs = list(window_targets.keys())
-    ys = np.zeros(len(xs), dtype=float)
-    for x_id in range(0, len(xs)):
-        curr_residuals = window_residuals[xs[x_id]]
-        ys[x_id] = np.std(curr_residuals)
-
-    return xs, ys
-
-
-def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'):
-    targets = np.squeeze(np.asarray(targets))
-    residuals = np.squeeze(np.asarray(residuals))
-
-    min_target = int(np.floor(min(targets)))
-    max_target = int(np.ceil(max(targets)))
-    window_residuals = {}
-    window_targets = {}
-    for center in range(min_target, max_target + 1):
-        window_residuals[center] = []
-        window_targets[center] = []
-
-    for point_id in range(0, len(targets)):
-        curr_target = targets[point_id]
-        curr_target_round = int(round(curr_target))
-        curr_residuals = residuals[point_id]
+        curr_residuals = values[point_id]
         for window_id in range(curr_target_round - semi_window, curr_target_round + semi_window + 1):
             if window_id in window_residuals:
                 window_residuals[window_id].append(curr_residuals)
@@ -59,13 +29,15 @@ def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'
     ts = np.zeros(len(xs), dtype=float)
     for x_id in range(0, len(xs)):
         curr_residuals = window_residuals[xs[x_id]]
-        q1, median, q3 = np.percentile(np.asarray(curr_residuals), [25, 50, 75])
+        q5, q1, median, q3, q95 = np.percentile(np.asarray(curr_residuals), [5, 25, 50, 75, 95])
         iqr = q3 - q1
         ms[x_id] = median
         if box_b == 'left':
             bs[x_id] = q1 - 1.5 * iqr
         elif box_b == 'Q1':
             bs[x_id] = q1
+        elif box_b == 'Q5':
+            bs[x_id] = q5
         else:
             raise ValueError('Unknown box_b type')
 
@@ -73,6 +45,8 @@ def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'
             ts[x_id] = q3 + 1.5 * iqr
         elif box_t == 'Q3':
             ts[x_id] = q3
+        elif box_t == 'Q95':
+            ts[x_id] = q95
         else:
             raise ValueError('Unknown box_t type')
 
@@ -80,17 +54,28 @@ def residuals_box(targets, residuals, semi_window=2, box_b='left', box_t='right'
 
 
 def variance_processing(exog, endog, characteristics_dict, key_prefix):
-    lin_lin_exog = sm.add_constant(exog)
-    lin_lin_endog = endog
-    lin_lin_results = sm.OLS(lin_lin_endog, lin_lin_exog).fit()
-    characteristics_dict[key_prefix + '_lin_lin_R2'].append(lin_lin_results.rsquared)
-    characteristics_dict[key_prefix + '_lin_lin_intercept'].append(lin_lin_results.params[0])
-    characteristics_dict[key_prefix + '_lin_lin_slope'].append(lin_lin_results.params[1])
-    characteristics_dict[key_prefix + '_lin_lin_intercept_std'].append(lin_lin_results.bse[0])
-    characteristics_dict[key_prefix + '_lin_lin_slope_std'].append(lin_lin_results.bse[1])
-    characteristics_dict[key_prefix + '_lin_lin_intercept_p_value'].append(lin_lin_results.pvalues[0])
-    characteristics_dict[key_prefix + '_lin_lin_slope_p_value'].append(lin_lin_results.pvalues[1])
-    R2s = [lin_lin_results.rsquared]
+    is_same_elements = all(x == endog[0] for x in endog)
+    if is_same_elements:
+        characteristics_dict[key_prefix + '_lin_lin_R2'].append(1.0)
+        characteristics_dict[key_prefix + '_lin_lin_intercept'].append(0.0)
+        characteristics_dict[key_prefix + '_lin_lin_slope'].append(0.0)
+        characteristics_dict[key_prefix + '_lin_lin_intercept_std'].append(0.0)
+        characteristics_dict[key_prefix + '_lin_lin_slope_std'].append(0.0)
+        characteristics_dict[key_prefix + '_lin_lin_intercept_p_value'].append('NA')
+        characteristics_dict[key_prefix + '_lin_lin_slope_p_value'].append('NA')
+        R2s = [1.0]
+    else:
+        lin_lin_exog = sm.add_constant(exog)
+        lin_lin_endog = endog
+        lin_lin_results = sm.OLS(lin_lin_endog, lin_lin_exog).fit()
+        characteristics_dict[key_prefix + '_lin_lin_R2'].append(lin_lin_results.rsquared)
+        characteristics_dict[key_prefix + '_lin_lin_intercept'].append(lin_lin_results.params[0])
+        characteristics_dict[key_prefix + '_lin_lin_slope'].append(lin_lin_results.params[1])
+        characteristics_dict[key_prefix + '_lin_lin_intercept_std'].append(lin_lin_results.bse[0])
+        characteristics_dict[key_prefix + '_lin_lin_slope_std'].append(lin_lin_results.bse[1])
+        characteristics_dict[key_prefix + '_lin_lin_intercept_p_value'].append(lin_lin_results.pvalues[0])
+        characteristics_dict[key_prefix + '_lin_lin_slope_p_value'].append(lin_lin_results.pvalues[1])
+        R2s = [lin_lin_results.rsquared]
 
     if min(endog) > 0:
         lin_log_exog = sm.add_constant(exog)
@@ -169,5 +154,8 @@ def init_variance_characteristics_dict(characteristics_dict, key_prefix):
     characteristics_dict[key_prefix + '_log_log_slope_p_value'] = []
     characteristics_dict[key_prefix + '_best_type'] = []
     characteristics_dict[key_prefix + '_best_R2'] = []
-    characteristics_dict['best_type'] = []
-    characteristics_dict['best_R2'] = []
+
+    if 'best_type' not in characteristics_dict:
+        characteristics_dict['best_type'] = []
+    if 'best_R2' not in characteristics_dict:
+        characteristics_dict['best_R2'] = []

@@ -14,8 +14,7 @@ from pydnameth.routines.common import is_float, get_names, normalize_to_0_1
 from pydnameth.routines.polygon.types import PolygonRoutines
 from statsmodels.stats.stattools import jarque_bera, omni_normtest, durbin_watson
 from tqdm import tqdm
-from pydnameth.routines.residuals.variance import residuals_std, residuals_box, \
-    variance_processing, init_variance_characteristics_dict
+from pydnameth.routines.residuals.variance import process_box, variance_processing, init_variance_characteristics_dict
 
 
 class RunStrategy(metaclass=abc.ABCMeta):
@@ -228,7 +227,6 @@ class TableRunStrategy(RunStrategy):
 
                 elif config.experiment.method_params['method'] == Method.variance:
 
-                    polygons_region_std = []
                     polygons_region_box = []
 
                     for config_child in configs_child:
@@ -244,23 +242,10 @@ class TableRunStrategy(RunStrategy):
                         residuals = results.resid
 
                         semi_window = config_child.experiment.method_params['semi_window']
+                        box_b = config_child.experiment.method_params['box_b']
+                        box_t = config_child.experiment.method_params['box_t']
 
-                        std_xs, std_ys = residuals_std(targets, residuals, semi_window)
-                        points_std = []
-                        for p_id in range(0, len(std_xs)):
-                            points_std.append(geometry.Point(
-                                std_xs[p_id],
-                                std_ys[p_id]
-                            ))
-                        for p_id in range(len(std_xs) - 1, -1, -1):
-                            points_std.append(geometry.Point(
-                                std_xs[p_id],
-                                -std_ys[p_id]
-                            ))
-                        polygon = geometry.Polygon([[point.x, point.y] for point in points_std])
-                        polygons_region_std.append(polygon)
-
-                        box_xs, box_bs, box_ms, box_ts = residuals_box(targets, residuals, semi_window)
+                        box_xs, box_bs, box_ms, box_ts = process_box(targets, residuals, semi_window, box_b, box_t)
                         points_box = []
                         for p_id in range(0, len(box_xs)):
                             points_box.append(geometry.Point(
@@ -275,13 +260,6 @@ class TableRunStrategy(RunStrategy):
                         polygon = geometry.Polygon([[point.x, point.y] for point in points_box])
                         polygons_region_box.append(polygon)
 
-                    intersection_std = polygons_region_std[0]
-                    union_std = polygons_region_std[0]
-                    for polygon in polygons_region_std[1::]:
-                        intersection_std = intersection_std.intersection(polygon)
-                        union_std = union_std.union(polygon)
-                    area_intersection_rel_std = intersection_std.area / union_std.area
-
                     intersection_box = polygons_region_box[0]
                     union_box = polygons_region_box[0]
                     for polygon in polygons_region_box[1::]:
@@ -292,7 +270,6 @@ class TableRunStrategy(RunStrategy):
                     config.metrics['item'].append(item)
                     aux = self.get_strategy.get_aux(config, item)
                     config.metrics['aux'].append(aux)
-                    config.metrics['area_intersection_rel_std'].append(area_intersection_rel_std)
                     config.metrics['area_intersection_rel_box'].append(area_intersection_rel_box)
 
             elif config.experiment.method == Method.z_test_linreg:
@@ -359,31 +336,18 @@ class TableRunStrategy(RunStrategy):
                 targets = np.squeeze(np.asarray(targets))
                 data = np.squeeze(np.asarray(data))
 
-                exog = sm.add_constant(targets)
-                endog = data
-                results = sm.OLS(endog, exog).fit()
-                residuals = results.resid
-
                 semi_window = config.experiment.method_params['semi_window']
-
-                exog, endog = residuals_std(targets, residuals, semi_window)
-                variance_processing(exog, endog, config.metrics, 'std')
-
                 box_b = config.experiment.method_params['box_b']
                 box_t = config.experiment.method_params['box_t']
 
-                xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                xs, bs, ms, ts = process_box(targets, data, semi_window, box_b, box_t)
                 variance_processing(xs, bs, config.metrics, 'box_b')
                 variance_processing(xs, ms, config.metrics, 'box_m')
                 variance_processing(xs, ts, config.metrics, 'box_t')
 
-                R2s = [
-                    config.metrics['std_best_R2'][-1],
-                    np.min([config.metrics['box_b_best_R2'][-1], config.metrics['box_t_best_R2'][-1]])
-                ]
+                R2 = np.min([config.metrics['box_b_best_R2'][-1], config.metrics['box_t_best_R2'][-1]])
 
-                config.metrics['best_type'].append(np.argmax(R2s))
-                config.metrics['best_R2'].append(np.max(R2s))
+                config.metrics['best_R2'].append(R2)
 
                 config.metrics['item'].append(item)
                 aux = self.get_strategy.get_aux(config, item)
@@ -507,6 +471,7 @@ class PlotRunStrategy(RunStrategy):
                 item = config.experiment.method_params['item']
                 line = config.experiment.method_params['line']
                 add = config.experiment.method_params['add']
+                fit = config.experiment.method_params['fit']
                 semi_window = config.experiment.method_params['semi_window']
                 box_b = config.experiment.method_params['box_b']
                 box_t = config.experiment.method_params['box_t']
@@ -588,49 +553,9 @@ class PlotRunStrategy(RunStrategy):
                         scatter = pr.get_scatter(color_transparent)
                         plot_data.append(scatter)
 
-                    # Adding std curve
-                    if add == 'std' and semi_window != 'none':
-
-                        residuals = results.resid
-
-                        xs, ys = residuals_std(targets, residuals, semi_window)
-                        ys_t = np.zeros(len(ys), dtype=float)
-                        ys_b = np.zeros(len(ys), dtype=float)
-                        for std_id in range(0, len(xs)):
-                            ys_t[std_id] = (slope * xs[std_id] + intercept) + ys[std_id]
-                            ys_b[std_id] = (slope * xs[std_id] + intercept) - ys[std_id]
-
-                        scatter = go.Scatter(
-                            x=xs,
-                            y=ys_t,
-                            name=get_names(config_child),
-                            mode='lines',
-                            line=dict(
-                                width=4,
-                                color=color_border
-                            ),
-                            showlegend=False
-                        )
-                        plot_data.append(scatter)
-
-                        scatter = go.Scatter(
-                            x=xs,
-                            y=ys_b,
-                            name=get_names(config_child),
-                            mode='lines',
-                            line=dict(
-                                width=4,
-                                color=color_border
-                            ),
-                            showlegend=False
-                        )
-                        plot_data.append(scatter)
-
                     # Adding box curve
-                    if add == 'box' and semi_window != 'none':
-                        residuals = results.resid
-
-                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
+                    if fit == 'no' and semi_window != 'none':
+                        xs, bs, ms, ts = process_box(targets, data, semi_window, box_b, box_t)
 
                         scatter = go.Scatter(
                             x=xs,
@@ -672,153 +597,98 @@ class PlotRunStrategy(RunStrategy):
                         plot_data.append(scatter)
 
                     # Adding best curve
-                    if add == 'best' and semi_window != 'none':
+                    if fit == 'yes' and semi_window != 'none':
 
-                        residuals = results.resid
+                        residuals = data
 
                         characteristics_dict = {}
-                        init_variance_characteristics_dict(characteristics_dict, 'std')
+
                         init_variance_characteristics_dict(characteristics_dict, 'box_b')
                         init_variance_characteristics_dict(characteristics_dict, 'box_m')
                         init_variance_characteristics_dict(characteristics_dict, 'box_t')
 
-                        xs_std, ys_std = residuals_std(targets, residuals, semi_window)
-                        variance_processing(xs_std, ys_std, characteristics_dict, 'std')
+                        xs_box, bs_box, ms_box, ts_box = process_box(targets, residuals, semi_window, box_b, box_t)
+                        variance_processing(xs_box, bs_box, characteristics_dict, 'box_b')
+                        variance_processing(xs_box, ms_box, characteristics_dict, 'box_m')
+                        variance_processing(xs_box, ts_box, characteristics_dict, 'box_t')
 
-                        xs, bs, ms, ts = residuals_box(targets, residuals, semi_window, box_b, box_t)
-                        variance_processing(xs, bs, characteristics_dict, 'box_b')
-                        variance_processing(xs, ms, characteristics_dict, 'box_m')
-                        variance_processing(xs, ts, characteristics_dict, 'box_t')
+                        R2 = np.min([characteristics_dict['box_b_best_R2'][-1],
+                                     characteristics_dict['box_t_best_R2'][-1]])
 
-                        R2s = [
-                            characteristics_dict['std_best_R2'][-1],
-                            np.min([characteristics_dict['box_b_best_R2'][-1],
-                                    characteristics_dict['box_t_best_R2'][-1]])
-                        ]
+                        characteristics_dict['best_R2'].append(R2)
 
-                        characteristics_dict['best_type'].append(np.argmax(R2s))
-                        characteristics_dict['best_R2'].append(np.max(R2s))
+                        if characteristics_dict['box_t_best_type'] == [0]:  # lin-lin axes
 
-                        if np.argmax(R2s) == 0:  # std is the best fit
+                            ys_t = np.zeros(2, dtype=float)
+                            ys_b = np.zeros(2, dtype=float)
 
-                            if characteristics_dict['std_best_type'] == [0]:  # lin-lin axes
+                            intercept_box_t = characteristics_dict['box_t_lin_lin_intercept'][0]
+                            slope_box_t = characteristics_dict['box_t_lin_lin_slope'][0]
 
-                                ys_t = np.zeros(2, dtype=float)
-                                ys_b = np.zeros(2, dtype=float)
+                            intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
+                            slope_box_b = characteristics_dict['box_b_lin_lin_slope'][0]
 
-                                intercept_std = characteristics_dict['std_lin_lin_intercept'][0]
-                                slope_std = characteristics_dict['std_lin_lin_slope'][0]
+                            ys_t[0] = slope_box_t * xs_box[0] + intercept_box_t
+                            ys_b[0] = slope_box_b * xs_box[0] + intercept_box_b
 
-                                ys_t[0] = (slope * xs_std[0] + intercept) + (slope_std * xs_std[0] + intercept_std)
-                                ys_b[0] = (slope * xs_std[0] + intercept) - (slope_std * xs_std[0] + intercept_std)
+                            ys_t[1] = slope_box_t * xs_box[-1] + intercept_box_t
+                            ys_b[1] = slope_box_b * xs_box[-1] + intercept_box_b
 
-                                ys_t[1] = (slope * xs_std[-1] + intercept) + (slope_std * xs_std[-1] + intercept_std)
-                                ys_b[1] = (slope * xs_std[-1] + intercept) - (slope_std * xs_std[-1] + intercept_std)
+                            xs = [xs_box[0], xs_box[-1]]
 
-                                xs = [xs_std[0], xs_std[-1]]
+                        elif characteristics_dict['box_t_best_type'] == [1]:  # lin-log axes
 
-                            elif characteristics_dict['std_best_type'] == [1]:  # lin-log axes
+                            ys_t = np.zeros(len(ts_box), dtype=float)
+                            ys_b = np.zeros(len(bs_box), dtype=float)
 
-                                ys_t = np.zeros(len(ys_std), dtype=float)
-                                ys_b = np.zeros(len(ys_std), dtype=float)
+                            intercept_box_t = characteristics_dict['box_t_lin_log_intercept'][0]
+                            slope_box_t = characteristics_dict['box_t_lin_log_slope'][0]
 
-                                intercept_std = characteristics_dict['std_lin_log_intercept'][0]
-                                slope_std = characteristics_dict['std_lin_log_slope'][0]
-
-                                for std_id in range(0, len(xs_std)):
-                                    basic_linreg = slope * xs_std[std_id] + intercept
-                                    ys_t[std_id] = basic_linreg + np.exp(slope_std * xs_std[std_id] + intercept_std)
-                                    ys_b[std_id] = basic_linreg - np.exp(slope_std * xs_std[std_id] + intercept_std)
-
-                            elif characteristics_dict['std_best_type'] == [2]:  # log-log axes
-
-                                ys_t = np.zeros(len(ys_std), dtype=float)
-                                ys_b = np.zeros(len(ys_std), dtype=float)
-
-                                intercept_std = characteristics_dict['std_log_log_intercept'][0]
-                                slope_std = characteristics_dict['std_log_log_slope'][0]
-
-                                for std_id in range(0, len(xs_std)):
-                                    basic_linreg = slope * xs_std[std_id] + intercept
-                                    ys_t[std_id] = basic_linreg + np.exp(
-                                        slope_std * np.log(xs_std[std_id]) + intercept_std)
-                                    ys_b[std_id] = basic_linreg - np.exp(
-                                        slope_std * np.log(xs_std[std_id]) + intercept_std)
-
-                        elif np.argmax(R2s) == 1:  # box is the best fit
-
-                            if characteristics_dict['box_t_best_type'] == [0]:  # lin-lin axes
-
-                                ys_t = np.zeros(2, dtype=float)
-                                ys_b = np.zeros(2, dtype=float)
-
-                                intercept_box_t = characteristics_dict['box_t_lin_lin_intercept'][0]
-                                slope_box_t = characteristics_dict['box_t_lin_lin_slope'][0]
-
+                            if characteristics_dict['box_b_lin_log_intercept'][0] != 'NA' and \
+                                    characteristics_dict['box_b_lin_log_slope'][0] != 'NA':
+                                intercept_box_b = characteristics_dict['box_b_lin_log_intercept'][0]
+                                slope_box_b = characteristics_dict['box_b_lin_log_slope'][0]
+                                is_lin_log = True
+                            else:
                                 intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
                                 slope_box_b = characteristics_dict['box_b_lin_lin_slope'][0]
+                                is_lin_log = False
 
-                                ys_t[0] = (slope * xs[0] + intercept) + (slope_box_t * xs[0] + intercept_box_t)
-                                ys_b[0] = (slope * xs[0] + intercept) - (slope_box_b * xs[0] + intercept_box_b)
-
-                                ys_t[1] = (slope * xs[-1] + intercept) + (slope_box_t * xs[-1] + intercept_box_t)
-                                ys_b[1] = (slope * xs[-1] + intercept) - (slope_box_b * xs[-1] + intercept_box_b)
-
-                                xs = [xs[0], xs[-1]]
-
-                            elif characteristics_dict['box_t_best_type'] == [1]:  # lin-log axes
-
-                                ys_t = np.zeros(len(ys_std), dtype=float)
-                                ys_b = np.zeros(len(ys_std), dtype=float)
-
-                                intercept_box_t = characteristics_dict['box_t_lin_log_intercept'][0]
-                                slope_box_t = characteristics_dict['box_t_lin_log_slope'][0]
-
-                                if characteristics_dict['box_b_lin_log_intercept'][0] != 'NA' and \
-                                        characteristics_dict['box_b_lin_log_slope'][0] != 'NA':
-                                    intercept_box_b = characteristics_dict['box_b_lin_log_intercept'][0]
-                                    slope_box_b = characteristics_dict['box_b_lin_log_slope'][0]
-                                    is_lin_log = True
+                            for box_id in range(0, len(xs_box)):
+                                ys_t[box_id] = np.exp(slope_box_t * xs_box[box_id] + intercept_box_t)
+                                if is_lin_log:
+                                    ys_b[box_id] = np.exp(slope_box_b * xs_box[box_id] + intercept_box_b)
                                 else:
-                                    intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
-                                    slope_box_b = abs(characteristics_dict['box_b_lin_lin_slope'][0])
-                                    is_lin_log = False
+                                    ys_b[box_id] = slope_box_b * xs_box[box_id] + intercept_box_b
 
-                                for std_id in range(0, len(xs)):
-                                    basic_linreg = slope * xs[std_id] + intercept
-                                    ys_t[std_id] = basic_linreg + np.exp(slope_box_t * xs[std_id] + intercept_box_t)
-                                    if is_lin_log:
-                                        ys_b[std_id] = basic_linreg - np.exp(slope_box_b * xs[std_id] + intercept_box_b)
-                                    else:
-                                        ys_b[std_id] = basic_linreg - (slope_box_b * xs[std_id] + intercept_box_b)
+                            xs = xs_box
 
-                            elif characteristics_dict['box_t_best_type'] == [2]:  # log-log axes
+                        elif characteristics_dict['box_t_best_type'] == [2]:  # log-log axes
 
-                                ys_t = np.zeros(len(ys_std), dtype=float)
-                                ys_b = np.zeros(len(ys_std), dtype=float)
+                            ys_t = np.zeros(len(ts_box), dtype=float)
+                            ys_b = np.zeros(len(bs_box), dtype=float)
 
-                                intercept_box_t = characteristics_dict['box_t_log_log_intercept'][0]
-                                slope_box_t = characteristics_dict['box_t_log_log_slope'][0]
+                            intercept_box_t = characteristics_dict['box_t_log_log_intercept'][0]
+                            slope_box_t = characteristics_dict['box_t_log_log_slope'][0]
 
-                                if characteristics_dict['box_b_log_log_intercept'][0] != 'NA' and \
-                                        characteristics_dict['box_b_log_log_slope'][0] != 'NA':
-                                    intercept_box_b = characteristics_dict['box_b_log_log_intercept'][0]
-                                    slope_box_b = characteristics_dict['box_b_log_log_slope'][0]
-                                    is_log_log = True
+                            if characteristics_dict['box_b_log_log_intercept'][0] != 'NA' and \
+                                    characteristics_dict['box_b_log_log_slope'][0] != 'NA':
+                                intercept_box_b = characteristics_dict['box_b_log_log_intercept'][0]
+                                slope_box_b = characteristics_dict['box_b_log_log_slope'][0]
+                                is_log_log = True
+                            else:
+                                intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
+                                slope_box_b = characteristics_dict['box_b_lin_lin_slope'][0]
+                                is_log_log = False
+
+                            for box_id in range(0, len(xs_box)):
+                                ys_t[box_id] = np.exp(slope_box_t * np.log(xs_box[box_id]) + intercept_box_t)
+                                if is_log_log:
+                                    ys_b[box_id] = np.exp(slope_box_b * np.log(xs_box[box_id]) + intercept_box_b)
                                 else:
-                                    intercept_box_b = characteristics_dict['box_b_lin_lin_intercept'][0]
-                                    slope_box_b = abs(characteristics_dict['box_b_lin_lin_slope'][0])
-                                    is_log_log = False
+                                    ys_b[box_id] = slope_box_b * xs_box[box_id] + intercept_box_b
 
-                                for std_id in range(0, len(xs)):
-                                    basic_linreg = slope * xs[std_id] + intercept
-                                    ys_t[std_id] = basic_linreg + np.exp(
-                                        slope_box_t * np.log(xs[std_id]) + intercept_box_t)
-                                    if is_log_log:
-                                        ys_b[std_id] = basic_linreg - np.exp(
-                                            slope_box_b * np.log(xs[std_id]) + intercept_box_b)
-                                    else:
-                                        ys_b[std_id] = basic_linreg - (slope_box_b * xs[std_id] + intercept_box_b)
+                            xs = xs_box
 
                         scatter = go.Scatter(
                             x=xs,
