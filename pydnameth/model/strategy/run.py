@@ -354,13 +354,9 @@ class TableRunStrategy(RunStrategy):
                 config.metrics['aux'].append(aux)
 
     def iterate(self, config, configs_child):
-        item_id = 0
         for item in tqdm(config.base_list, mininterval=60.0, desc=f'{str(config.experiment)} running'):
-            if item_id == 1102:
-                olol = 0
             if item in config.base_dict:
                 self.single(item, config, configs_child)
-            item_id += 1
 
     def run(self, config, configs_child):
         self.iterate(config, configs_child)
