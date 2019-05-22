@@ -42,8 +42,14 @@ def load_betas(config):
         for line in tqdm(f, mininterval=60.0, desc='betas_dict creating'):
             line_list = get_line_list(line)
             cpg = line_list[0]
-            config.betas_dict[cpg] = cpg_id
-            cpg_id += 1
+
+            if 'NA' in line_list:
+                raise ValueError(f'{cpg} contains NA')
+
+            else:
+                config.betas_dict[cpg] = cpg_id
+                cpg_id += 1
+
         f.close()
 
         f = open(fn_dict, 'wb')
@@ -66,6 +72,7 @@ def load_betas(config):
             curr_data = list(map(np.float32, line_list[1::]))
             config.betas_data[cpg_id] = curr_data
             cpg_id += 1
+
         f.close()
 
         np.savez_compressed(fn_npz, data=config.betas_data)
