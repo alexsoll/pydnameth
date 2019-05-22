@@ -59,6 +59,10 @@ def load_cells_dict(config):
         cells_dict = pickle.load(f)
         f.close()
 
+    elif not os.path.isfile(fn_txt):
+
+        return None
+
     else:
 
         f = open(fn_txt)

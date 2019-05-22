@@ -65,14 +65,16 @@ def subset_attributes(config):
 
 def subset_cells(config):
 
-    if config.attributes.cells.types != CommonTypes.any:
-        if isinstance(config.attributes.cells.types, list):
-            all_cells_types = list(config.cells_dict.keys())
-            for key in all_cells_types:
-                if key not in config.attributes.cells.types:
-                    config.cells_dict.pop(key)
+    if config.cells_dict is not None:
 
-    for key in config.cells_dict:
-        values = config.cells_dict[key]
-        values = list(np.array(values)[config.attributes_indexes])
-        config.cells_dict[key] = values
+        if config.attributes.cells.types != CommonTypes.any:
+            if isinstance(config.attributes.cells.types, list):
+                all_cells_types = list(config.cells_dict.keys())
+                for key in all_cells_types:
+                    if key not in config.attributes.cells.types:
+                        config.cells_dict.pop(key)
+
+        for key in config.cells_dict:
+            values = config.cells_dict[key]
+            values = list(np.array(values)[config.attributes_indexes])
+            config.cells_dict[key] = values
